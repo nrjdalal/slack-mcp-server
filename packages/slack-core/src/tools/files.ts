@@ -7,12 +7,29 @@ const MAX_BYTES = 5 * 1024 * 1024
 export const filesInfo = defineTool({
   name: "files_info",
   description:
-    "Get a file's metadata and, when under 5MB, its content (text as-is, binary as base64).",
+    "Gets information about a file (and, when under 5MB, its content: text as-is, binary as base64).",
   tier: "read",
   scopes: ["files:read"],
-  input: z.object({ file: z.string().describe("File ID (Fxxxx).") }),
+  input: z.object({
+    file: z.string().describe("Specify a file by providing its ID."),
+    count: z.number().int().optional().describe("Number of comments to return per page."),
+    cursor: z
+      .string()
+      .optional()
+      .describe(
+        "Parameter for pagination. Set to the next_cursor attribute returned by the previous request's response_metadata.",
+      ),
+    limit: z.number().int().optional().describe("The maximum number of items to return."),
+    page: z.number().int().optional().describe("Page number of comments to return."),
+  }),
   handler: async (client, args) => {
-    const res = await client.files.info({ file: args.file })
+    const res = await client.files.info({
+      file: args.file,
+      count: args.count,
+      cursor: args.cursor,
+      limit: args.limit,
+      page: args.page,
+    })
     const file = res.file as
       | {
           url_private_download?: string
