@@ -1,213 +1,238 @@
 # better-slack-mcp
 
-Coverage of the full Slack Web API (non-admin), in [reference](https://docs.slack.dev/reference/methods/) order. **better-slack-mcp** is our tool name (`-` = not yet implemented; our names mirror the method); **korotovsky** is korotovsky/slack-mcp-server's name where it maps 1:1 (`-` = none). 16 of 205 methods covered 1:1, plus 3 composite tools (below) for 19 total.
+Coverage of the Slack Web API (non-admin). **better-slack-mcp** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented); **korotovsky** is korotovsky/slack-mcp-server's name where it maps 1:1 (`-` = none).
 
-> Both also ship `users_search`, `conversations_unreads`, and `usergroups_me`; korotovsky additionally ships `saved_*` (browser-token only). These wrap no single Slack method, so they stay out of the table.
+## Implemented
 
-| #   | slack api                                     | better-slack-mcp          | korotovsky                      |
-| --- | --------------------------------------------- | ------------------------- | ------------------------------- |
-| 1   | `api.test`                                    | `-`                       | `-`                             |
-| 2   | `apps.activities.list`                        | `-`                       | `-`                             |
-| 3   | `apps.auth.external.delete`                   | `-`                       | `-`                             |
-| 4   | `apps.auth.external.get`                      | `-`                       | `-`                             |
-| 5   | `apps.connections.open`                       | `-`                       | `-`                             |
-| 6   | `apps.datastore.bulkDelete`                   | `-`                       | `-`                             |
-| 7   | `apps.datastore.bulkGet`                      | `-`                       | `-`                             |
-| 8   | `apps.datastore.bulkPut`                      | `-`                       | `-`                             |
-| 9   | `apps.datastore.count`                        | `-`                       | `-`                             |
-| 10  | `apps.datastore.delete`                       | `-`                       | `-`                             |
-| 11  | `apps.datastore.get`                          | `-`                       | `-`                             |
-| 12  | `apps.datastore.put`                          | `-`                       | `-`                             |
-| 13  | `apps.datastore.query`                        | `-`                       | `-`                             |
-| 14  | `apps.datastore.update`                       | `-`                       | `-`                             |
-| 15  | `apps.event.authorizations.list`              | `-`                       | `-`                             |
-| 16  | `apps.icon.set`                               | `-`                       | `-`                             |
-| 17  | `apps.manifest.create`                        | `-`                       | `-`                             |
-| 18  | `apps.manifest.delete`                        | `-`                       | `-`                             |
-| 19  | `apps.manifest.export`                        | `-`                       | `-`                             |
-| 20  | `apps.manifest.update`                        | `-`                       | `-`                             |
-| 21  | `apps.manifest.validate`                      | `-`                       | `-`                             |
-| 22  | `apps.uninstall`                              | `-`                       | `-`                             |
-| 23  | `apps.user.connection.update`                 | `-`                       | `-`                             |
-| 24  | `assistant.search.context`                    | `-`                       | `-`                             |
-| 25  | `assistant.search.info`                       | `-`                       | `-`                             |
-| 26  | `assistant.threads.setStatus`                 | `-`                       | `-`                             |
-| 27  | `assistant.threads.setSuggestedPrompts`       | `-`                       | `-`                             |
-| 28  | `assistant.threads.setTitle`                  | `-`                       | `-`                             |
-| 29  | `auth.revoke`                                 | `-`                       | `-`                             |
-| 30  | `auth.teams.list`                             | `-`                       | `-`                             |
-| 31  | `auth.test`                                   | `-`                       | `-`                             |
-| 32  | `blocks.validate`                             | `-`                       | `-`                             |
-| 33  | `bookmarks.add`                               | `-`                       | `-`                             |
-| 34  | `bookmarks.edit`                              | `-`                       | `-`                             |
-| 35  | `bookmarks.list`                              | `-`                       | `-`                             |
-| 36  | `bookmarks.remove`                            | `-`                       | `-`                             |
-| 37  | `bots.info`                                   | `-`                       | `-`                             |
-| 38  | `calls.add`                                   | `-`                       | `-`                             |
-| 39  | `calls.end`                                   | `-`                       | `-`                             |
-| 40  | `calls.info`                                  | `-`                       | `-`                             |
-| 41  | `calls.participants.add`                      | `-`                       | `-`                             |
-| 42  | `calls.participants.remove`                   | `-`                       | `-`                             |
-| 43  | `calls.update`                                | `-`                       | `-`                             |
-| 44  | `canvases.access.delete`                      | `-`                       | `-`                             |
-| 45  | `canvases.access.set`                         | `-`                       | `-`                             |
-| 46  | `canvases.create`                             | `-`                       | `-`                             |
-| 47  | `canvases.delete`                             | `-`                       | `-`                             |
-| 48  | `canvases.edit`                               | `-`                       | `-`                             |
-| 49  | `canvases.sections.lookup`                    | `-`                       | `-`                             |
-| 50  | `chat.appendStream`                           | `-`                       | `-`                             |
-| 51  | `chat.delete`                                 | `-`                       | `-`                             |
-| 52  | `chat.deleteScheduledMessage`                 | `-`                       | `-`                             |
-| 53  | `chat.getPermalink`                           | `-`                       | `-`                             |
-| 54  | `chat.meMessage`                              | `-`                       | `-`                             |
-| 55  | `chat.postEphemeral`                          | `-`                       | `-`                             |
-| 56  | `chat.postMessage`                            | `chat_postMessage`        | `conversations_add_message`     |
-| 57  | `chat.scheduledMessages.list`                 | `-`                       | `-`                             |
-| 58  | `chat.scheduleMessage`                        | `-`                       | `-`                             |
-| 59  | `chat.startStream`                            | `-`                       | `-`                             |
-| 60  | `chat.stopStream`                             | `-`                       | `-`                             |
-| 61  | `chat.unfurl`                                 | `-`                       | `-`                             |
-| 62  | `chat.update`                                 | `-`                       | `-`                             |
-| 63  | `conversations.acceptSharedInvite`            | `-`                       | `-`                             |
-| 64  | `conversations.approveSharedInvite`           | `-`                       | `-`                             |
-| 65  | `conversations.archive`                       | `-`                       | `-`                             |
-| 66  | `conversations.canvases.create`               | `-`                       | `-`                             |
-| 67  | `conversations.close`                         | `-`                       | `-`                             |
-| 68  | `conversations.create`                        | `-`                       | `-`                             |
-| 69  | `conversations.declineSharedInvite`           | `-`                       | `-`                             |
-| 70  | `conversations.externalInvitePermissions.set` | `-`                       | `-`                             |
-| 71  | `conversations.history`                       | `conversations_history`   | `conversations_history`         |
-| 72  | `conversations.info`                          | `-`                       | `-`                             |
-| 73  | `conversations.invite`                        | `-`                       | `-`                             |
-| 74  | `conversations.inviteShared`                  | `-`                       | `-`                             |
-| 75  | `conversations.join`                          | `conversations_join`      | `conversations_join`            |
-| 76  | `conversations.kick`                          | `-`                       | `-`                             |
-| 77  | `conversations.leave`                         | `conversations_leave`     | `conversations_leave`           |
-| 78  | `conversations.list`                          | `conversations_list`      | `channels_list`                 |
-| 79  | `conversations.listConnectInvites`            | `-`                       | `-`                             |
-| 80  | `conversations.mark`                          | `conversations_mark`      | `conversations_mark`            |
-| 81  | `conversations.members`                       | `-`                       | `-`                             |
-| 82  | `conversations.open`                          | `-`                       | `-`                             |
-| 83  | `conversations.rename`                        | `-`                       | `-`                             |
-| 84  | `conversations.replies`                       | `conversations_replies`   | `conversations_replies`         |
-| 85  | `conversations.requestSharedInvite.approve`   | `-`                       | `-`                             |
-| 86  | `conversations.requestSharedInvite.deny`      | `-`                       | `-`                             |
-| 87  | `conversations.requestSharedInvite.list`      | `-`                       | `-`                             |
-| 88  | `conversations.setPurpose`                    | `-`                       | `-`                             |
-| 89  | `conversations.setTopic`                      | `-`                       | `-`                             |
-| 90  | `conversations.unarchive`                     | `-`                       | `-`                             |
-| 91  | `developer.apps.owners.add`                   | `-`                       | `-`                             |
-| 92  | `developer.apps.owners.list`                  | `-`                       | `-`                             |
-| 93  | `developer.apps.owners.remove`                | `-`                       | `-`                             |
-| 94  | `dialog.open`                                 | `-`                       | `-`                             |
-| 95  | `dnd.endDnd`                                  | `-`                       | `-`                             |
-| 96  | `dnd.endSnooze`                               | `-`                       | `-`                             |
-| 97  | `dnd.info`                                    | `-`                       | `-`                             |
-| 98  | `dnd.setSnooze`                               | `-`                       | `-`                             |
-| 99  | `dnd.teamInfo`                                | `-`                       | `-`                             |
-| 100 | `emoji.list`                                  | `-`                       | `-`                             |
-| 101 | `entity.presentDetails`                       | `-`                       | `-`                             |
-| 102 | `files.comments.delete`                       | `-`                       | `-`                             |
-| 103 | `files.completeUploadExternal`                | `-`                       | `-`                             |
-| 104 | `files.delete`                                | `-`                       | `-`                             |
-| 105 | `files.getUploadURLExternal`                  | `-`                       | `-`                             |
-| 106 | `files.info`                                  | `files_info`              | `attachment_get_data`           |
-| 107 | `files.list`                                  | `-`                       | `-`                             |
-| 108 | `files.remote.add`                            | `-`                       | `-`                             |
-| 109 | `files.remote.info`                           | `-`                       | `-`                             |
-| 110 | `files.remote.list`                           | `-`                       | `-`                             |
-| 111 | `files.remote.remove`                         | `-`                       | `-`                             |
-| 112 | `files.remote.share`                          | `-`                       | `-`                             |
-| 113 | `files.remote.update`                         | `-`                       | `-`                             |
-| 114 | `files.revokePublicURL`                       | `-`                       | `-`                             |
-| 115 | `files.sharedPublicURL`                       | `-`                       | `-`                             |
-| 116 | `files.upload`                                | `-`                       | `-`                             |
-| 117 | `functions.completeError`                     | `-`                       | `-`                             |
-| 118 | `functions.completeSuccess`                   | `-`                       | `-`                             |
-| 119 | `functions.distributions.permissions.add`     | `-`                       | `-`                             |
-| 120 | `functions.distributions.permissions.list`    | `-`                       | `-`                             |
-| 121 | `functions.distributions.permissions.remove`  | `-`                       | `-`                             |
-| 122 | `functions.distributions.permissions.set`     | `-`                       | `-`                             |
-| 123 | `functions.workflows.steps.list`              | `-`                       | `-`                             |
-| 124 | `functions.workflows.steps.responses.export`  | `-`                       | `-`                             |
-| 125 | `migration.exchange`                          | `-`                       | `-`                             |
-| 126 | `oauth.access`                                | `-`                       | `-`                             |
-| 127 | `oauth.v2.access`                             | `-`                       | `-`                             |
-| 128 | `oauth.v2.exchange`                           | `-`                       | `-`                             |
-| 129 | `oauth.v2.user.access`                        | `-`                       | `-`                             |
-| 130 | `openid.connect.token`                        | `-`                       | `-`                             |
-| 131 | `openid.connect.userInfo`                     | `-`                       | `-`                             |
-| 132 | `pins.add`                                    | `-`                       | `-`                             |
-| 133 | `pins.list`                                   | `-`                       | `-`                             |
-| 134 | `pins.remove`                                 | `-`                       | `-`                             |
-| 135 | `reactions.add`                               | `reactions_add`           | `reactions_add`                 |
-| 136 | `reactions.get`                               | `-`                       | `-`                             |
-| 137 | `reactions.list`                              | `-`                       | `-`                             |
-| 138 | `reactions.remove`                            | `reactions_remove`        | `reactions_remove`              |
-| 139 | `reminders.add`                               | `-`                       | `-`                             |
-| 140 | `reminders.complete`                          | `-`                       | `-`                             |
-| 141 | `reminders.delete`                            | `-`                       | `-`                             |
-| 142 | `reminders.info`                              | `-`                       | `-`                             |
-| 143 | `reminders.list`                              | `-`                       | `-`                             |
-| 144 | `rtm.connect`                                 | `-`                       | `-`                             |
-| 145 | `rtm.start`                                   | `-`                       | `-`                             |
-| 146 | `search.all`                                  | `-`                       | `-`                             |
-| 147 | `search.files`                                | `-`                       | `-`                             |
-| 148 | `search.messages`                             | `search_messages`         | `conversations_search_messages` |
-| 149 | `slackLists.access.delete`                    | `-`                       | `-`                             |
-| 150 | `slackLists.access.set`                       | `-`                       | `-`                             |
-| 151 | `slackLists.create`                           | `-`                       | `-`                             |
-| 152 | `slackLists.download.get`                     | `-`                       | `-`                             |
-| 153 | `slackLists.download.start`                   | `-`                       | `-`                             |
-| 154 | `slackLists.items.create`                     | `-`                       | `-`                             |
-| 155 | `slackLists.items.delete`                     | `-`                       | `-`                             |
-| 156 | `slackLists.items.deleteMultiple`             | `-`                       | `-`                             |
-| 157 | `slackLists.items.info`                       | `-`                       | `-`                             |
-| 158 | `slackLists.items.list`                       | `-`                       | `-`                             |
-| 159 | `slackLists.items.update`                     | `-`                       | `-`                             |
-| 160 | `slackLists.update`                           | `-`                       | `-`                             |
-| 161 | `stars.add`                                   | `-`                       | `-`                             |
-| 162 | `stars.list`                                  | `-`                       | `-`                             |
-| 163 | `stars.remove`                                | `-`                       | `-`                             |
-| 164 | `team.accessLogs`                             | `-`                       | `-`                             |
-| 165 | `team.billableInfo`                           | `-`                       | `-`                             |
-| 166 | `team.billing.info`                           | `-`                       | `-`                             |
-| 167 | `team.externalTeams.disconnect`               | `-`                       | `-`                             |
-| 168 | `team.externalTeams.list`                     | `-`                       | `-`                             |
-| 169 | `team.info`                                   | `-`                       | `-`                             |
-| 170 | `team.integrationLogs`                        | `-`                       | `-`                             |
-| 171 | `team.preferences.list`                       | `-`                       | `-`                             |
-| 172 | `team.profile.get`                            | `-`                       | `-`                             |
-| 173 | `tooling.tokens.rotate`                       | `-`                       | `-`                             |
-| 174 | `usergroups.create`                           | `usergroups_create`       | `usergroups_create`             |
-| 175 | `usergroups.disable`                          | `-`                       | `-`                             |
-| 176 | `usergroups.enable`                           | `-`                       | `-`                             |
-| 177 | `usergroups.list`                             | `usergroups_list`         | `usergroups_list`               |
-| 178 | `usergroups.update`                           | `usergroups_update`       | `usergroups_update`             |
-| 179 | `usergroups.users.list`                       | `-`                       | `-`                             |
-| 180 | `usergroups.users.update`                     | `usergroups_users_update` | `usergroups_users_update`       |
-| 181 | `users.conversations`                         | `users_conversations`     | `channels_me`                   |
-| 182 | `users.deletePhoto`                           | `-`                       | `-`                             |
-| 183 | `users.discoverableContacts.lookup`           | `-`                       | `-`                             |
-| 184 | `users.getPresence`                           | `-`                       | `-`                             |
-| 185 | `users.identity`                              | `-`                       | `-`                             |
-| 186 | `users.info`                                  | `-`                       | `-`                             |
-| 187 | `users.list`                                  | `-`                       | `-`                             |
-| 188 | `users.lookupByEmail`                         | `-`                       | `-`                             |
-| 189 | `users.profile.get`                           | `-`                       | `-`                             |
-| 190 | `users.profile.set`                           | `-`                       | `-`                             |
-| 191 | `users.setActive`                             | `-`                       | `-`                             |
-| 192 | `users.setPhoto`                              | `-`                       | `-`                             |
-| 193 | `users.setPresence`                           | `-`                       | `-`                             |
-| 194 | `views.open`                                  | `-`                       | `-`                             |
-| 195 | `views.publish`                               | `-`                       | `-`                             |
-| 196 | `views.push`                                  | `-`                       | `-`                             |
-| 197 | `views.update`                                | `-`                       | `-`                             |
-| 198 | `workflows.featured.add`                      | `-`                       | `-`                             |
-| 199 | `workflows.featured.list`                     | `-`                       | `-`                             |
-| 200 | `workflows.featured.remove`                   | `-`                       | `-`                             |
-| 201 | `workflows.featured.set`                      | `-`                       | `-`                             |
-| 202 | `workflows.triggers.permissions.add`          | `-`                       | `-`                             |
-| 203 | `workflows.triggers.permissions.list`         | `-`                       | `-`                             |
-| 204 | `workflows.triggers.permissions.remove`       | `-`                       | `-`                             |
-| 205 | `workflows.triggers.permissions.set`          | `-`                       | `-`                             |
+16 methods covered 1:1, plus 3 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me` (19 tools total). korotovsky additionally ships `saved_*`, which are browser-token only.
+
+| slack api                 | better-slack-mcp          | korotovsky                      |
+| ------------------------- | ------------------------- | ------------------------------- |
+| `chat.postMessage`        | `chat_post_message`       | `conversations_add_message`     |
+| `conversations.history`   | `conversations_history`   | `conversations_history`         |
+| `conversations.join`      | `conversations_join`      | `conversations_join`            |
+| `conversations.leave`     | `conversations_leave`     | `conversations_leave`           |
+| `conversations.list`      | `conversations_list`      | `channels_list`                 |
+| `conversations.mark`      | `conversations_mark`      | `conversations_mark`            |
+| `conversations.replies`   | `conversations_replies`   | `conversations_replies`         |
+| `files.info`              | `files_info`              | `attachment_get_data`           |
+| `reactions.add`           | `reactions_add`           | `reactions_add`                 |
+| `reactions.remove`        | `reactions_remove`        | `reactions_remove`              |
+| `search.messages`         | `search_messages`         | `conversations_search_messages` |
+| `usergroups.create`       | `usergroups_create`       | `usergroups_create`             |
+| `usergroups.list`         | `usergroups_list`         | `usergroups_list`               |
+| `usergroups.update`       | `usergroups_update`       | `usergroups_update`             |
+| `usergroups.users.update` | `usergroups_users_update` | `usergroups_users_update`       |
+| `users.conversations`     | `users_conversations`     | `channels_me`                   |
+
+## Full Slack Web API coverage
+
+All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/methods/) order.
+
+| slack api                                     | better-slack-mcp          | korotovsky                      |
+| --------------------------------------------- | ------------------------- | ------------------------------- |
+| `api.test`                                    | `-`                       | `-`                             |
+| `apps.activities.list`                        | `-`                       | `-`                             |
+| `apps.auth.external.delete`                   | `-`                       | `-`                             |
+| `apps.auth.external.get`                      | `-`                       | `-`                             |
+| `apps.connections.open`                       | `-`                       | `-`                             |
+| `apps.datastore.bulkDelete`                   | `-`                       | `-`                             |
+| `apps.datastore.bulkGet`                      | `-`                       | `-`                             |
+| `apps.datastore.bulkPut`                      | `-`                       | `-`                             |
+| `apps.datastore.count`                        | `-`                       | `-`                             |
+| `apps.datastore.delete`                       | `-`                       | `-`                             |
+| `apps.datastore.get`                          | `-`                       | `-`                             |
+| `apps.datastore.put`                          | `-`                       | `-`                             |
+| `apps.datastore.query`                        | `-`                       | `-`                             |
+| `apps.datastore.update`                       | `-`                       | `-`                             |
+| `apps.event.authorizations.list`              | `-`                       | `-`                             |
+| `apps.icon.set`                               | `-`                       | `-`                             |
+| `apps.manifest.create`                        | `-`                       | `-`                             |
+| `apps.manifest.delete`                        | `-`                       | `-`                             |
+| `apps.manifest.export`                        | `-`                       | `-`                             |
+| `apps.manifest.update`                        | `-`                       | `-`                             |
+| `apps.manifest.validate`                      | `-`                       | `-`                             |
+| `apps.uninstall`                              | `-`                       | `-`                             |
+| `apps.user.connection.update`                 | `-`                       | `-`                             |
+| `assistant.search.context`                    | `-`                       | `-`                             |
+| `assistant.search.info`                       | `-`                       | `-`                             |
+| `assistant.threads.setStatus`                 | `-`                       | `-`                             |
+| `assistant.threads.setSuggestedPrompts`       | `-`                       | `-`                             |
+| `assistant.threads.setTitle`                  | `-`                       | `-`                             |
+| `auth.revoke`                                 | `-`                       | `-`                             |
+| `auth.teams.list`                             | `-`                       | `-`                             |
+| `auth.test`                                   | `-`                       | `-`                             |
+| `blocks.validate`                             | `-`                       | `-`                             |
+| `bookmarks.add`                               | `-`                       | `-`                             |
+| `bookmarks.edit`                              | `-`                       | `-`                             |
+| `bookmarks.list`                              | `-`                       | `-`                             |
+| `bookmarks.remove`                            | `-`                       | `-`                             |
+| `bots.info`                                   | `-`                       | `-`                             |
+| `calls.add`                                   | `-`                       | `-`                             |
+| `calls.end`                                   | `-`                       | `-`                             |
+| `calls.info`                                  | `-`                       | `-`                             |
+| `calls.participants.add`                      | `-`                       | `-`                             |
+| `calls.participants.remove`                   | `-`                       | `-`                             |
+| `calls.update`                                | `-`                       | `-`                             |
+| `canvases.access.delete`                      | `-`                       | `-`                             |
+| `canvases.access.set`                         | `-`                       | `-`                             |
+| `canvases.create`                             | `-`                       | `-`                             |
+| `canvases.delete`                             | `-`                       | `-`                             |
+| `canvases.edit`                               | `-`                       | `-`                             |
+| `canvases.sections.lookup`                    | `-`                       | `-`                             |
+| `chat.appendStream`                           | `-`                       | `-`                             |
+| `chat.delete`                                 | `-`                       | `-`                             |
+| `chat.deleteScheduledMessage`                 | `-`                       | `-`                             |
+| `chat.getPermalink`                           | `-`                       | `-`                             |
+| `chat.meMessage`                              | `-`                       | `-`                             |
+| `chat.postEphemeral`                          | `-`                       | `-`                             |
+| `chat.postMessage`                            | `chat_post_message`       | `conversations_add_message`     |
+| `chat.scheduledMessages.list`                 | `-`                       | `-`                             |
+| `chat.scheduleMessage`                        | `-`                       | `-`                             |
+| `chat.startStream`                            | `-`                       | `-`                             |
+| `chat.stopStream`                             | `-`                       | `-`                             |
+| `chat.unfurl`                                 | `-`                       | `-`                             |
+| `chat.update`                                 | `-`                       | `-`                             |
+| `conversations.acceptSharedInvite`            | `-`                       | `-`                             |
+| `conversations.approveSharedInvite`           | `-`                       | `-`                             |
+| `conversations.archive`                       | `-`                       | `-`                             |
+| `conversations.canvases.create`               | `-`                       | `-`                             |
+| `conversations.close`                         | `-`                       | `-`                             |
+| `conversations.create`                        | `-`                       | `-`                             |
+| `conversations.declineSharedInvite`           | `-`                       | `-`                             |
+| `conversations.externalInvitePermissions.set` | `-`                       | `-`                             |
+| `conversations.history`                       | `conversations_history`   | `conversations_history`         |
+| `conversations.info`                          | `-`                       | `-`                             |
+| `conversations.invite`                        | `-`                       | `-`                             |
+| `conversations.inviteShared`                  | `-`                       | `-`                             |
+| `conversations.join`                          | `conversations_join`      | `conversations_join`            |
+| `conversations.kick`                          | `-`                       | `-`                             |
+| `conversations.leave`                         | `conversations_leave`     | `conversations_leave`           |
+| `conversations.list`                          | `conversations_list`      | `channels_list`                 |
+| `conversations.listConnectInvites`            | `-`                       | `-`                             |
+| `conversations.mark`                          | `conversations_mark`      | `conversations_mark`            |
+| `conversations.members`                       | `-`                       | `-`                             |
+| `conversations.open`                          | `-`                       | `-`                             |
+| `conversations.rename`                        | `-`                       | `-`                             |
+| `conversations.replies`                       | `conversations_replies`   | `conversations_replies`         |
+| `conversations.requestSharedInvite.approve`   | `-`                       | `-`                             |
+| `conversations.requestSharedInvite.deny`      | `-`                       | `-`                             |
+| `conversations.requestSharedInvite.list`      | `-`                       | `-`                             |
+| `conversations.setPurpose`                    | `-`                       | `-`                             |
+| `conversations.setTopic`                      | `-`                       | `-`                             |
+| `conversations.unarchive`                     | `-`                       | `-`                             |
+| `developer.apps.owners.add`                   | `-`                       | `-`                             |
+| `developer.apps.owners.list`                  | `-`                       | `-`                             |
+| `developer.apps.owners.remove`                | `-`                       | `-`                             |
+| `dialog.open`                                 | `-`                       | `-`                             |
+| `dnd.endDnd`                                  | `-`                       | `-`                             |
+| `dnd.endSnooze`                               | `-`                       | `-`                             |
+| `dnd.info`                                    | `-`                       | `-`                             |
+| `dnd.setSnooze`                               | `-`                       | `-`                             |
+| `dnd.teamInfo`                                | `-`                       | `-`                             |
+| `emoji.list`                                  | `-`                       | `-`                             |
+| `entity.presentDetails`                       | `-`                       | `-`                             |
+| `files.comments.delete`                       | `-`                       | `-`                             |
+| `files.completeUploadExternal`                | `-`                       | `-`                             |
+| `files.delete`                                | `-`                       | `-`                             |
+| `files.getUploadURLExternal`                  | `-`                       | `-`                             |
+| `files.info`                                  | `files_info`              | `attachment_get_data`           |
+| `files.list`                                  | `-`                       | `-`                             |
+| `files.remote.add`                            | `-`                       | `-`                             |
+| `files.remote.info`                           | `-`                       | `-`                             |
+| `files.remote.list`                           | `-`                       | `-`                             |
+| `files.remote.remove`                         | `-`                       | `-`                             |
+| `files.remote.share`                          | `-`                       | `-`                             |
+| `files.remote.update`                         | `-`                       | `-`                             |
+| `files.revokePublicURL`                       | `-`                       | `-`                             |
+| `files.sharedPublicURL`                       | `-`                       | `-`                             |
+| `files.upload`                                | `-`                       | `-`                             |
+| `functions.completeError`                     | `-`                       | `-`                             |
+| `functions.completeSuccess`                   | `-`                       | `-`                             |
+| `functions.distributions.permissions.add`     | `-`                       | `-`                             |
+| `functions.distributions.permissions.list`    | `-`                       | `-`                             |
+| `functions.distributions.permissions.remove`  | `-`                       | `-`                             |
+| `functions.distributions.permissions.set`     | `-`                       | `-`                             |
+| `functions.workflows.steps.list`              | `-`                       | `-`                             |
+| `functions.workflows.steps.responses.export`  | `-`                       | `-`                             |
+| `migration.exchange`                          | `-`                       | `-`                             |
+| `oauth.access`                                | `-`                       | `-`                             |
+| `oauth.v2.access`                             | `-`                       | `-`                             |
+| `oauth.v2.exchange`                           | `-`                       | `-`                             |
+| `oauth.v2.user.access`                        | `-`                       | `-`                             |
+| `openid.connect.token`                        | `-`                       | `-`                             |
+| `openid.connect.userInfo`                     | `-`                       | `-`                             |
+| `pins.add`                                    | `-`                       | `-`                             |
+| `pins.list`                                   | `-`                       | `-`                             |
+| `pins.remove`                                 | `-`                       | `-`                             |
+| `reactions.add`                               | `reactions_add`           | `reactions_add`                 |
+| `reactions.get`                               | `-`                       | `-`                             |
+| `reactions.list`                              | `-`                       | `-`                             |
+| `reactions.remove`                            | `reactions_remove`        | `reactions_remove`              |
+| `reminders.add`                               | `-`                       | `-`                             |
+| `reminders.complete`                          | `-`                       | `-`                             |
+| `reminders.delete`                            | `-`                       | `-`                             |
+| `reminders.info`                              | `-`                       | `-`                             |
+| `reminders.list`                              | `-`                       | `-`                             |
+| `rtm.connect`                                 | `-`                       | `-`                             |
+| `rtm.start`                                   | `-`                       | `-`                             |
+| `search.all`                                  | `-`                       | `-`                             |
+| `search.files`                                | `-`                       | `-`                             |
+| `search.messages`                             | `search_messages`         | `conversations_search_messages` |
+| `slackLists.access.delete`                    | `-`                       | `-`                             |
+| `slackLists.access.set`                       | `-`                       | `-`                             |
+| `slackLists.create`                           | `-`                       | `-`                             |
+| `slackLists.download.get`                     | `-`                       | `-`                             |
+| `slackLists.download.start`                   | `-`                       | `-`                             |
+| `slackLists.items.create`                     | `-`                       | `-`                             |
+| `slackLists.items.delete`                     | `-`                       | `-`                             |
+| `slackLists.items.deleteMultiple`             | `-`                       | `-`                             |
+| `slackLists.items.info`                       | `-`                       | `-`                             |
+| `slackLists.items.list`                       | `-`                       | `-`                             |
+| `slackLists.items.update`                     | `-`                       | `-`                             |
+| `slackLists.update`                           | `-`                       | `-`                             |
+| `stars.add`                                   | `-`                       | `-`                             |
+| `stars.list`                                  | `-`                       | `-`                             |
+| `stars.remove`                                | `-`                       | `-`                             |
+| `team.accessLogs`                             | `-`                       | `-`                             |
+| `team.billableInfo`                           | `-`                       | `-`                             |
+| `team.billing.info`                           | `-`                       | `-`                             |
+| `team.externalTeams.disconnect`               | `-`                       | `-`                             |
+| `team.externalTeams.list`                     | `-`                       | `-`                             |
+| `team.info`                                   | `-`                       | `-`                             |
+| `team.integrationLogs`                        | `-`                       | `-`                             |
+| `team.preferences.list`                       | `-`                       | `-`                             |
+| `team.profile.get`                            | `-`                       | `-`                             |
+| `tooling.tokens.rotate`                       | `-`                       | `-`                             |
+| `usergroups.create`                           | `usergroups_create`       | `usergroups_create`             |
+| `usergroups.disable`                          | `-`                       | `-`                             |
+| `usergroups.enable`                           | `-`                       | `-`                             |
+| `usergroups.list`                             | `usergroups_list`         | `usergroups_list`               |
+| `usergroups.update`                           | `usergroups_update`       | `usergroups_update`             |
+| `usergroups.users.list`                       | `-`                       | `-`                             |
+| `usergroups.users.update`                     | `usergroups_users_update` | `usergroups_users_update`       |
+| `users.conversations`                         | `users_conversations`     | `channels_me`                   |
+| `users.deletePhoto`                           | `-`                       | `-`                             |
+| `users.discoverableContacts.lookup`           | `-`                       | `-`                             |
+| `users.getPresence`                           | `-`                       | `-`                             |
+| `users.identity`                              | `-`                       | `-`                             |
+| `users.info`                                  | `-`                       | `-`                             |
+| `users.list`                                  | `-`                       | `-`                             |
+| `users.lookupByEmail`                         | `-`                       | `-`                             |
+| `users.profile.get`                           | `-`                       | `-`                             |
+| `users.profile.set`                           | `-`                       | `-`                             |
+| `users.setActive`                             | `-`                       | `-`                             |
+| `users.setPhoto`                              | `-`                       | `-`                             |
+| `users.setPresence`                           | `-`                       | `-`                             |
+| `views.open`                                  | `-`                       | `-`                             |
+| `views.publish`                               | `-`                       | `-`                             |
+| `views.push`                                  | `-`                       | `-`                             |
+| `views.update`                                | `-`                       | `-`                             |
+| `workflows.featured.add`                      | `-`                       | `-`                             |
+| `workflows.featured.list`                     | `-`                       | `-`                             |
+| `workflows.featured.remove`                   | `-`                       | `-`                             |
+| `workflows.featured.set`                      | `-`                       | `-`                             |
+| `workflows.triggers.permissions.add`          | `-`                       | `-`                             |
+| `workflows.triggers.permissions.list`         | `-`                       | `-`                             |
+| `workflows.triggers.permissions.remove`       | `-`                       | `-`                             |
+| `workflows.triggers.permissions.set`          | `-`                       | `-`                             |
