@@ -11,21 +11,22 @@ import { searchFiles, searchMessages } from "@/tools/search"
 import { usersInfo, usersList, usersLookupByEmail, usersProfileGet } from "@/tools/users"
 import type { SlackTool } from "@/types"
 
+// ordered to match the Slack Web API method sequence
 export const readTools: SlackTool[] = [
-  conversationsList,
-  usersConversations,
-  conversationsInfo,
-  conversationsMembers,
   conversationsHistory,
+  conversationsInfo,
+  conversationsList,
+  conversationsMembers,
   conversationsReplies,
-  usersList,
-  usersInfo,
-  usersProfileGet,
-  usersLookupByEmail,
-  searchMessages,
-  searchFiles,
   emojiList,
+  searchFiles,
+  searchMessages,
   teamInfo,
+  usersConversations,
+  usersInfo,
+  usersList,
+  usersLookupByEmail,
+  usersProfileGet,
 ]
 
 export const allTools: SlackTool[] = [...readTools]
