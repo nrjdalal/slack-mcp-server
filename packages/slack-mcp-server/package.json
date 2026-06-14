@@ -1,6 +1,6 @@
 {
   "name": "@nrjdalal/slack-mcp-server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": false,
   "description": "User-token (xoxp) Slack MCP server over stdio",
   "keywords": [

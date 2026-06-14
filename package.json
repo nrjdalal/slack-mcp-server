@@ -1,6 +1,6 @@
 {
   "name": "slack-mcp-server",
-  "version": "0.1.0-0",
+  "version": "0.1.0",
   "private": true,
   "description": "Slack MCP server (user token / xoxp): a superset of korotovsky/slack-mcp-server and Slack's hosted connector",
   "keywords": [
