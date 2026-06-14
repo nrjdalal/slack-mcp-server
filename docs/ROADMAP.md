@@ -5,6 +5,9 @@ MCP server that mirrors korotovsky/slack-mcp-server's tool set, built on the
 zerostarter toolchain.
 Work lands PR-by-PR into `canary`; `main` is release-only.
 
+Related: [parity.md](parity.md) (behavior comparison vs korotovsky) ·
+[improvements.md](improvements.md) (standing do/leave/remove assessment).
+
 ## Status
 
 - **M0 Bootstrap**: done
