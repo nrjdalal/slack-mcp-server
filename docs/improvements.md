@@ -45,9 +45,10 @@ deliberately, not a bug.
 
 These are sound scope decisions; don't chase koro on them.
 
-- **Reactive-only rate limiting** — simpler than koro's proactive token buckets,
-  and it actually covers `history`/`replies` that koro leaves bare. Proactive
-  Tier-3 pacing is additive polish, not a fix; skip it unless real 429 pain shows.
+- **Rate limiting** — handled: reactive (`@slack/web-api` `Retry-After` + uniform
+  retry) plus, since the parity audit, proactive per-method token buckets sized by
+  each method's scraped Slack tier (`tiers.json`). The reactive retry still covers
+  `history`/`replies` that koro leaves bare.
 - **Single `SLACK_MCP_ALLOW_WRITE`** vs koro's per-tool gates — locked decision.
 - **stdio-only**, **`xoxp`-only**, **no `saved_*`**, **method-snake-case tool
   names** — all deliberate (see ROADMAP locked decisions / parking lot).

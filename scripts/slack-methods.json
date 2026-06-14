@@ -1,101 +1,124 @@
 [
   {
     "method": "api.test",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "apps.activities.list",
     "userScopes": [
       "hosting:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.auth.external.delete",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "apps.auth.external.get",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.connections.open",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.datastore.bulkDelete",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.datastore.bulkGet",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.datastore.bulkPut",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.datastore.count",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.datastore.delete",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "apps.datastore.get",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "apps.datastore.put",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "apps.datastore.query",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "apps.datastore.update",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "apps.event.authorizations.list",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Special"
   },
   {
     "method": "apps.icon.set",
     "userScopes": [
       "app_configurations:write"
-    ]
+    ],
+    "tier": "Tier 1"
   },
   {
     "method": "apps.manifest.create",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 1"
   },
   {
     "method": "apps.manifest.delete",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 1"
   },
   {
     "method": "apps.manifest.export",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.manifest.update",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 1"
   },
   {
     "method": "apps.manifest.validate",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "apps.uninstall",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 1"
   },
   {
     "method": "apps.user.connection.update",
     "userScopes": [
       "users:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "assistant.search.context",
@@ -106,219 +129,260 @@
       "search:read.private",
       "search:read.public",
       "search:read.users"
-    ]
+    ],
+    "tier": "Special"
   },
   {
     "method": "assistant.search.info",
     "userScopes": [
       "search:read.public"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "assistant.threads.setStatus",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Special"
   },
   {
     "method": "assistant.threads.setSuggestedPrompts",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "assistant.threads.setTitle",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "auth.revoke",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "auth.teams.list",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "auth.test",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Special"
   },
   {
     "method": "blocks.validate",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Special"
   },
   {
     "method": "bookmarks.add",
     "userScopes": [
       "bookmarks:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "bookmarks.edit",
     "userScopes": [
       "bookmarks:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "bookmarks.list",
     "userScopes": [
       "bookmarks:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "bookmarks.remove",
     "userScopes": [
       "bookmarks:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "bots.info",
     "userScopes": [
       "users:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "calls.add",
     "userScopes": [
       "calls:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "calls.end",
     "userScopes": [
       "calls:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "calls.info",
     "userScopes": [
       "calls:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "calls.participants.add",
     "userScopes": [
       "calls:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "calls.participants.remove",
     "userScopes": [
       "calls:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "calls.update",
     "userScopes": [
       "calls:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "canvases.access.delete",
     "userScopes": [
       "canvases:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "canvases.access.set",
     "userScopes": [
       "canvases:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "canvases.create",
     "userScopes": [
       "canvases:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "canvases.delete",
     "userScopes": [
       "canvases:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "canvases.edit",
     "userScopes": [
       "canvases:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "canvases.sections.lookup",
     "userScopes": [
       "canvases:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "chat.appendStream",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "chat.delete",
     "userScopes": [
       "chat:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "chat.deleteScheduledMessage",
     "userScopes": [
       "chat:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "chat.getPermalink",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Special"
   },
   {
     "method": "chat.meMessage",
     "userScopes": [
       "chat:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "chat.postEphemeral",
     "userScopes": [
       "chat:write"
-    ]
+    ],
+    "tier": "Tier 4"
   },
   {
     "method": "chat.postMessage",
     "userScopes": [
       "chat:write"
-    ]
+    ],
+    "tier": "Special"
   },
   {
     "method": "chat.scheduledMessages.list",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "chat.scheduleMessage",
     "userScopes": [
       "chat:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "chat.startStream",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "chat.stopStream",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "chat.unfurl",
     "userScopes": [
       "links:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "chat.update",
     "userScopes": [
       "chat:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.acceptSharedInvite",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.approveSharedInvite",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.archive",
@@ -327,13 +391,15 @@
       "groups:write",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.canvases.create",
     "userScopes": [
       "canvases:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.close",
@@ -342,7 +408,8 @@
       "groups:write",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.create",
@@ -351,15 +418,18 @@
       "groups:write",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.declineSharedInvite",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.externalInvitePermissions.set",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.history",
@@ -368,7 +438,8 @@
       "groups:history",
       "im:history",
       "mpim:history"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.info",
@@ -377,7 +448,8 @@
       "groups:read",
       "im:read",
       "mpim:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.invite",
@@ -388,24 +460,28 @@
       "groups:write.invites",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.inviteShared",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.join",
     "userScopes": [
       "channels:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.kick",
     "userScopes": [
       "channels:write",
       "groups:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.leave",
@@ -414,7 +490,8 @@
       "groups:write",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.list",
@@ -423,11 +500,13 @@
       "groups:read",
       "im:read",
       "mpim:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.listConnectInvites",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 1"
   },
   {
     "method": "conversations.mark",
@@ -436,7 +515,8 @@
       "groups:write",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.members",
@@ -445,7 +525,8 @@
       "groups:read",
       "im:read",
       "mpim:read"
-    ]
+    ],
+    "tier": "Tier 4"
   },
   {
     "method": "conversations.open",
@@ -454,7 +535,8 @@
       "groups:write",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.rename",
@@ -463,7 +545,8 @@
       "groups:write",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.replies",
@@ -472,19 +555,23 @@
       "groups:history",
       "im:history",
       "mpim:history"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "conversations.requestSharedInvite.approve",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.requestSharedInvite.deny",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.requestSharedInvite.list",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.setPurpose",
@@ -497,7 +584,8 @@
       "im:write.topic",
       "mpim:write",
       "mpim:write.topic"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.setTopic",
@@ -510,7 +598,8 @@
       "im:write.topic",
       "mpim:write",
       "mpim:write.topic"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "conversations.unarchive",
@@ -519,501 +608,592 @@
       "groups:write",
       "im:write",
       "mpim:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "developer.apps.owners.add",
     "userScopes": [
       "apps"
-    ]
+    ],
+    "tier": "Tier 1"
   },
   {
     "method": "developer.apps.owners.list",
     "userScopes": [
       "apps"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "developer.apps.owners.remove",
     "userScopes": [
       "apps"
-    ]
+    ],
+    "tier": "Tier 1"
   },
   {
     "method": "dialog.open",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "dnd.endDnd",
     "userScopes": [
       "dnd:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "dnd.endSnooze",
     "userScopes": [
       "dnd:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "dnd.info",
     "userScopes": [
       "dnd:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "dnd.setSnooze",
     "userScopes": [
       "dnd:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "dnd.teamInfo",
     "userScopes": [
       "dnd:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "emoji.list",
     "userScopes": [
       "emoji:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "entity.presentDetails",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "files.comments.delete",
     "userScopes": [
       "files:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "files.completeUploadExternal",
     "userScopes": [
       "files:write"
-    ]
+    ],
+    "tier": "Tier 4"
   },
   {
     "method": "files.delete",
     "userScopes": [
       "files:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "files.getUploadURLExternal",
     "userScopes": [
       "files:write"
-    ]
+    ],
+    "tier": "Tier 4"
   },
   {
     "method": "files.info",
     "userScopes": [
       "files:read"
-    ]
+    ],
+    "tier": "Tier 4"
   },
   {
     "method": "files.list",
     "userScopes": [
       "files:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "files.remote.add",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "files.remote.info",
     "userScopes": [
       "remote_files:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "files.remote.list",
     "userScopes": [
       "remote_files:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "files.remote.remove",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "files.remote.share",
     "userScopes": [
       "remote_files:share"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "files.remote.update",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "files.revokePublicURL",
     "userScopes": [
       "files:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "files.sharedPublicURL",
     "userScopes": [
       "files:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "files.upload",
     "userScopes": [
       "files:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "functions.completeError",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "functions.completeSuccess",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "functions.distributions.permissions.add",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "functions.distributions.permissions.list",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "functions.distributions.permissions.remove",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "functions.distributions.permissions.set",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "functions.workflows.steps.list",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "functions.workflows.steps.responses.export",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "migration.exchange",
     "userScopes": [
       "tokens.basic"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "oauth.access",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "oauth.v2.access",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Special"
   },
   {
     "method": "oauth.v2.exchange",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "oauth.v2.user.access",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Special"
   },
   {
     "method": "openid.connect.token",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "openid.connect.userInfo",
     "userScopes": [
       "openid"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "pins.add",
     "userScopes": [
       "pins:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "pins.list",
     "userScopes": [
       "pins:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "pins.remove",
     "userScopes": [
       "pins:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "reactions.add",
     "userScopes": [
       "reactions:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "reactions.get",
     "userScopes": [
       "reactions:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "reactions.list",
     "userScopes": [
       "reactions:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "reactions.remove",
     "userScopes": [
       "reactions:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "reminders.add",
     "userScopes": [
       "reminders:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "reminders.complete",
     "userScopes": [
       "reminders:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "reminders.delete",
     "userScopes": [
       "reminders:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "reminders.info",
     "userScopes": [
       "reminders:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "reminders.list",
     "userScopes": [
       "reminders:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "rtm.connect",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 1"
   },
   {
     "method": "rtm.start",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 1"
   },
   {
     "method": "search.all",
     "userScopes": [
       "search:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "search.files",
     "userScopes": [
       "search:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "search.messages",
     "userScopes": [
       "search:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "slackLists.access.delete",
     "userScopes": [
       "lists:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "slackLists.access.set",
     "userScopes": [
       "lists:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "slackLists.create",
     "userScopes": [
       "lists:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "slackLists.download.get",
     "userScopes": [
       "lists:read"
-    ]
+    ],
+    "tier": "Tier 4"
   },
   {
     "method": "slackLists.download.start",
     "userScopes": [
       "lists:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "slackLists.items.create",
     "userScopes": [
       "lists:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "slackLists.items.delete",
     "userScopes": [
       "lists:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "slackLists.items.deleteMultiple",
     "userScopes": [
       "lists:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "slackLists.items.info",
     "userScopes": [
       "lists:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "slackLists.items.list",
     "userScopes": [
       "lists:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "slackLists.items.update",
     "userScopes": [
       "lists:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "slackLists.update",
     "userScopes": [
       "lists:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "stars.add",
     "userScopes": [
       "stars:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "stars.list",
     "userScopes": [
       "stars:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "stars.remove",
     "userScopes": [
       "stars:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "team.accessLogs",
     "userScopes": [
       "admin"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "team.billableInfo",
     "userScopes": [
       "admin"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "team.billing.info",
     "userScopes": [
       "team.billing:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "team.externalTeams.disconnect",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 1"
   },
   {
     "method": "team.externalTeams.list",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "team.info",
     "userScopes": [
       "team:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "team.integrationLogs",
     "userScopes": [
       "admin"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "team.preferences.list",
     "userScopes": [
       "team.preferences:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "team.profile.get",
     "userScopes": [
       "users.profile:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "tooling.tokens.rotate",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Special"
   },
   {
     "method": "usergroups.create",
     "userScopes": [
       "usergroups:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "usergroups.disable",
     "userScopes": [
       "usergroups:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "usergroups.enable",
     "userScopes": [
       "usergroups:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "usergroups.list",
     "userScopes": [
       "usergroups:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "usergroups.update",
     "userScopes": [
       "usergroups:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "usergroups.users.list",
     "userScopes": [
       "usergroups:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "usergroups.users.update",
     "userScopes": [
       "usergroups:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "users.conversations",
@@ -1022,132 +1202,157 @@
       "groups:read",
       "im:read",
       "mpim:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "users.deletePhoto",
     "userScopes": [
       "users.profile:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "users.discoverableContacts.lookup",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 2"
   },
   {
     "method": "users.getPresence",
     "userScopes": [
       "users:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "users.identity",
     "userScopes": [
       "identity:read"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "users.info",
     "userScopes": [
       "users:read"
-    ]
+    ],
+    "tier": "Tier 4"
   },
   {
     "method": "users.list",
     "userScopes": [
       "users:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "users.lookupByEmail",
     "userScopes": [
       "users:read.email"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "users.profile.get",
     "userScopes": [
       "users.profile:read"
-    ]
+    ],
+    "tier": "Tier 4"
   },
   {
     "method": "users.profile.set",
     "userScopes": [
       "users.profile:write"
-    ]
+    ],
+    "tier": "Tier 3"
   },
   {
     "method": "users.setActive",
     "userScopes": [
       "users:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "users.setPhoto",
     "userScopes": [
       "users.profile:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "users.setPresence",
     "userScopes": [
       "users:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "views.open",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "views.publish",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "views.push",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "views.update",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 4"
   },
   {
     "method": "workflows.featured.add",
     "userScopes": [
       "bookmarks:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "workflows.featured.list",
     "userScopes": [
       "bookmarks:read"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "workflows.featured.remove",
     "userScopes": [
       "bookmarks:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "workflows.featured.set",
     "userScopes": [
       "bookmarks:write"
-    ]
+    ],
+    "tier": "Tier 2"
   },
   {
     "method": "workflows.triggers.permissions.add",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "workflows.triggers.permissions.list",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "workflows.triggers.permissions.remove",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   },
   {
     "method": "workflows.triggers.permissions.set",
-    "userScopes": []
+    "userScopes": [],
+    "tier": "Tier 3"
   }
 ]

@@ -1,5 +1,7 @@
 import { WebClient, type WebClientOptions } from "@slack/web-api"
 
+import { createRateLimitInterceptor } from "@/rate-limit"
+
 export const TOKEN_ENV = "SLACK_MCP_XOXP_TOKEN"
 
 // @slack/web-api already honours 429 `Retry-After` (it sleeps for the advertised
@@ -32,6 +34,9 @@ export const createClient = (
   const client = new WebClient(token, {
     retryConfig: RETRY_CONFIG,
     maxRequestConcurrency: MAX_REQUEST_CONCURRENCY,
+    // proactive per-method tier throttling, on top of the SDK's reactive
+    // Retry-After handling; overridable via `options`.
+    requestInterceptor: createRateLimitInterceptor(),
     ...options,
   })
   tokens.set(client, token)

@@ -14,3 +14,7 @@ test("README.md is in sync with the generator", () => {
 test("docs/coverage.md is in sync with the generator", () => {
   expect(readFileSync(`${ROOT}/docs/coverage.md`, "utf8")).toBe(docs.coverage)
 })
+
+test("packages/slack-core/src/tiers.json is in sync with the generator", () => {
+  expect(readFileSync(`${ROOT}/packages/slack-core/src/tiers.json`, "utf8")).toBe(docs.tiers)
+})
