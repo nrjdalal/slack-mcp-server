@@ -51,6 +51,34 @@ test("allowWrite exposes the full tool set", async () => {
   expect(tools.some((t) => t.name === "chat_post_message")).toBe(true)
 })
 
+test("write tool roundtrip under allowWrite returns the mapped result", async () => {
+  const slack = {
+    chat: { postMessage: async () => ({ ok: true, ts: "1.2", channel: "C1" }) },
+  } as unknown as WebClient
+  const client = await connect({ client: slack, allowWrite: true })
+
+  const res = await client.callTool({
+    name: "chat_post_message",
+    arguments: { channel: "C1", text: "hi" },
+  })
+  const content = res.content as Array<{ type: string; text: string }>
+  expect(JSON.parse(content[0]!.text)).toEqual({ ts: "1.2", channel: "C1" })
+})
+
+test("a handler that throws is surfaced as an isError result", async () => {
+  const slack = {
+    conversations: {
+      list: async () => {
+        throw new Error("slack is down")
+      },
+    },
+  } as unknown as WebClient
+  const client = await connect({ client: slack })
+
+  const res = await client.callTool({ name: "conversations_list", arguments: {} })
+  expect(res.isError).toBe(true)
+})
+
 test("call roundtrip invokes the tool and returns the mapped result", async () => {
   const { client: slack, calls } = fakeClient({
     "conversations.list": {

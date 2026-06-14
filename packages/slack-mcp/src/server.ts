@@ -22,6 +22,8 @@ export const createServer = ({
       tool.name,
       {
         description: tool.description,
+        // pass the whole Zod object; @modelcontextprotocol/sdk >=1.29 accepts a
+        // full schema via its AnySchema branch (older SDKs need a ZodRawShape).
         inputSchema: tool.input,
         annotations: { readOnlyHint: tool.tier === "read" },
       },
