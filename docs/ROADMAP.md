@@ -1,7 +1,8 @@
 # Roadmap
 
-`better-slack-mcp` is a user-token (xoxp) Slack MCP server that mirrors
-korotovsky/slack-mcp-server's tool set, built on the zerostarter toolchain.
+`slack-mcp-server` (npm `@nrjdalal/slack-mcp-server`) is a user-token (xoxp) Slack
+MCP server that mirrors korotovsky/slack-mcp-server's tool set, built on the
+zerostarter toolchain.
 Work lands PR-by-PR into `canary`; `main` is release-only.
 
 ## Status
@@ -11,7 +12,8 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 - **M2 `slack-mcp`** (stdio server): done
 - **M3 write gating**: done
 - **M4 resilience**: done
-- **M5 release**: next
+- **M5 release**: done
+- **M6 inscope integration**: next
 
 ## What shaped the current design
 
@@ -31,9 +33,9 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 
 ### M2 - `slack-mcp` (stdio server) [done]
 
-- New package `better-slack-mcp` (`packages/slack-mcp`) wrapping the `slack-core`
-  registry in `@modelcontextprotocol/sdk`'s `McpServer` over stdio.
-- npx-able bin (`better-slack-mcp`); reads `SLACK_MCP_XOXP_TOKEN`.
+- New package `@nrjdalal/slack-mcp-server` (`packages/slack-mcp-server`) wrapping
+  the `slack-core` registry in `@modelcontextprotocol/sdk`'s `McpServer` over stdio.
+- npx-able bin (`slack-mcp-server`); reads `SLACK_MCP_XOXP_TOKEN`.
 - Registers tools from the registry; each call runs `invoke(tool, client, args)`.
 - Read-only by default (write tools arrive gated in M3).
 - Tests via the SDK in-memory transport (list tools, call roundtrip, missing-token error).
@@ -44,7 +46,7 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 ### M3 - write gating [done]
 
 - Single `SLACK_MCP_ALLOW_WRITE` flag (default off; truthy = `true` / `1`,
-  case-insensitive). The server reads it (`packages/slack-mcp/src/env.ts`) and
+  case-insensitive). The server reads it (`packages/slack-mcp-server/src/env.ts`) and
   passes `allowWrite` to `createServer`, which selects `enabledTools(allowWrite)`:
   10 read tools off, all 19 on.
 - Deliberately simpler than korotovsky: no per-tool gates, no
@@ -69,18 +71,25 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
   `conversations.history` / `.replies` (~1 req/min), which is why retries are
   capped low rather than left at the SDK default.
 
-### M5 - release
+### M5 - release [done]
 
-- Publish to npm via the `canary` -> `main` -> auto-release flow; bin, changelog,
-  install docs. May need a dedicated publish workflow if `auto-release` does not
-  already `npm publish`.
+- Publishes `@nrjdalal/slack-mcp-server` to npm from the existing `auto-release`
+  job (no separate workflow): the publish runs after changelogen computes the
+  version and _before_ the atomic tag/branch push, so a failed publish never
+  leaves a tag or GitHub release for a version that isn't on npm.
+- `npm publish --provenance --access public` (OIDC `id-token: write`). Monorepo
+  fixes: the bumped version is mirrored into the workspace manifest, the
+  `catalog:` protocol is resolved to concrete versions npm can read, and
+  `scripts`/`devDependencies` are stripped before publishing.
+- Auto-derived versioning (changelogen) is kept; `NPM_TOKEN` gates the run.
 
 ### M6 - inscope integration
 
-- Make inscope's Slack MCP server swappable (it currently pins `slack-mcp-server`)
-  so a workspace can point at `better-slack-mcp`. Token plumbing
-  (`SLACK_MCP_XOXP_TOKEN`) is unchanged, so per-directory identity keeps working.
-  Writes move from korotovsky's per-tool gates to our `SLACK_MCP_ALLOW_WRITE`.
+- Make inscope's Slack MCP server swappable (it currently pins korotovsky's
+  `slack-mcp-server`) so a workspace can point at `@nrjdalal/slack-mcp-server`.
+  Token plumbing (`SLACK_MCP_XOXP_TOKEN`) is unchanged, so per-directory identity
+  keeps working. Writes move from korotovsky's per-tool gates to our single
+  `SLACK_MCP_ALLOW_WRITE`.
 
 ## Parking lot (post-parity)
 
@@ -92,11 +101,12 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 
 ## Locked decisions
 
-- **Published package**: `better-slack-mcp` (npm `name`, `private: false`, bin
-  `better-slack-mcp`), built from the `packages/slack-mcp` workspace. It is the one
-  public package (the deliberate exception to zerostarter's all-private norm,
-  required for `npx better-slack-mcp`). `@packages/slack-core` stays private and is
-  consumed as a `workspace:*` dependency.
+- **Published package**: `@nrjdalal/slack-mcp-server` (npm `name`, `private: false`,
+  bin `slack-mcp-server`), built from the `packages/slack-mcp-server` workspace. It is
+  the one public package (the deliberate exception to zerostarter's all-private norm,
+  required for `npx @nrjdalal/slack-mcp-server`). `@packages/slack-core` stays private
+  and is consumed as a `workspace:*` dependency. The GitHub repo and project are
+  `slack-mcp-server` (renamed from `better-slack-mcp` during M5).
 - **M2 default exposure**: read-only (write tools gated in M3).
 - **M2 transport**: stdio only.
 - **M3 write gating**: one `SLACK_MCP_ALLOW_WRITE` boolean, not korotovsky's

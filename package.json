@@ -1,8 +1,8 @@
 {
-  "name": "better-slack-mcp",
+  "name": "slack-mcp-server",
   "version": "0.0.0",
   "private": true,
-  "description": "Better Slack MCP server (user token / xoxp): a superset of korotovsky/slack-mcp-server and Slack's hosted connector",
+  "description": "Slack MCP server (user token / xoxp): a superset of korotovsky/slack-mcp-server and Slack's hosted connector",
   "keywords": [
     "claude",
     "cli",
@@ -11,15 +11,15 @@
     "slack",
     "xoxp"
   ],
-  "homepage": "https://github.com/nrjdalal/better-slack-mcp#readme",
-  "bugs": "https://github.com/nrjdalal/better-slack-mcp/issues",
+  "homepage": "https://github.com/nrjdalal/slack-mcp-server#readme",
+  "bugs": "https://github.com/nrjdalal/slack-mcp-server/issues",
   "license": "MIT",
   "author": {
     "name": "Neeraj Dalal",
     "email": "admin@nrjdalal.com",
     "url": "https://nrjdalal.com"
   },
-  "repository": "nrjdalal/better-slack-mcp",
+  "repository": "nrjdalal/slack-mcp-server",
   "funding": "https://github.com/sponsors/nrjdalal",
   "workspaces": [
     "packages/*"

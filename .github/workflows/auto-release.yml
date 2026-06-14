@@ -10,10 +10,11 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
-  update-changelog:
-    name: Update changelog branch
+  release:
+    name: Publish to npm, changelog, tag, and GitHub release
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'canary'
     steps:
@@ -27,15 +28,21 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org
+
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit changelog to canary
+      - name: Publish and update changelog
         run: |
-          # the changelog commit is mechanical (generated from already-reviewed PR titles),
-          # so it lands directly on canary instead of going through a PR
+          # publishes @nrjdalal/slack-mcp-server to npm, then lands the changelog
+          # commit directly on canary (mechanical, generated from reviewed PR titles)
           git checkout canary
           # install first so every bunx below resolves the LOCKED versions
           # (changelogen's output format is load-bearing for the content gate)
@@ -72,9 +79,16 @@ jobs:
           # so also require at least one entry in the new section before releasing
           SECTION=$(awk '/^## v/ { n++ } n == 1' CHANGELOG.md | sed '/^### ❤️ Contributors/,$d')
           if [ -n "$(git status --porcelain CHANGELOG.md package.json)" ] && echo "$SECTION" | grep -q '^- '; then
-            git add CHANGELOG.md package.json
-            git commit -m "ci(changelog): update changelog and bump version"
             NEW_VERSION=$(bun -e 'console.log(JSON.parse(await Bun.file("package.json").text()).version)')
+            # mirror the bumped version into the published workspace package
+            NEW_VERSION="$NEW_VERSION" bun -e '
+              const p = "packages/slack-mcp-server/package.json"
+              const pkg = JSON.parse(await Bun.file(p).text())
+              pkg.version = process.env.NEW_VERSION
+              await Bun.write(p, JSON.stringify(pkg, null, 2) + "\n")
+            '
+            git add CHANGELOG.md package.json packages/slack-mcp-server/package.json
+            git commit -m "ci(changelog): update changelog and bump version"
             # fail loudly on tag collision: proceeding would mislabel this changelog section
             EXISTING=$(git rev-parse -q --verify "refs/tags/v$NEW_VERSION^{commit}" || true)
             if [ -n "$EXISTING" ] && [ "$EXISTING" != "$BOUNDARY" ]; then
@@ -83,6 +97,38 @@ jobs:
             fi
             if [ -z "$EXISTING" ]; then
               git tag "v$NEW_VERSION" "$BOUNDARY"
+            fi
+            # publish to npm BEFORE pushing the branch + tag, so a failed publish never
+            # leaves a tag or GitHub release pointing at a version that is not on npm
+            PACKAGE_NAME=$(bun -e 'console.log(JSON.parse(await Bun.file("packages/slack-mcp-server/package.json").text()).name)')
+            if [ -z "$NODE_AUTH_TOKEN" ]; then
+              echo "::warning::NPM_TOKEN is not set; skipping publish and release this run"
+              exit 0
+            fi
+            if npm view "$PACKAGE_NAME@$NEW_VERSION" version > /dev/null 2>&1; then
+              echo "$PACKAGE_NAME@$NEW_VERSION already on npm, skipping publish"
+            else
+              bun run build
+              # publish-only rewrite of the workspace manifest (never committed): resolve
+              # the catalog: protocol npm cannot read, and drop non-published fields
+              bun -e '
+                const root = JSON.parse(await Bun.file("package.json").text())
+                const cat = root.catalog ?? {}
+                const path = "packages/slack-mcp-server/package.json"
+                const pkg = JSON.parse(await Bun.file(path).text())
+                for (const [name, range] of Object.entries(pkg.dependencies ?? {})) {
+                  if (range !== "catalog:") continue
+                  if (!cat[name]) throw new Error("no catalog entry for " + name)
+                  pkg.dependencies[name] = cat[name]
+                }
+                delete pkg.scripts
+                delete pkg.devDependencies
+                await Bun.write(path, JSON.stringify(pkg, null, 2) + "\n")
+              '
+              ( cd packages/slack-mcp-server && npm publish --provenance --access public --no-git-checks ) \
+                || { echo "::error::npm publish failed for $PACKAGE_NAME@$NEW_VERSION"; exit 1; }
+              # restore the committed manifest; publish-only edits must never land in git
+              git checkout -- packages/slack-mcp-server/package.json
             fi
             # atomic: branch and tag land together or not at all, no corrupting middle state
             git push --atomic https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git canary "refs/tags/v$NEW_VERSION"
@@ -96,3 +142,4 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

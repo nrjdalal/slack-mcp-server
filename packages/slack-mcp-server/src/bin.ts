@@ -6,11 +6,11 @@ import { createServer } from "@/server"
 
 const main = async () => {
   const warning = allowWriteWarning()
-  if (warning) console.error(`better-slack-mcp: ${warning}`)
+  if (warning) console.error(`slack-mcp-server: ${warning}`)
   const allowWrite = allowWriteFromEnv()
   const server = createServer({ allowWrite })
   await server.connect(new StdioServerTransport())
-  console.error(`better-slack-mcp: listening on stdio (${allowWrite ? "read+write" : "read-only"})`)
+  console.error(`slack-mcp-server: listening on stdio (${allowWrite ? "read+write" : "read-only"})`)
 }
 
 main().catch((error: unknown) => {

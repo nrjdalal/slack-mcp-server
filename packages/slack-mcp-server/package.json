@@ -1,5 +1,5 @@
 {
-  "name": "better-slack-mcp",
+  "name": "@nrjdalal/slack-mcp-server",
   "version": "0.0.0",
   "private": false,
   "description": "User-token (xoxp) Slack MCP server over stdio",
@@ -11,18 +11,21 @@
     "slack",
     "xoxp"
   ],
-  "homepage": "https://github.com/nrjdalal/better-slack-mcp#readme",
-  "bugs": "https://github.com/nrjdalal/better-slack-mcp/issues",
+  "homepage": "https://github.com/nrjdalal/slack-mcp-server#readme",
+  "bugs": "https://github.com/nrjdalal/slack-mcp-server/issues",
   "license": "MIT",
   "author": {
     "name": "Neeraj Dalal",
     "email": "admin@nrjdalal.com",
     "url": "https://nrjdalal.com"
   },
-  "repository": "nrjdalal/better-slack-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nrjdalal/slack-mcp-server.git"
+  },
   "funding": "https://github.com/sponsors/nrjdalal",
   "bin": {
-    "better-slack-mcp": "./dist/bin.mjs"
+    "slack-mcp-server": "./dist/bin.mjs"
   },
   "files": [
     "dist"
