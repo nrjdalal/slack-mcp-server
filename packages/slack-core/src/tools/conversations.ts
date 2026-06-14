@@ -245,10 +245,18 @@ export const conversationsUnreads = defineTool({
     })
     const scanned = await mapLimit(conv.channels ?? [], UNREADS_CONCURRENCY, async (ch) => {
       if (!ch.id) return undefined
-      const info = await client.conversations.info({ channel: ch.id })
-      const c = info.channel as { unread_count_display?: number; unread_count?: number } | undefined
-      const count = c?.unread_count_display ?? c?.unread_count ?? 0
-      return count > 0 ? { id: ch.id, name: ch.name, unread_count: count } : undefined
+      try {
+        const info = await client.conversations.info({ channel: ch.id })
+        const c = info.channel as
+          | { unread_count_display?: number; unread_count?: number }
+          | undefined
+        const count = c?.unread_count_display ?? c?.unread_count ?? 0
+        return count > 0 ? { id: ch.id, name: ch.name, unread_count: count } : undefined
+      } catch {
+        // best effort: a single inaccessible or throttled channel shouldn't
+        // sink the whole scan, so skip it and keep the rest.
+        return undefined
+      }
     })
     return { unreads: scanned.filter((u) => u !== undefined) }
   },

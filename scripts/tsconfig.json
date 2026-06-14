@@ -3,6 +3,8 @@
   "compilerOptions": {
     "target": "esnext",
     "types": ["bun"],
+    // required: scripts pull in slack-core source, whose internal `@/` imports
+    // resolve against the compiling project's paths (this one), not slack-core's.
     "paths": {
       "@/*": ["../packages/slack-core/src/*"]
     }

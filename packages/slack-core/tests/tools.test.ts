@@ -126,6 +126,31 @@ test("conversations_unreads keeps only channels with unreads, in order", async (
   ])
 })
 
+test("conversations_unreads skips a channel whose info call fails", async () => {
+  const client = {
+    users: {
+      conversations: async () => ({
+        ok: true,
+        channels: [
+          { id: "C1", name: "one" },
+          { id: "C2", name: "two" },
+          { id: "C3", name: "three" },
+        ],
+      }),
+    },
+    conversations: {
+      info: async ({ channel }: { channel: string }) => {
+        if (channel === "C2") throw new Error("channel_not_found")
+        return { ok: true, channel: { unread_count_display: 5 } }
+      },
+    },
+  } as unknown as WebClient
+  const out = (await conversationsUnreads.handler(client, { max_channels: 50 })) as {
+    unreads: Array<{ id: string }>
+  }
+  expect(out.unreads.map((u) => u.id)).toEqual(["C1", "C3"])
+})
+
 test("conversations_mark (write) marks read", async () => {
   const { client, calls } = fakeClient()
   const out = await conversationsMark.handler(client, { channel: "C1", ts: "1.2" })
