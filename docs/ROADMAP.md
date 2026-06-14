@@ -8,7 +8,8 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 
 - **M0 Bootstrap**: done
 - **M1 `slack-core`** (tool layer): done (PR #2, merged)
-- **M2 `slack-mcp`** (stdio server): next
+- **M2 `slack-mcp`** (stdio server): done
+- **M3 write gating + safety**: next
 
 ## What shaped the current design
 
@@ -25,17 +26,19 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 
 ## Milestones
 
-### M2 - `slack-mcp` (stdio server) [next]
+### M2 - `slack-mcp` (stdio server) [done]
 
-- New package `@packages/slack-mcp` wrapping the `slack-core` registry in
-  `@modelcontextprotocol/sdk`'s `McpServer` over stdio.
+- New package `better-slack-mcp` (`packages/slack-mcp`) wrapping the `slack-core`
+  registry in `@modelcontextprotocol/sdk`'s `McpServer` over stdio.
 - npx-able bin (`better-slack-mcp`); reads `SLACK_MCP_XOXP_TOKEN`.
 - Registers tools from the registry; each call runs `invoke(tool, client, args)`.
 - Read-only by default (write tools arrive gated in M3).
 - Tests via the SDK in-memory transport (list tools, call roundtrip, missing-token error).
 - README: `mcpServers` client config.
+- `slack-core` is bundled into the published artifact (it stays private/unpublished),
+  so the only runtime deps are `@modelcontextprotocol/sdk`, `@slack/web-api`, `zod`.
 
-### M3 - write gating + safety
+### M3 - write gating + safety [next]
 
 - Per-tool env gates: `SLACK_MCP_ADD_MESSAGE_TOOL`, `SLACK_MCP_REACTION_TOOL`,
   `SLACK_MCP_ATTACHMENT_TOOL`, `SLACK_MCP_MARK_TOOL`.
