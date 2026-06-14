@@ -2,37 +2,37 @@
 
 Tool-name index, korotovsky/slack-mcp-server vs better-slack-mcp. **Bold** = shipped (M1); `-` = no counterpart.
 
-| #   | korotovsky                                              | better-slack-mcp                                                                         |
-| --- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| 1   | `channels_list`                                         | **`list_channels`**                                                                      |
-| 2   | `channels_me`                                           | **`my_channels`**                                                                        |
-| 3   | `conversations_history`                                 | **`channel_history`**                                                                    |
-| 4   | `conversations_replies`                                 | **`thread_replies`**                                                                     |
-| 5   | `conversations_search_messages`                         | **`search_messages`**                                                                    |
-| 6   | `conversations_unreads`                                 | `unreads`                                                                                |
-| 7   | `conversations_mark`                                    | `mark_read`                                                                              |
-| 8   | `conversations_join`                                    | `join_channel`                                                                           |
-| 9   | `conversations_leave`                                   | `leave_channel`                                                                          |
-| 10  | `conversations_add_message`                             | `send_message`                                                                           |
-| 11  | `reactions_add`                                         | `add_reaction`                                                                           |
-| 12  | `reactions_remove`                                      | `remove_reaction`                                                                        |
-| 13  | `attachment_get_data`                                   | `download_file`                                                                          |
-| 14  | `users_search`                                          | **`list_users`** / **`find_user_by_email`**                                              |
-| 15  | `usergroups_list`                                       | `usergroups_list`                                                                        |
-| 16  | `usergroups_me`                                         | `usergroups_me`                                                                          |
-| 17  | `usergroups_create`                                     | `usergroups_create`                                                                      |
-| 18  | `usergroups_update`                                     | `usergroups_update`                                                                      |
-| 19  | `usergroups_users_update`                               | `usergroups_set_members`                                                                 |
-| 20  | `saved_list` / `saved_update` / `saved_clear_completed` | `-` (xoxc/xoxd only)                                                                     |
-| 21  | `-`                                                     | **`channel_info`**                                                                       |
-| 22  | `-`                                                     | **`channel_members`**                                                                    |
-| 23  | `-`                                                     | **`search_files`**                                                                       |
-| 24  | `-`                                                     | **`user_info`** / **`user_profile`**                                                     |
-| 25  | `-`                                                     | **`team_info`** / **`list_emoji`**                                                       |
-| 26  | `-`                                                     | `open_dm` / `create_channel` / `invite_to_channel` / `remove_from_channel`               |
-| 27  | `-`                                                     | `rename_channel` / `set_topic` / `set_purpose` / `archive_channel` / `unarchive_channel` |
-| 28  | `-`                                                     | `update_message` / `delete_message` / `schedule_message` / `get_permalink`               |
-| 29  | `-`                                                     | `get_reactions` / `my_reactions`                                                         |
-| 30  | `-`                                                     | `list_files` / `file_info` / `upload_file` / `delete_file` / `share_public_url`          |
-| 31  | `-`                                                     | `set_my_profile` / `get_presence` / `set_presence`                                       |
-| 32  | `-`                                                     | `pins_*` / `bookmarks_*` / `reminders_*` / `canvases_*` / `dnd_*`                        |
+| #   | korotovsky                                              | better-slack-mcp                                                                         | slack api                                                                        |
+| --- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| 1   | `channels_list`                                         | **`list_channels`**                                                                      | `conversations.list`                                                             |
+| 2   | `channels_me`                                           | **`my_channels`**                                                                        | `users.conversations`                                                            |
+| 3   | `conversations_history`                                 | **`channel_history`**                                                                    | `conversations.history`                                                          |
+| 4   | `conversations_replies`                                 | **`thread_replies`**                                                                     | `conversations.replies`                                                          |
+| 5   | `conversations_search_messages`                         | **`search_messages`**                                                                    | `search.messages`                                                                |
+| 6   | `conversations_unreads`                                 | `unreads`                                                                                | `conversations.info` (iterate)                                                   |
+| 7   | `conversations_mark`                                    | `mark_read`                                                                              | `conversations.mark`                                                             |
+| 8   | `conversations_join`                                    | `join_channel`                                                                           | `conversations.join`                                                             |
+| 9   | `conversations_leave`                                   | `leave_channel`                                                                          | `conversations.leave`                                                            |
+| 10  | `conversations_add_message`                             | `send_message`                                                                           | `chat.postMessage`                                                               |
+| 11  | `reactions_add`                                         | `add_reaction`                                                                           | `reactions.add`                                                                  |
+| 12  | `reactions_remove`                                      | `remove_reaction`                                                                        | `reactions.remove`                                                               |
+| 13  | `attachment_get_data`                                   | `download_file`                                                                          | `files.info`                                                                     |
+| 14  | `users_search`                                          | **`list_users`** / **`find_user_by_email`**                                              | `users.list` / `users.lookupByEmail`                                             |
+| 15  | `usergroups_list`                                       | `usergroups_list`                                                                        | `usergroups.list`                                                                |
+| 16  | `usergroups_me`                                         | `usergroups_me`                                                                          | `usergroups.list`                                                                |
+| 17  | `usergroups_create`                                     | `usergroups_create`                                                                      | `usergroups.create`                                                              |
+| 18  | `usergroups_update`                                     | `usergroups_update`                                                                      | `usergroups.update`                                                              |
+| 19  | `usergroups_users_update`                               | `usergroups_set_members`                                                                 | `usergroups.users.update`                                                        |
+| 20  | `saved_list` / `saved_update` / `saved_clear_completed` | `-` (xoxc/xoxd only)                                                                     | internal client API                                                              |
+| 21  | `-`                                                     | **`channel_info`**                                                                       | `conversations.info`                                                             |
+| 22  | `-`                                                     | **`channel_members`**                                                                    | `conversations.members`                                                          |
+| 23  | `-`                                                     | **`search_files`**                                                                       | `search.files`                                                                   |
+| 24  | `-`                                                     | **`user_info`** / **`user_profile`**                                                     | `users.info` / `users.profile.get`                                               |
+| 25  | `-`                                                     | **`team_info`** / **`list_emoji`**                                                       | `team.info` / `emoji.list`                                                       |
+| 26  | `-`                                                     | `open_dm` / `create_channel` / `invite_to_channel` / `remove_from_channel`               | `conversations.open` / `.create` / `.invite` / `.kick`                           |
+| 27  | `-`                                                     | `rename_channel` / `set_topic` / `set_purpose` / `archive_channel` / `unarchive_channel` | `conversations.rename` / `.setTopic` / `.setPurpose` / `.archive` / `.unarchive` |
+| 28  | `-`                                                     | `update_message` / `delete_message` / `schedule_message` / `get_permalink`               | `chat.update` / `.delete` / `.scheduleMessage` / `.getPermalink`                 |
+| 29  | `-`                                                     | `get_reactions` / `my_reactions`                                                         | `reactions.get` / `reactions.list`                                               |
+| 30  | `-`                                                     | `list_files` / `file_info` / `upload_file` / `delete_file` / `share_public_url`          | `files.list` / `.info` / upload v2 / `.delete` / `.sharedPublicURL`              |
+| 31  | `-`                                                     | `set_my_profile` / `get_presence` / `set_presence`                                       | `users.profile.set` / `users.getPresence` / `users.setPresence`                  |
+| 32  | `-`                                                     | `pins_*` / `bookmarks_*` / `reminders_*` / `canvases_*` / `dnd_*`                        | `pins.*` / `bookmarks.*` / `reminders.*` / `canvases.*` / `dnd.*`                |
