@@ -25,10 +25,10 @@ inscope runs its Slack server as `npx slack-mcp-server@…` — a **published, s
 
 ## 1. Workspace plan
 
-| New workspace | npm name | private | role |
-|---|---|---|---|
-| `packages/slack-core` | `@packages/slack-core` | yes | `@slack/web-api` wrapper + transport-agnostic tool registry (auth, paging, cache, tool defs/handlers) |
-| `packages/slack-mcp` | **`better-slack-mcp`** (verify availability, else `@nrjdalal/better-slack-mcp`) | **no** | **stdio MCP server** + `bin`; consumes slack-core; bundles everything into `dist`; reads `SLACK_MCP_XOXP_TOKEN` at runtime. **This is what inscope `npx`-runs.** |
+| New workspace         | npm name                                                                        | private | role                                                                                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/slack-core` | `@packages/slack-core`                                                          | yes     | `@slack/web-api` wrapper + transport-agnostic tool registry (auth, paging, cache, tool defs/handlers)                                                            |
+| `packages/slack-mcp`  | **`better-slack-mcp`** (verify availability, else `@nrjdalal/better-slack-mcp`) | **no**  | **stdio MCP server** + `bin`; consumes slack-core; bundles everything into `dist`; reads `SLACK_MCP_XOXP_TOKEN` at runtime. **This is what inscope `npx`-runs.** |
 
 **Scope decision: stdio only, no frontend.** A hosted HTTP MCP endpoint, web UI, OAuth onboarding, auth, and DB are **out of scope**, so `@api/hono`, `@web/next`, `@packages/auth`, and `@packages/db` are trimmed (see §4). Two new workspaces total.
 
@@ -37,17 +37,20 @@ inscope runs its Slack server as `npx slack-mcp-server@…` — a **published, s
 ## 2. How each new workspace fits zero's conventions
 
 **`@packages/slack-core`** (private lib)
+
 - `package.json`: `@packages/slack-core`, `private:true`, `type:module`, `exports`/`types` → `dist`, dep `@slack/web-api` (add to catalog) via `catalog:`; dev `@packages/tsconfig`, `tsdown`, `typescript`, `@types/*` via `catalog:`.
 - `tsconfig.json` extends `@packages/tsconfig/base.json`, `@/*`→`./src/*`.
 - `tsdown.config.ts`: `dts:{tsgo:true}`, `entry:["src/index.ts"]`, `minify:true`.
 - Contents: `src/client.ts` (auth + WebClient), `src/tools/*` (read/write/canvas/usergroups), `src/registry.ts` (tool list honoring read-only/allow-write).
 
 **`better-slack-mcp`** (the published exception, folder `packages/slack-mcp`)
+
 - `package.json`: real npm `name`, `private:false`, `bin: { "better-slack-mcp": "./dist/index.mjs" }`, `files:["dist"]`, **no `dependencies`** (all bundled).
 - `tsdown.config.ts`: `deps.alwaysBundle: [/^@packages\//, "@slack/web-api", "@modelcontextprotocol/sdk"]`, `neverBundle:["bun"]`, no env hook (token is a **runtime** check, not build-time, since inscope sets it per `$PWD`).
 - `src/index.ts`: `@modelcontextprotocol/sdk` `StdioServerTransport` + `McpServer`, registers slack-core tools, validates `SLACK_MCP_XOXP_TOKEN` lazily.
 
 **Catalog edits**
+
 - Root `catalog`: add `@slack/web-api`; keep `@modelcontextprotocol/sdk`; drop `@hono/mcp` (unused once surface B is out).
 - No `packages/env` change: the stdio package reads `SLACK_MCP_XOXP_TOKEN` at **runtime** (inscope sets it per `$PWD`), so it skips zero's build-time t3-env entirely.
 
@@ -59,7 +62,7 @@ Goal: cover the **whole useful `xoxp` Web API surface**, not a token subset. Eac
 
 **Conversations & channels** — `list_channels` (`conversations.list`, R), `my_channels` (`users.conversations`, R), `channel_info` (`conversations.info`, R), `channel_members` (`conversations.members`, R), `channel_history` (`conversations.history`, R), `thread_replies` (`conversations.replies`, R), `unreads` (iterate, R), `open_dm` (`conversations.open`, W), `create_channel` (`conversations.create`, W), `join_channel`/`leave_channel` (W), `invite_to_channel` (`conversations.invite`, W), `remove_from_channel` (`conversations.kick`, W/A), `rename_channel` (`conversations.rename`, W), `set_topic`/`set_purpose` (W), `archive_channel`/`unarchive_channel` (W/A), `mark_read` (`conversations.mark`, W).
 
-**Messaging** — `send_message` (`chat.postMessage`, W), `update_message` (`chat.update`, W), `delete_message` (`chat.delete`, W), `schedule_message` (`chat.scheduleMessage`, W), `list_scheduled`/`delete_scheduled` (W), `get_permalink` (`chat.getPermalink`, R). *Drafts have no public API — implement as local compose+preview, not a Slack call.*
+**Messaging** — `send_message` (`chat.postMessage`, W), `update_message` (`chat.update`, W), `delete_message` (`chat.delete`, W), `schedule_message` (`chat.scheduleMessage`, W), `list_scheduled`/`delete_scheduled` (W), `get_permalink` (`chat.getPermalink`, R). _Drafts have no public API — implement as local compose+preview, not a Slack call._
 
 **Search** — `search_messages` (`search.messages`, R), `search_files` (`search.files`, R), `search_all` (`search.all`, R).
 
@@ -86,6 +89,7 @@ Ceiling: internal-client-only endpoints (one-shot unread counts, edge search) ne
 Ship a complete, paste-ready **app manifest** at the repo root (`slack-app.manifest.yaml`) so a user creates the app with all scopes in one step ("Create New App → From a manifest"), then installs and copies the `xoxp` token. This is the primary onboarding path and is what makes it enterprise-friendly.
 
 Two variants now ship at the repo root, scope names **verified against `docs.slack.dev/reference/scopes` (Jun 2026)**:
+
 - `manifest.readonly.yaml` — least-privilege read scopes only.
 - `manifest.full.yaml` — read + write (the union below).
 
@@ -154,16 +158,19 @@ Notes: a few scopes are workspace-admin gated (kick/archive); some names differ 
 Verified against source, June 2026. (Sources: korotovsky `pkg/server/server.go` + `docs/01-authentication-setup.md`; `slackapi/slack-mcp-plugin`; `docs.slack.dev/reference/{scopes,methods}`.)
 
 **Naming & gating — adopt the best of both servers:**
+
 - Primary tool names task-shaped like Slack's official plugin (`slack_search`, `slack_send_message`, `slack_send_message_draft`, `slack_create_canvas`), with **korotovsky `conversations_*` aliases** for drop-in parity.
 - **Read-only by default.** Two-level write gating like korotovsky: registration (`SLACK_MCP_ALLOW_WRITE` / `SLACK_MCP_ENABLED_TOOLS`) + an optional runtime **channel allowlist** for posting (`SLACK_MCP_ADD_MESSAGE_TOOL=true | CID,CID | !CID`). Keep send vs draft as separate tools.
 
 **Architecture to copy from korotovsky:**
+
 - **Users + channels cache is essential, not optional** — without it `list_channels` and `#channel`/`@user` name-resolution break. Persist to an OS cache dir, TTL + stale-while-revalidate (`SLACK_MCP_CACHE_TTL`, default 24h).
 - Expose **MCP resources** `slack://<workspace>/channels` and `slack://<workspace>/users` (CSV directories) alongside tools.
 - Ship **SKILL.md** guides like the official plugin (its highest-value asset): the Slack **search DSL** (`in:`/`from:`/`has:`/`before:`/`"phrase"`/`-exclude`; Boolean AND/OR/NOT unsupported) and a **markdown→Slack formatting** table.
 - Enterprise Grid: optional `SLACK_MCP_USER_AGENT` + browser-like TLS for locked-down workspaces.
 
 **Scope facts that shaped the manifest (now verified):**
+
 - korotovsky's **proven** xoxp set is 16 scopes; `manifest.full.yaml` extends it with reactions/files/pins/bookmarks/users.profile/canvases/dnd/team/emoji/users:read.email.
 - **search = `search:read`** (classic, simplest). The hosted connector uses granular `search:read.public/.private/.im/.mpim/.files/.users` (private/im/mpim **consent-gated**) — offer as opt-in.
 - Granular write apps also need `*:write.topic` (topic/purpose) and `*:write.invites` (invite) — commented in the manifest.
@@ -172,6 +179,7 @@ Verified against source, June 2026. (Sources: korotovsky `pkg/server/server.go` 
 **Differentiator — user-token-only methods** (impossible with a bot): `search.*`, `conversations.unarchive`, `files.sharedPublicURL`, `users.profile.set`, `dnd.setSnooze/endSnooze`. Lead with these.
 
 **Operational caveats to document:**
+
 - **History rate limit:** since 2025-05-29, **non-Marketplace** apps are throttled on `conversations.history`/`.replies` to ~1 req/min, ≤15 msgs/call. We're non-Marketplace → paginate carefully, lean on cache, surface the limit.
 - **Paid-plan gates:** usergroups and canvases (`plan upgrade_required` otherwise).
 - **Grid/admin gates:** `conversations.join/rename/archive` may return `enterprise_is_restricted`; `usergroups.users.update` may need an admin token.
