@@ -1,6 +1,6 @@
 # better-slack-mcp
 
-Tool index: one row per Slack Web API method the package implements (14), in Slack API order. The better-slack-mcp name mirrors the method; korotovsky/slack-mcp-server's name is shown for parity (`-` = none).
+Tool index: one row per Slack Web API method the package implements (14), ordered as they appear in the [Slack methods reference](https://docs.slack.dev/reference/methods/) (`admin.*` omitted). The better-slack-mcp name mirrors the method; korotovsky/slack-mcp-server's name is shown for parity (`-` = none).
 
 | #   | slack api               | better-slack-mcp        | korotovsky                      |
 | --- | ----------------------- | ----------------------- | ------------------------------- |
