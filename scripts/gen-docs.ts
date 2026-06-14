@@ -74,7 +74,7 @@ ${compositeLine}
 ${header}
 ${doneRows}
 
-See [docs/coverage.md](docs/coverage.md) for the full non-admin Slack Web API surface (${methods.length} methods).
+See [docs/coverage.md](docs/coverage.md) for the full non-admin Slack Web API surface (${methods.length} methods), and the [roadmap](docs/ROADMAP.md) for milestones.
 `
 
 const coverage = `${banner}# Slack Web API coverage
