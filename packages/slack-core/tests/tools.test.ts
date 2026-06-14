@@ -99,7 +99,7 @@ test("conversations_mark (write) marks read", async () => {
   expect(out).toEqual({ ok: true })
 })
 
-test("registry: read/write tiers and the write gate", () => {
+test("registry: read/write tiers and the enabledTools selector", () => {
   expect(readTools).toHaveLength(10)
   expect(writeTools).toHaveLength(9)
   expect(allTools).toHaveLength(19)

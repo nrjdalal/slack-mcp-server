@@ -49,10 +49,10 @@ export const writeTools: SlackTool[] = [
 
 export const allTools: SlackTool[] = [...readTools, ...writeTools]
 
-// write tools are opt-in via SLACK_MCP_ALLOW_WRITE
-export const enabledTools = (
-  allowWrite: boolean = Boolean(process.env.SLACK_MCP_ALLOW_WRITE),
-): SlackTool[] => (allowWrite ? allTools : readTools)
+// neutral tier selector; the write-gating policy (env vars, per-tool,
+// channel scoping) is decided by the server layer in a later milestone.
+export const enabledTools = (allowWrite: boolean): SlackTool[] =>
+  allowWrite ? allTools : readTools
 
 export const toolByName = (name: string): SlackTool | undefined =>
   allTools.find((tool) => tool.name === name)
