@@ -24,19 +24,19 @@ oauth_config:
       - groups:history
       - im:history
       - mpim:history
-      - search:read          # classic search scope; covers search.messages/files/all
+      - search:read # classic search scope; covers search.messages/files/all
       - reactions:read
       - files:read
       - users:read
-      - users:read.email     # only needed to read email addresses
-      - users.profile:read   # note the dot before the colon
+      - users:read.email # only needed to read email addresses
+      - users.profile:read # note the dot before the colon
       - usergroups:read
       - pins:read
       - bookmarks:read
       - emoji:read
       - team:read
       - dnd:read
-      - canvases:read        # paid plans
+      - canvases:read # paid plans
       # --- write (used only when SLACK_MCP_ALLOW_WRITE is on) ---
       - chat:write
       - channels:write
@@ -46,11 +46,11 @@ oauth_config:
       - reactions:write
       - files:write
       - users.profile:write
-      - users:write          # set own presence
-      - usergroups:write     # paid plans
+      - users:write # set own presence
+      - usergroups:write # paid plans
       - pins:write
       - bookmarks:write
-      - canvases:write       # paid plans
+      - canvases:write # paid plans
       - dnd:write
       # --- optional granular write (uncomment if you enable these tools) ---
       # - channels:write.topic   # set_topic / set_purpose (public)
