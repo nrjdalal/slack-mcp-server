@@ -1,0 +1,97 @@
+---
+title: Documentation
+description: Manage documentation content and search.
+---
+
+## Overview
+
+Documentation is managed using [Fumadocs](https://fumadocs.vercel.app) and stored in `web/next/content/docs/`. Full-text search is powered by [Orama](https://orama.com) via Fumadocs.
+
+## Content Structure
+
+- **Location**: `web/next/content/docs/`
+- **Format**: MDX files with frontmatter
+- **Configuration**: Defined in `web/next/source.config.ts` and `web/next/content/docs/meta.json`
+
+## Creating Documentation
+
+1. Create a new `.mdx` file in `web/next/content/docs/`
+2. Add frontmatter with `title` and `description`
+3. Write content using MDX syntax
+4. Add entry to `web/next/content/docs/meta.json`
+
+## Configuration
+
+Documentation source is configured in `web/next/source.config.ts`:
+
+```ts
+export const docs = defineDocs({
+  dir: "content/docs",
+  docs: {
+    postprocess: {
+      includeProcessedMarkdown: true,
+    },
+  },
+})
+```
+
+`includeProcessedMarkdown` keeps the rendered Markdown around so the `llms.txt` routes can serve a plain-text version of each page.
+
+Pages are listed in `web/next/content/docs/meta.json`. **The sequence matters** - it determines the order pages appear in navigation:
+
+```json
+{
+  "pages": [
+    "index",
+    "getting-started/architecture",
+    "getting-started/project-structure",
+    "getting-started/type-safe-api",
+    "getting-started/setup",
+    "getting-started/scripts",
+    "getting-started/roadmap",
+    "manage/authentication",
+    "manage/dashboard",
+    "manage/database",
+    "manage/api-conventions",
+    "manage/analytics",
+    "manage/blog",
+    "manage/code-quality",
+    "manage/documentation",
+    "manage/feedback",
+    "manage/environment",
+    "manage/release",
+    "manage/theming",
+    "manage/og-images",
+    "manage/llms-txt",
+    "manage/robots",
+    "manage/sitemap",
+    "deployment/docker",
+    "deployment/vercel",
+    "resources/ai-skills",
+    "resources/ide-setup",
+    "resources/infisical",
+    "contributing"
+  ]
+}
+```
+
+## Search
+
+Full-text search indexes the documentation via a route handler at `web/next/src/app/api/search/route.ts`. It is built from `docsSource` with `createFromSource`, which wires up the Orama index automatically:
+
+```ts
+import { createFromSource } from "fumadocs-core/search/server"
+
+import { docsSource } from "@/lib/source"
+
+export const { GET } = createFromSource(docsSource, {
+  // https://docs.orama.com/docs/orama-js/supported-languages
+  language: "english",
+})
+```
+
+Only the docs source is indexed; the blog is not part of search. Because this is a real Next.js route handler, it takes precedence over the generic `/api/:path*` rewrite in `next.config.ts` (which forwards the rest of `/api/*` to the backend), so no dedicated search rewrite is needed.
+
+### Keyboard Shortcut
+
+Press `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux) to open the search dialog from any docs page. The search dialog supports full-text search across the documentation, heading-level results, and keyboard navigation.

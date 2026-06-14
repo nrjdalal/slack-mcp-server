@@ -1,0 +1,38 @@
+name: auto-canary-into-main
+
+on:
+  push:
+    branches: ["canary"]
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-canary-into-main:
+    name: Auto create PR to merge canary into main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Create release PR if missing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh pr list --head canary --base main --state open --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            echo "Pull request #$EXISTING already exists. Skipping creation."
+            exit 0
+          fi
+          gh pr create --head canary --base main --draft \
+            --title "ci(release): 🚀 merge canary into main" \
+            --body "This PR was automatically created to merge changes from canary into main.
+
+          > [!IMPORTANT]
+          > Merge with a **merge commit** (not squash), so main keeps shared history with canary and future release diffs stay clean."

@@ -1,0 +1,80 @@
+---
+title: Release Management
+description: Automate releases and changelog generation.
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+## Overview
+
+ZeroStarter uses an automated release workflow that manages versioning, changelog generation, and GitHub releases across `canary` (development) and `main` (production). The only manual step is reviewing and merging the auto-created `canary` → `main` pull request; the changelog, version bump, tag, and GitHub release are all produced automatically.
+
+## Prerequisites
+
+1. Enable the following GitHub setting for the workflow to function:
+
+   **Settings → Actions → General → Workflow permissions**
+   - ✅ **Allow GitHub Actions to create and approve pull requests**
+
+   This setting is required for the automated workflows to create draft PRs.
+
+2. **Changelog Generation**: The release workflow uses `changelogen` to auto-generate the changelog from conventional commits. No additional configuration file is required.
+
+## Workflow
+
+The release pipeline spans two workflows. Only the `canary` → `main` PR is reviewed by a human; everything after it is automatic.
+
+<Steps>
+<Step>
+
+### Open the release PR (automatic)
+
+Every push to `canary` runs `auto-canary-into-main.yml`, which opens a draft PR if one is not already open:
+
+- Title: `ci(release): 🚀 merge canary into main`
+- Head: `canary` → Base: `main`
+
+The PR body asks you to **merge with a merge commit (not squash)** so `main` keeps shared history with `canary`.
+
+</Step>
+
+<Step>
+
+### Review and merge into main
+
+Mark the draft ready, review it, and merge it into `main` with a merge commit. Merging triggers `auto-release.yml`, which runs when a PR whose head branch is `canary` is merged into `main`.
+
+</Step>
+
+<Step>
+
+### Changelog, version, and release (automatic)
+
+`auto-release.yml` checks out `canary` directly (there is no separate `changelog` branch) and:
+
+- Generates `CHANGELOG.md` with `changelogen --bump` from the last `v*` tag
+- Bumps the version in `package.json`
+- Refreshes the build-graph snapshot at `.github/assets/graph-build.svg`
+- Commits `ci(changelog): update changelog and bump version` straight onto `canary`
+- Tags `v<version>` and pushes the branch and tag atomically
+- Publishes a GitHub release whose notes mirror the new `CHANGELOG.md` section
+
+The changelog commit is mechanical (generated from already-reviewed PR titles), so it lands directly on `canary` instead of going through another PR. If the commit range contains only filtered-out commit types, the workflow skips the release.
+
+</Step>
+</Steps>
+
+### Build Checks
+
+`auto-check-build.yml` runs on pull requests targeting `canary` or `main` (and on pull request reviews), executing `bun audit --audit-level high`, `bun run lint`, and `bun run build` with `NODE_ENV=production` and `SKIP_ENV_VALIDATION=true`.
+
+## GitHub Releases
+
+Releases are published automatically by `auto-release.yml`, so there is no manual "Draft a new release" step. After the version bump lands on `canary`, the workflow tags `v<version>` and runs `gh release create` with notes extracted from the matching `CHANGELOG.md` section, which includes:
+
+- Version header with a compare-changes link
+- Categorized changes (📖 Documentation, 🏡 Chore, etc.)
+- Commit links with hashes
+- Contributor credits
+
+If a previous run pushed the tag but failed before publishing, the next run backfills the missing GitHub release for that tag.
