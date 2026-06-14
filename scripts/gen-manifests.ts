@@ -33,7 +33,7 @@ oauth_config:
     user:
 ${list(readScopes)}
 settings:
-  org_deploy_enabled: true
+  org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false
 `
@@ -60,7 +60,7 @@ ${list(readScopes)}
       # write tools
 ${list(writeScopes)}
 settings:
-  org_deploy_enabled: true
+  org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false
 `

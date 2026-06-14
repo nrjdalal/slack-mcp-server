@@ -43,3 +43,6 @@ writeFileSync(PATH, JSON.stringify(methods, null, 2) + "\n")
 console.log(
   `refreshed ${methods.length} methods, ${methods.filter((m) => m.userScopes.length).length} with user scopes`,
 )
+console.warn(
+  "Review the git diff before committing: docs.slack.dev HTML parsing is brittle, and a failed fetch zeroes that method's scopes.",
+)
