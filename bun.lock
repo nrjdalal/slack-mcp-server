@@ -30,7 +30,6 @@
         "@packages/tsconfig": "workspace:*",
         "@types/bun": "catalog:",
         "@types/node": "catalog:",
-        "@typescript/native-preview": "catalog:",
         "tsdown": "catalog:",
         "typescript": "catalog:",
       },
