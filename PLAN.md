@@ -1,4 +1,4 @@
-# slack-mcp-pro — build plan (refined to zerostarter architecture)
+# better-slack-mcp — build plan (refined to zerostarter architecture)
 
 A user-token (`xoxp`) Slack MCP server with a **superset** of korotovsky's `slack-mcp-server` and Slack's hosted connector, built **inside the zerostarter monorepo** following its real conventions, and shipping the one publishable npm package inscope needs.
 
@@ -28,7 +28,7 @@ inscope runs its Slack server as `npx slack-mcp-server@…` — a **published, s
 | New workspace | npm name | private | role |
 |---|---|---|---|
 | `packages/slack-core` | `@packages/slack-core` | yes | `@slack/web-api` wrapper + transport-agnostic tool registry (auth, paging, cache, tool defs/handlers) |
-| `packages/slack-mcp` | **`slack-mcp-pro`** (verify availability, else `@nrjdalal/slack-mcp-pro`) | **no** | **stdio MCP server** + `bin`; consumes slack-core; bundles everything into `dist`; reads `SLACK_MCP_XOXP_TOKEN` at runtime. **This is what inscope `npx`-runs.** |
+| `packages/slack-mcp` | **`better-slack-mcp`** (verify availability, else `@nrjdalal/better-slack-mcp`) | **no** | **stdio MCP server** + `bin`; consumes slack-core; bundles everything into `dist`; reads `SLACK_MCP_XOXP_TOKEN` at runtime. **This is what inscope `npx`-runs.** |
 
 **Scope decision: stdio only, no frontend.** A hosted HTTP MCP endpoint, web UI, OAuth onboarding, auth, and DB are **out of scope**, so `@api/hono`, `@web/next`, `@packages/auth`, and `@packages/db` are trimmed (see §4). Two new workspaces total.
 
@@ -42,8 +42,8 @@ inscope runs its Slack server as `npx slack-mcp-server@…` — a **published, s
 - `tsdown.config.ts`: `dts:{tsgo:true}`, `entry:["src/index.ts"]`, `minify:true`.
 - Contents: `src/client.ts` (auth + WebClient), `src/tools/*` (read/write/canvas/usergroups), `src/registry.ts` (tool list honoring read-only/allow-write).
 
-**`slack-mcp-pro`** (the published exception, folder `packages/slack-mcp`)
-- `package.json`: real npm `name`, `private:false`, `bin: { "slack-mcp-pro": "./dist/index.mjs" }`, `files:["dist"]`, **no `dependencies`** (all bundled).
+**`better-slack-mcp`** (the published exception, folder `packages/slack-mcp`)
+- `package.json`: real npm `name`, `private:false`, `bin: { "better-slack-mcp": "./dist/index.mjs" }`, `files:["dist"]`, **no `dependencies`** (all bundled).
 - `tsdown.config.ts`: `deps.alwaysBundle: [/^@packages\//, "@slack/web-api", "@modelcontextprotocol/sdk"]`, `neverBundle:["bun"]`, no env hook (token is a **runtime** check, not build-time, since inscope sets it per `$PWD`).
 - `src/index.ts`: `@modelcontextprotocol/sdk` `StdioServerTransport` + `McpServer`, registers slack-core tools, validates `SLACK_MCP_XOXP_TOKEN` lazily.
 
@@ -94,7 +94,7 @@ Also plan a Claude Desktop **DXT** manifest (`manifest-dxt.json`) like korotovsk
 ```yaml
 # manifest.full.yaml  (verify exact scope names against Slack's current scope reference)
 display_information:
-  name: slack-mcp-pro
+  name: better-slack-mcp
   description: Personal, per-workspace Slack MCP server (user token)
   background_color: "#0b1221"
 oauth_config:
@@ -187,7 +187,7 @@ Decision is **stdio only, no frontend**, so trim hard (clone-everything-then-tri
 
 - **Remove workspaces:** `web/next`, `api/hono`, `packages/auth`, `packages/db`.
 - **Keep:** `packages/tsconfig`, turbo, `.github` (adapted), oxfmt/oxlint/lefthook/commitlint, `AGENTS.md`. (`packages/env` likely removable too — the stdio server uses a runtime token, not build-time env.)
-- **Add:** `@packages/slack-core` + `slack-mcp-pro`.
+- **Add:** `@packages/slack-core` + `better-slack-mcp`.
 - **Root/catalog cleanup:** drop now-unused deps (next, react, drizzle, better-auth, posthog, hono, `@hono/mcp`, fumadocs, tailwind, shadcn, …); drop surface-B `globalEnv` vars in `turbo.json`; simplify root scripts (no `db:*`/`shadcn:*`). Add `@slack/web-api`.
 
 Result: a lean Bun + turbo tools-monorepo with two workspaces.
@@ -196,15 +196,15 @@ Result: a lean Bun + turbo tools-monorepo with two workspaces.
 
 ## 5. CI / release (fit zero's flow, add the one exception)
 
-- Reuse `auto-check-build.yml` (audit + lint + `turbo build`), `auto-labeler.yml` (auto-labels the new packages), canary→main + `changelogen` + GitHub release.
-- **Add** a dedicated `npm-publish.yml`: on a version tag, build `slack-mcp-pro` and `npm publish --provenance` (the deliberate exception to zero's no-publish norm; only this package publishes).
+- **Branching = zero's cycle; `canary` is the default branch.** PRs squash-merge into `canary`; `main` is release-only (canary→main via `auto-canary-into-main.yml`, then `auto-release.yml` runs `changelogen` + version bump + GitHub release). Reuse `auto-check-build.yml` (audit + lint + `turbo build`) and `auto-labeler.yml`; these zero workflows carry over and get adapted in M0.
+- **Add** a dedicated `npm-publish.yml`: on a version tag, build `better-slack-mcp` and `npm publish --provenance` (the deliberate exception to zero's no-publish norm; only this package publishes).
 - Commits: conventional, no co-author trailer (already enforced).
 
 ---
 
 ## 6. inscope integration
 
-inscope hardcodes the slack server to `slack-mcp-server@1.3.0` (`src/generators/mcp.ts:75-85`). Add a config knob so a workspace can point at `slack-mcp-pro` (custom `command`/`package`/`version`) — the same configurability extension discussed for the github server. Token plumbing (`SLACK_MCP_XOXP_TOKEN` from the chpwd hook) is unchanged, so per-`$PWD` identity works out of the box.
+inscope hardcodes the slack server to `slack-mcp-server@1.3.0` (`src/generators/mcp.ts:75-85`). Add a config knob so a workspace can point at `better-slack-mcp` (custom `command`/`package`/`version`) — the same configurability extension discussed for the github server. Token plumbing (`SLACK_MCP_XOXP_TOKEN` from the chpwd hook) is unchanged, so per-`$PWD` identity works out of the box.
 
 ---
 
@@ -212,9 +212,9 @@ inscope hardcodes the slack server to `slack-mcp-server@1.3.0` (`src/generators/
 
 1. **M0 Base** — `bun install`; set identity in root `package.json`; trim the surface-B workspaces + unused catalog deps; add `@slack/web-api`; `turbo run build` + lint/format green.
 2. **M1 `@packages/slack-core`** — client + the read tools (history, replies, search, list/info/members, users, emoji); `bun test` with a mocked `@slack/web-api`.
-3. **M2 `slack-mcp-pro` (stdio)** — sdk StdioServerTransport, register slack-core tools, runtime token check, bundled `dist`, `bin` runs via `node dist/index.mjs` and `npx`.
+3. **M2 `better-slack-mcp` (stdio)** — sdk StdioServerTransport, register slack-core tools, runtime token check, bundled `dist`, `bin` runs via `node dist/index.mjs` and `npx`.
 4. **M3 Writes (gated) + canvas / files / usergroups / reminders / …** — full superset behind `SLACK_MCP_ALLOW_WRITE`.
-5. **M4 Manifest + publish** — generate `manifest.{readonly,full}.yaml` from the tool registry; add `npm-publish.yml`; first `slack-mcp-pro` release; README/demo.
+5. **M4 Manifest + publish** — generate `manifest.{readonly,full}.yaml` from the tool registry; add `npm-publish.yml`; first `better-slack-mcp` release; README/demo.
 6. **M5 inscope knob** — make inscope's slack server swappable; document.
 
 ---
@@ -222,7 +222,7 @@ inscope hardcodes the slack server to `slack-mcp-server@1.3.0` (`src/generators/
 ## 8. Open decisions (need a call at M0)
 
 - ~~Surface A vs A+B~~ — **decided: stdio only, no frontend.**
-- **Publish exception OK?** Confirm `slack-mcp-pro` goes public + gets an `npm-publish.yml`, against zero's all-private norm. (Required for inscope `npx`.)
-- **npm name:** `slack-mcp-pro` (if free) vs `@nrjdalal/slack-mcp-pro`.
+- **Publish exception OK?** Confirm `better-slack-mcp` goes public + gets an `npm-publish.yml`, against zero's all-private norm. (Required for inscope `npx`.)
+- ~~npm name~~ — **decided: `better-slack-mcp`** (verified available on npm).
 - **Tool naming:** clear verbs (`channel_history`) vs korotovsky's `conversations_*` (offer aliases for drop-in parity).
 - **Whether to ship an `xoxc`/`xoxd` mode** at all.

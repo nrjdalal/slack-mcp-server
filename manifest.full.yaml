@@ -1,4 +1,4 @@
-# Slack app manifest — slack-mcp-pro (full: read + write, user token / xoxp)
+# Slack app manifest — better-slack-mcp (full: read + write, user token / xoxp)
 #
 # Create the app:  api.slack.com/apps  ->  Create New App  ->  From a manifest
 #                  -> paste this file -> Create -> Install to Workspace
@@ -9,7 +9,7 @@
 # scopes are requested so writes work once enabled. For a read-only install use
 # manifest.readonly.yaml instead.
 display_information:
-  name: slack-mcp-pro
+  name: better-slack-mcp
   description: Personal, per-workspace Slack MCP server (user token)
   background_color: "#0b1221"
 oauth_config:

@@ -1,4 +1,4 @@
-# Slack app manifest — slack-mcp-pro (READ ONLY, user token / xoxp) — least privilege
+# Slack app manifest — better-slack-mcp (READ ONLY, user token / xoxp) — least privilege
 #
 # Create the app:  api.slack.com/apps  ->  Create New App  ->  From a manifest
 #                  -> paste -> Create -> Install -> copy the "User OAuth Token".
@@ -6,7 +6,7 @@
 # Verified read-only scope set (https://docs.slack.dev/reference/scopes, Jun 2026).
 # Every scope here is read-only; no message can be sent or mutated with this app.
 display_information:
-  name: slack-mcp-pro (read-only)
+  name: better-slack-mcp (read-only)
   description: Read-only personal Slack MCP server (user token)
   background_color: "#0b1221"
 oauth_config:
