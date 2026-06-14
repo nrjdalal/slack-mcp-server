@@ -2,9 +2,8 @@ import { z } from "zod"
 
 import { defineTool } from "@/types"
 
-export const listUsers = defineTool({
-  name: "list_users",
-  alias: "users_list",
+export const usersList = defineTool({
+  name: "users_list",
   description: "List users in the workspace.",
   tier: "read",
   scopes: ["users:read"],
@@ -21,9 +20,8 @@ export const listUsers = defineTool({
   },
 })
 
-export const userInfo = defineTool({
-  name: "user_info",
-  alias: "users_info",
+export const usersInfo = defineTool({
+  name: "users_info",
   description: "Get information about a user by ID.",
   tier: "read",
   scopes: ["users:read"],
@@ -34,9 +32,8 @@ export const userInfo = defineTool({
   },
 })
 
-export const userProfile = defineTool({
-  name: "user_profile",
-  alias: "users_profile_get",
+export const usersProfileGet = defineTool({
+  name: "users_profile_get",
   description: "Get a user's profile. Omit `user` for the authenticated user.",
   tier: "read",
   scopes: ["users.profile:read"],
@@ -47,9 +44,8 @@ export const userProfile = defineTool({
   },
 })
 
-export const findUserByEmail = defineTool({
-  name: "find_user_by_email",
-  alias: "users_lookupByEmail",
+export const usersLookupByEmail = defineTool({
+  name: "users_lookupByEmail",
   description: "Find a user by email address.",
   tier: "read",
   scopes: ["users:read.email"],

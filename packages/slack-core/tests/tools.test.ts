@@ -5,10 +5,10 @@ import type { WebClient } from "@slack/web-api"
 import { createClient, TOKEN_ENV } from "@/client"
 import { invoke } from "@/invoke"
 import { allTools, readTools, toolByName } from "@/registry"
-import { channelHistory, listChannels } from "@/tools/conversations"
-import { listEmoji } from "@/tools/misc"
+import { conversationsHistory, conversationsList } from "@/tools/conversations"
+import { emojiList } from "@/tools/misc"
 import { searchMessages } from "@/tools/search"
-import { listUsers } from "@/tools/users"
+import { usersList } from "@/tools/users"
 
 type Call = { method: string; args: unknown }
 
@@ -45,7 +45,7 @@ test("createClient requires a token", () => {
   expect(createClient("xoxp-test")).toBeDefined()
 })
 
-test("list_channels calls conversations.list and maps the result", async () => {
+test("conversations_list calls conversations.list and maps the result", async () => {
   const { client, calls } = fakeClient({
     "conversations.list": {
       ok: true,
@@ -53,16 +53,16 @@ test("list_channels calls conversations.list and maps the result", async () => {
       response_metadata: { next_cursor: "CUR" },
     },
   })
-  const out = await listChannels.handler(client, { exclude_archived: true, limit: 200 })
+  const out = await conversationsList.handler(client, { exclude_archived: true, limit: 200 })
   expect(calls[0]?.method).toBe("conversations.list")
   expect(out).toEqual({ channels: [{ id: "C1", name: "general" }], next_cursor: "CUR" })
 })
 
-test("channel_history maps messages and has_more", async () => {
+test("conversations_history maps messages and has_more", async () => {
   const { client } = fakeClient({
     "conversations.history": { ok: true, messages: [{ text: "hi" }], has_more: true },
   })
-  const out = await channelHistory.handler(client, { channel: "C1", limit: 50 })
+  const out = await conversationsHistory.handler(client, { channel: "C1", limit: 50 })
   expect(out).toEqual({ messages: [{ text: "hi" }], has_more: true, next_cursor: undefined })
 })
 
@@ -78,10 +78,10 @@ test("search_messages unwraps matches and total", async () => {
   expect(out.matches).toHaveLength(1)
 })
 
-test("list_users and list_emoji call the right methods", async () => {
+test("users_list and emoji_list call the right methods", async () => {
   const { client, calls } = fakeClient()
-  await listUsers.handler(client, { limit: 200 })
-  await listEmoji.handler(client, {})
+  await usersList.handler(client, { limit: 200 })
+  await emojiList.handler(client, {})
   expect(calls.map((c) => c.method)).toEqual(["users.list", "emoji.list"])
 })
 
@@ -89,19 +89,19 @@ test("registry exposes read-only tools whose names and aliases resolve", () => {
   expect(allTools).toHaveLength(14)
   expect(readTools).toHaveLength(14)
   expect(allTools.every((tool) => tool.tier === "read")).toBe(true)
-  expect(toolByName("list_channels")?.name).toBe("list_channels")
-  expect(toolByName("channels_list")?.name).toBe("list_channels")
+  expect(toolByName("conversations_list")?.name).toBe("conversations_list")
+  expect(toolByName("channels_list")?.name).toBe("conversations_list")
   expect(toolByName("nope")).toBeUndefined()
 })
 
 test("invoke parses input and applies declared defaults", async () => {
   const { client, calls } = fakeClient()
-  await invoke(listChannels, client, {})
+  await invoke(conversationsList, client, {})
   expect(calls[0]?.method).toBe("conversations.list")
   expect(calls[0]?.args).toMatchObject({ exclude_archived: true, limit: 200 })
 })
 
 test("invoke rejects input that violates the schema", async () => {
   const { client } = fakeClient()
-  await expect(invoke(listChannels, client, { limit: 99999 })).rejects.toThrow()
+  await expect(invoke(conversationsList, client, { limit: 99999 })).rejects.toThrow()
 })

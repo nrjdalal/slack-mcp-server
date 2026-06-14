@@ -10,8 +10,8 @@ const channelTypes = z
 const readScopes = ["channels:read", "groups:read", "im:read", "mpim:read"]
 const historyScopes = ["channels:history", "groups:history", "im:history", "mpim:history"]
 
-export const listChannels = defineTool({
-  name: "list_channels",
+export const conversationsList = defineTool({
+  name: "conversations_list",
   alias: "channels_list",
   description: "List channels in the workspace, optionally filtered by type.",
   tier: "read",
@@ -36,8 +36,8 @@ export const listChannels = defineTool({
   },
 })
 
-export const myChannels = defineTool({
-  name: "my_channels",
+export const usersConversations = defineTool({
+  name: "users_conversations",
   alias: "channels_me",
   description: "List channels the authenticated user is a member of.",
   tier: "read",
@@ -60,9 +60,8 @@ export const myChannels = defineTool({
   },
 })
 
-export const channelInfo = defineTool({
-  name: "channel_info",
-  alias: "conversations_info",
+export const conversationsInfo = defineTool({
+  name: "conversations_info",
   description: "Get metadata about a channel or conversation.",
   tier: "read",
   scopes: readScopes,
@@ -73,9 +72,8 @@ export const channelInfo = defineTool({
   },
 })
 
-export const channelMembers = defineTool({
-  name: "channel_members",
-  alias: "conversations_members",
+export const conversationsMembers = defineTool({
+  name: "conversations_members",
   description: "List the member user IDs of a channel.",
   tier: "read",
   scopes: readScopes,
@@ -97,9 +95,8 @@ export const channelMembers = defineTool({
   },
 })
 
-export const channelHistory = defineTool({
-  name: "channel_history",
-  alias: "conversations_history",
+export const conversationsHistory = defineTool({
+  name: "conversations_history",
   description: "Get recent messages from a channel or DM.",
   tier: "read",
   scopes: historyScopes,
@@ -126,9 +123,8 @@ export const channelHistory = defineTool({
   },
 })
 
-export const threadReplies = defineTool({
-  name: "thread_replies",
-  alias: "conversations_replies",
+export const conversationsReplies = defineTool({
+  name: "conversations_replies",
   description: "Get the replies in a message thread.",
   tier: "read",
   scopes: historyScopes,

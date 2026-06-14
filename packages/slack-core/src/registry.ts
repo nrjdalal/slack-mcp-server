@@ -1,30 +1,30 @@
 import {
-  channelHistory,
-  channelInfo,
-  channelMembers,
-  listChannels,
-  myChannels,
-  threadReplies,
+  conversationsHistory,
+  conversationsInfo,
+  conversationsList,
+  conversationsMembers,
+  conversationsReplies,
+  usersConversations,
 } from "@/tools/conversations"
-import { listEmoji, teamInfo } from "@/tools/misc"
+import { emojiList, teamInfo } from "@/tools/misc"
 import { searchFiles, searchMessages } from "@/tools/search"
-import { findUserByEmail, listUsers, userInfo, userProfile } from "@/tools/users"
+import { usersInfo, usersList, usersLookupByEmail, usersProfileGet } from "@/tools/users"
 import type { SlackTool } from "@/types"
 
 export const readTools: SlackTool[] = [
-  listChannels,
-  myChannels,
-  channelInfo,
-  channelMembers,
-  channelHistory,
-  threadReplies,
-  listUsers,
-  userInfo,
-  userProfile,
-  findUserByEmail,
+  conversationsList,
+  usersConversations,
+  conversationsInfo,
+  conversationsMembers,
+  conversationsHistory,
+  conversationsReplies,
+  usersList,
+  usersInfo,
+  usersProfileGet,
+  usersLookupByEmail,
   searchMessages,
   searchFiles,
-  listEmoji,
+  emojiList,
   teamInfo,
 ]
 

@@ -2,9 +2,8 @@ import { z } from "zod"
 
 import { defineTool } from "@/types"
 
-export const listEmoji = defineTool({
-  name: "list_emoji",
-  alias: "emoji_list",
+export const emojiList = defineTool({
+  name: "emoji_list",
   description: "List the workspace's custom emoji.",
   tier: "read",
   scopes: ["emoji:read"],
