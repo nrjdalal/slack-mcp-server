@@ -86,6 +86,9 @@ export const createRateLimitInterceptor = (): NonNullable<
       bucket = createTokenBucket(tierForMethod(method))
       buckets.set(method, bucket)
     }
+    // Note: this runs inside @slack/web-api's maxRequestConcurrency queue, so the
+    // wait holds a concurrency slot. Benign here - composite fan-out is bounded
+    // and tool calls are largely sequential - and the SDK exposes no pre-queue hook.
     await bucket.acquire()
     return config
   }
