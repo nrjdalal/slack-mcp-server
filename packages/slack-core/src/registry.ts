@@ -1,35 +1,58 @@
+import { chatPostMessage } from "@/tools/chat"
 import {
   conversationsHistory,
-  conversationsInfo,
+  conversationsJoin,
+  conversationsLeave,
   conversationsList,
-  conversationsMembers,
+  conversationsMark,
   conversationsReplies,
+  conversationsUnreads,
   usersConversations,
 } from "@/tools/conversations"
-import { emojiList, teamInfo } from "@/tools/misc"
-import { searchFiles, searchMessages } from "@/tools/search"
-import { usersInfo, usersList, usersLookupByEmail, usersProfileGet } from "@/tools/users"
+import { filesInfo } from "@/tools/files"
+import { reactionsAdd, reactionsRemove } from "@/tools/reactions"
+import { searchMessages } from "@/tools/search"
+import {
+  usergroupsCreate,
+  usergroupsList,
+  usergroupsMe,
+  usergroupsUpdate,
+  usergroupsUsersUpdate,
+} from "@/tools/usergroups"
+import { usersSearch } from "@/tools/users"
 import type { SlackTool } from "@/types"
 
-// ordered to match the Slack Web API method sequence
 export const readTools: SlackTool[] = [
   conversationsHistory,
-  conversationsInfo,
-  conversationsList,
-  conversationsMembers,
   conversationsReplies,
-  emojiList,
-  searchFiles,
-  searchMessages,
-  teamInfo,
+  conversationsList,
   usersConversations,
-  usersInfo,
-  usersList,
-  usersLookupByEmail,
-  usersProfileGet,
+  conversationsUnreads,
+  searchMessages,
+  usersSearch,
+  usergroupsList,
+  usergroupsMe,
+  filesInfo,
 ]
 
-export const allTools: SlackTool[] = [...readTools]
+export const writeTools: SlackTool[] = [
+  chatPostMessage,
+  reactionsAdd,
+  reactionsRemove,
+  conversationsMark,
+  conversationsJoin,
+  conversationsLeave,
+  usergroupsCreate,
+  usergroupsUpdate,
+  usergroupsUsersUpdate,
+]
+
+export const allTools: SlackTool[] = [...readTools, ...writeTools]
+
+// write tools are opt-in via SLACK_MCP_ALLOW_WRITE
+export const enabledTools = (
+  allowWrite: boolean = Boolean(process.env.SLACK_MCP_ALLOW_WRITE),
+): SlackTool[] => (allowWrite ? allTools : readTools)
 
 export const toolByName = (name: string): SlackTool | undefined =>
   allTools.find((tool) => tool.name === name || tool.alias === name)
