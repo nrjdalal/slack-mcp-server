@@ -6,7 +6,12 @@ import { createClient, TOKEN_ENV } from "@/client"
 import { invoke } from "@/invoke"
 import { allTools, enabledTools, readTools, toolByName, writeTools } from "@/registry"
 import { chatPostMessage } from "@/tools/chat"
-import { conversationsHistory, conversationsList, conversationsMark } from "@/tools/conversations"
+import {
+  conversationsHistory,
+  conversationsList,
+  conversationsMark,
+  conversationsUnreads,
+} from "@/tools/conversations"
 import { searchMessages } from "@/tools/search"
 import { usersSearch } from "@/tools/users"
 
@@ -90,6 +95,35 @@ test("chat_post_message (write) posts and returns ts", async () => {
   const out = await chatPostMessage.handler(client, { channel: "C1", text: "hi" })
   expect(calls[0]?.method).toBe("chat.postMessage")
   expect(out).toEqual({ ts: "123.45", channel: "C1" })
+})
+
+test("conversations_unreads keeps only channels with unreads, in order", async () => {
+  const counts: Record<string, number> = { C1: 3, C2: 0, C3: 7 }
+  const client = {
+    users: {
+      conversations: async () => ({
+        ok: true,
+        channels: [
+          { id: "C1", name: "one" },
+          { id: "C2", name: "two" },
+          { id: "C3", name: "three" },
+        ],
+      }),
+    },
+    conversations: {
+      info: async ({ channel }: { channel: string }) => ({
+        ok: true,
+        channel: { unread_count_display: counts[channel] ?? 0 },
+      }),
+    },
+  } as unknown as WebClient
+  const out = (await conversationsUnreads.handler(client, { max_channels: 50 })) as {
+    unreads: Array<{ id: string; name?: string; unread_count: number }>
+  }
+  expect(out.unreads).toEqual([
+    { id: "C1", name: "one", unread_count: 3 },
+    { id: "C3", name: "three", unread_count: 7 },
+  ])
 })
 
 test("conversations_mark (write) marks read", async () => {

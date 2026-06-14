@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 
-import { allowWriteFromEnv } from "@/env"
+import { allowWriteFromEnv, allowWriteWarning } from "@/env"
 import { createServer } from "@/server"
 
 const main = async () => {
+  const warning = allowWriteWarning()
+  if (warning) console.error(`better-slack-mcp: ${warning}`)
   const allowWrite = allowWriteFromEnv()
   const server = createServer({ allowWrite })
   await server.connect(new StdioServerTransport())
