@@ -81,7 +81,12 @@ jobs:
           if [ -n "$(git status --porcelain CHANGELOG.md package.json)" ] && echo "$SECTION" | grep -q '^- '; then
             NEW_VERSION=$(bun -e 'console.log(JSON.parse(await Bun.file("package.json").text()).version)')
             # mirror the bumped version into the published workspace package
-            bunx json -I -f packages/slack-mcp-server/package.json -e "this.version=\"$NEW_VERSION\""
+            NEW_VERSION="$NEW_VERSION" bun -e '
+              const p = "packages/slack-mcp-server/package.json"
+              const pkg = JSON.parse(await Bun.file(p).text())
+              pkg.version = process.env.NEW_VERSION
+              await Bun.write(p, JSON.stringify(pkg, null, 2) + "\n")
+            '
             git add CHANGELOG.md package.json packages/slack-mcp-server/package.json
             git commit -m "ci(changelog): update changelog and bump version"
             # fail loudly on tag collision: proceeding would mislabel this changelog section
@@ -95,7 +100,7 @@ jobs:
             fi
             # publish to npm BEFORE pushing the branch + tag, so a failed publish never
             # leaves a tag or GitHub release pointing at a version that is not on npm
-            PACKAGE_NAME=$(bunx json -f packages/slack-mcp-server/package.json -a name)
+            PACKAGE_NAME=$(bun -e 'console.log(JSON.parse(await Bun.file("packages/slack-mcp-server/package.json").text()).name)')
             if [ -z "$NODE_AUTH_TOKEN" ]; then
               echo "::warning::NPM_TOKEN is not set; skipping publish and release this run"
               exit 0
@@ -112,7 +117,9 @@ jobs:
                 const path = "packages/slack-mcp-server/package.json"
                 const pkg = JSON.parse(await Bun.file(path).text())
                 for (const [name, range] of Object.entries(pkg.dependencies ?? {})) {
-                  if (range === "catalog:") pkg.dependencies[name] = cat[name]
+                  if (range !== "catalog:") continue
+                  if (!cat[name]) throw new Error("no catalog entry for " + name)
+                  pkg.dependencies[name] = cat[name]
                 }
                 delete pkg.scripts
                 delete pkg.devDependencies

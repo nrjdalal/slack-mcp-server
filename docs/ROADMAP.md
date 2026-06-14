@@ -1,7 +1,8 @@
 # Roadmap
 
-`better-slack-mcp` is a user-token (xoxp) Slack MCP server that mirrors
-korotovsky/slack-mcp-server's tool set, built on the zerostarter toolchain.
+`slack-mcp-server` (npm `@nrjdalal/slack-mcp-server`) is a user-token (xoxp) Slack
+MCP server that mirrors korotovsky/slack-mcp-server's tool set, built on the
+zerostarter toolchain.
 Work lands PR-by-PR into `canary`; `main` is release-only.
 
 ## Status
@@ -104,8 +105,8 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
   bin `slack-mcp-server`), built from the `packages/slack-mcp-server` workspace. It is
   the one public package (the deliberate exception to zerostarter's all-private norm,
   required for `npx @nrjdalal/slack-mcp-server`). `@packages/slack-core` stays private
-  and is consumed as a `workspace:*` dependency. The GitHub repo is
-  `nrjdalal/slack-mcp-server`; "better-slack-mcp" remains the project display name.
+  and is consumed as a `workspace:*` dependency. The GitHub repo and project are
+  `slack-mcp-server` (renamed from `better-slack-mcp` during M5).
 - **M2 default exposure**: read-only (write tools gated in M3).
 - **M2 transport**: stdio only.
 - **M3 write gating**: one `SLACK_MCP_ALLOW_WRITE` boolean, not korotovsky's

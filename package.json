@@ -1,8 +1,8 @@
 {
-  "name": "better-slack-mcp",
+  "name": "slack-mcp-server",
   "version": "0.0.0",
   "private": true,
-  "description": "Better Slack MCP server (user token / xoxp): a superset of korotovsky/slack-mcp-server and Slack's hosted connector",
+  "description": "Slack MCP server (user token / xoxp): a superset of korotovsky/slack-mcp-server and Slack's hosted connector",
   "keywords": [
     "claude",
     "cli",

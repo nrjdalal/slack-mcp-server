@@ -4,9 +4,9 @@
 
 All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/methods/) order.
 
-**better-slack-mcp** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope).
+**slack-mcp-server** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope).
 
-| slack api | better-slack-mcp | user token scopes |
+| slack api | slack-mcp-server | user token scopes |
 | --- | --- | --- |
 | [`api.test`](https://docs.slack.dev/reference/methods/api.test) | `-` | `-` |
 | [`apps.activities.list`](https://docs.slack.dev/reference/methods/apps.activities.list) | `-` | [`hosting:read`](https://docs.slack.dev/reference/scopes/hosting.read) |
