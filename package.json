@@ -31,7 +31,8 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "lint": "oxlint",
-    "prepare": "bunx lefthook install"
+    "prepare": "bunx lefthook install",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:",
@@ -56,6 +57,7 @@
     "@commitlint/cli": "^21.0.1",
     "@commitlint/config-conventional": "^21.0.1",
     "@modelcontextprotocol/sdk": "1.29.0",
+    "@slack/web-api": "^7.17.0",
     "@types/bun": "^1.3.14",
     "@types/node": "^25.9.0",
     "@typescript/native-preview": "^7.0.0-dev.20260519.1",

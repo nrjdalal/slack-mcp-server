@@ -12,7 +12,8 @@
       "dependsOn": ["^build"],
       "persistent": true,
       "cache": false
-    }
+    },
+    "test": {}
   },
   "globalEnv": ["SKIP_ENV_VALIDATION", "NODE_ENV"]
 }
