@@ -1,0 +1,1153 @@
+[
+  {
+    "method": "api.test",
+    "userScopes": []
+  },
+  {
+    "method": "apps.activities.list",
+    "userScopes": [
+      "hosting:read"
+    ]
+  },
+  {
+    "method": "apps.auth.external.delete",
+    "userScopes": []
+  },
+  {
+    "method": "apps.auth.external.get",
+    "userScopes": []
+  },
+  {
+    "method": "apps.connections.open",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.bulkDelete",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.bulkGet",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.bulkPut",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.count",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.delete",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.get",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.put",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.query",
+    "userScopes": []
+  },
+  {
+    "method": "apps.datastore.update",
+    "userScopes": []
+  },
+  {
+    "method": "apps.event.authorizations.list",
+    "userScopes": []
+  },
+  {
+    "method": "apps.icon.set",
+    "userScopes": [
+      "app_configurations:write"
+    ]
+  },
+  {
+    "method": "apps.manifest.create",
+    "userScopes": []
+  },
+  {
+    "method": "apps.manifest.delete",
+    "userScopes": []
+  },
+  {
+    "method": "apps.manifest.export",
+    "userScopes": []
+  },
+  {
+    "method": "apps.manifest.update",
+    "userScopes": []
+  },
+  {
+    "method": "apps.manifest.validate",
+    "userScopes": []
+  },
+  {
+    "method": "apps.uninstall",
+    "userScopes": []
+  },
+  {
+    "method": "apps.user.connection.update",
+    "userScopes": [
+      "users:write"
+    ]
+  },
+  {
+    "method": "assistant.search.context",
+    "userScopes": [
+      "search:read.files",
+      "search:read.im",
+      "search:read.mpim",
+      "search:read.private",
+      "search:read.public",
+      "search:read.users"
+    ]
+  },
+  {
+    "method": "assistant.search.info",
+    "userScopes": [
+      "search:read.public"
+    ]
+  },
+  {
+    "method": "assistant.threads.setStatus",
+    "userScopes": []
+  },
+  {
+    "method": "assistant.threads.setSuggestedPrompts",
+    "userScopes": []
+  },
+  {
+    "method": "assistant.threads.setTitle",
+    "userScopes": []
+  },
+  {
+    "method": "auth.revoke",
+    "userScopes": []
+  },
+  {
+    "method": "auth.teams.list",
+    "userScopes": []
+  },
+  {
+    "method": "auth.test",
+    "userScopes": []
+  },
+  {
+    "method": "blocks.validate",
+    "userScopes": []
+  },
+  {
+    "method": "bookmarks.add",
+    "userScopes": [
+      "bookmarks:write"
+    ]
+  },
+  {
+    "method": "bookmarks.edit",
+    "userScopes": [
+      "bookmarks:write"
+    ]
+  },
+  {
+    "method": "bookmarks.list",
+    "userScopes": [
+      "bookmarks:read"
+    ]
+  },
+  {
+    "method": "bookmarks.remove",
+    "userScopes": [
+      "bookmarks:write"
+    ]
+  },
+  {
+    "method": "bots.info",
+    "userScopes": [
+      "users:read"
+    ]
+  },
+  {
+    "method": "calls.add",
+    "userScopes": [
+      "calls:write"
+    ]
+  },
+  {
+    "method": "calls.end",
+    "userScopes": [
+      "calls:write"
+    ]
+  },
+  {
+    "method": "calls.info",
+    "userScopes": [
+      "calls:read"
+    ]
+  },
+  {
+    "method": "calls.participants.add",
+    "userScopes": [
+      "calls:write"
+    ]
+  },
+  {
+    "method": "calls.participants.remove",
+    "userScopes": [
+      "calls:write"
+    ]
+  },
+  {
+    "method": "calls.update",
+    "userScopes": [
+      "calls:write"
+    ]
+  },
+  {
+    "method": "canvases.access.delete",
+    "userScopes": [
+      "canvases:write"
+    ]
+  },
+  {
+    "method": "canvases.access.set",
+    "userScopes": [
+      "canvases:write"
+    ]
+  },
+  {
+    "method": "canvases.create",
+    "userScopes": [
+      "canvases:write"
+    ]
+  },
+  {
+    "method": "canvases.delete",
+    "userScopes": [
+      "canvases:write"
+    ]
+  },
+  {
+    "method": "canvases.edit",
+    "userScopes": [
+      "canvases:write"
+    ]
+  },
+  {
+    "method": "canvases.sections.lookup",
+    "userScopes": [
+      "canvases:read"
+    ]
+  },
+  {
+    "method": "chat.appendStream",
+    "userScopes": []
+  },
+  {
+    "method": "chat.delete",
+    "userScopes": [
+      "chat:write"
+    ]
+  },
+  {
+    "method": "chat.deleteScheduledMessage",
+    "userScopes": [
+      "chat:write"
+    ]
+  },
+  {
+    "method": "chat.getPermalink",
+    "userScopes": []
+  },
+  {
+    "method": "chat.meMessage",
+    "userScopes": [
+      "chat:write"
+    ]
+  },
+  {
+    "method": "chat.postEphemeral",
+    "userScopes": [
+      "chat:write"
+    ]
+  },
+  {
+    "method": "chat.postMessage",
+    "userScopes": [
+      "chat:write"
+    ]
+  },
+  {
+    "method": "chat.scheduledMessages.list",
+    "userScopes": []
+  },
+  {
+    "method": "chat.scheduleMessage",
+    "userScopes": [
+      "chat:write"
+    ]
+  },
+  {
+    "method": "chat.startStream",
+    "userScopes": []
+  },
+  {
+    "method": "chat.stopStream",
+    "userScopes": []
+  },
+  {
+    "method": "chat.unfurl",
+    "userScopes": [
+      "links:write"
+    ]
+  },
+  {
+    "method": "chat.update",
+    "userScopes": [
+      "chat:write"
+    ]
+  },
+  {
+    "method": "conversations.acceptSharedInvite",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.approveSharedInvite",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.archive",
+    "userScopes": [
+      "channels:write",
+      "groups:write",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "conversations.canvases.create",
+    "userScopes": [
+      "canvases:write"
+    ]
+  },
+  {
+    "method": "conversations.close",
+    "userScopes": [
+      "channels:write",
+      "groups:write",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "conversations.create",
+    "userScopes": [
+      "channels:write",
+      "groups:write",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "conversations.declineSharedInvite",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.externalInvitePermissions.set",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.history",
+    "userScopes": [
+      "channels:history",
+      "groups:history",
+      "im:history",
+      "mpim:history"
+    ]
+  },
+  {
+    "method": "conversations.info",
+    "userScopes": [
+      "channels:read",
+      "groups:read",
+      "im:read",
+      "mpim:read"
+    ]
+  },
+  {
+    "method": "conversations.invite",
+    "userScopes": [
+      "channels:write",
+      "channels:write.invites",
+      "groups:write",
+      "groups:write.invites",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "conversations.inviteShared",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.join",
+    "userScopes": [
+      "channels:write"
+    ]
+  },
+  {
+    "method": "conversations.kick",
+    "userScopes": [
+      "channels:write",
+      "groups:write"
+    ]
+  },
+  {
+    "method": "conversations.leave",
+    "userScopes": [
+      "channels:write",
+      "groups:write",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "conversations.list",
+    "userScopes": [
+      "channels:read",
+      "groups:read",
+      "im:read",
+      "mpim:read"
+    ]
+  },
+  {
+    "method": "conversations.listConnectInvites",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.mark",
+    "userScopes": [
+      "channels:write",
+      "groups:write",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "conversations.members",
+    "userScopes": [
+      "channels:read",
+      "groups:read",
+      "im:read",
+      "mpim:read"
+    ]
+  },
+  {
+    "method": "conversations.open",
+    "userScopes": [
+      "channels:write",
+      "groups:write",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "conversations.rename",
+    "userScopes": [
+      "channels:write",
+      "groups:write",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "conversations.replies",
+    "userScopes": [
+      "channels:history",
+      "groups:history",
+      "im:history",
+      "mpim:history"
+    ]
+  },
+  {
+    "method": "conversations.requestSharedInvite.approve",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.requestSharedInvite.deny",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.requestSharedInvite.list",
+    "userScopes": []
+  },
+  {
+    "method": "conversations.setPurpose",
+    "userScopes": [
+      "channels:write",
+      "channels:write.topic",
+      "groups:write",
+      "groups:write.topic",
+      "im:write",
+      "im:write.topic",
+      "mpim:write",
+      "mpim:write.topic"
+    ]
+  },
+  {
+    "method": "conversations.setTopic",
+    "userScopes": [
+      "channels:write",
+      "channels:write.topic",
+      "groups:write",
+      "groups:write.topic",
+      "im:write",
+      "im:write.topic",
+      "mpim:write",
+      "mpim:write.topic"
+    ]
+  },
+  {
+    "method": "conversations.unarchive",
+    "userScopes": [
+      "channels:write",
+      "groups:write",
+      "im:write",
+      "mpim:write"
+    ]
+  },
+  {
+    "method": "developer.apps.owners.add",
+    "userScopes": [
+      "apps"
+    ]
+  },
+  {
+    "method": "developer.apps.owners.list",
+    "userScopes": [
+      "apps"
+    ]
+  },
+  {
+    "method": "developer.apps.owners.remove",
+    "userScopes": [
+      "apps"
+    ]
+  },
+  {
+    "method": "dialog.open",
+    "userScopes": []
+  },
+  {
+    "method": "dnd.endDnd",
+    "userScopes": [
+      "dnd:write"
+    ]
+  },
+  {
+    "method": "dnd.endSnooze",
+    "userScopes": [
+      "dnd:write"
+    ]
+  },
+  {
+    "method": "dnd.info",
+    "userScopes": [
+      "dnd:read"
+    ]
+  },
+  {
+    "method": "dnd.setSnooze",
+    "userScopes": [
+      "dnd:write"
+    ]
+  },
+  {
+    "method": "dnd.teamInfo",
+    "userScopes": [
+      "dnd:read"
+    ]
+  },
+  {
+    "method": "emoji.list",
+    "userScopes": [
+      "emoji:read"
+    ]
+  },
+  {
+    "method": "entity.presentDetails",
+    "userScopes": []
+  },
+  {
+    "method": "files.comments.delete",
+    "userScopes": [
+      "files:write"
+    ]
+  },
+  {
+    "method": "files.completeUploadExternal",
+    "userScopes": [
+      "files:write"
+    ]
+  },
+  {
+    "method": "files.delete",
+    "userScopes": [
+      "files:write"
+    ]
+  },
+  {
+    "method": "files.getUploadURLExternal",
+    "userScopes": [
+      "files:write"
+    ]
+  },
+  {
+    "method": "files.info",
+    "userScopes": [
+      "files:read"
+    ]
+  },
+  {
+    "method": "files.list",
+    "userScopes": [
+      "files:read"
+    ]
+  },
+  {
+    "method": "files.remote.add",
+    "userScopes": []
+  },
+  {
+    "method": "files.remote.info",
+    "userScopes": [
+      "remote_files:read"
+    ]
+  },
+  {
+    "method": "files.remote.list",
+    "userScopes": [
+      "remote_files:read"
+    ]
+  },
+  {
+    "method": "files.remote.remove",
+    "userScopes": []
+  },
+  {
+    "method": "files.remote.share",
+    "userScopes": [
+      "remote_files:share"
+    ]
+  },
+  {
+    "method": "files.remote.update",
+    "userScopes": []
+  },
+  {
+    "method": "files.revokePublicURL",
+    "userScopes": [
+      "files:write"
+    ]
+  },
+  {
+    "method": "files.sharedPublicURL",
+    "userScopes": [
+      "files:write"
+    ]
+  },
+  {
+    "method": "files.upload",
+    "userScopes": [
+      "files:write"
+    ]
+  },
+  {
+    "method": "functions.completeError",
+    "userScopes": []
+  },
+  {
+    "method": "functions.completeSuccess",
+    "userScopes": []
+  },
+  {
+    "method": "functions.distributions.permissions.add",
+    "userScopes": []
+  },
+  {
+    "method": "functions.distributions.permissions.list",
+    "userScopes": []
+  },
+  {
+    "method": "functions.distributions.permissions.remove",
+    "userScopes": []
+  },
+  {
+    "method": "functions.distributions.permissions.set",
+    "userScopes": []
+  },
+  {
+    "method": "functions.workflows.steps.list",
+    "userScopes": []
+  },
+  {
+    "method": "functions.workflows.steps.responses.export",
+    "userScopes": []
+  },
+  {
+    "method": "migration.exchange",
+    "userScopes": [
+      "tokens.basic"
+    ]
+  },
+  {
+    "method": "oauth.access",
+    "userScopes": []
+  },
+  {
+    "method": "oauth.v2.access",
+    "userScopes": []
+  },
+  {
+    "method": "oauth.v2.exchange",
+    "userScopes": []
+  },
+  {
+    "method": "oauth.v2.user.access",
+    "userScopes": []
+  },
+  {
+    "method": "openid.connect.token",
+    "userScopes": []
+  },
+  {
+    "method": "openid.connect.userInfo",
+    "userScopes": [
+      "openid"
+    ]
+  },
+  {
+    "method": "pins.add",
+    "userScopes": [
+      "pins:write"
+    ]
+  },
+  {
+    "method": "pins.list",
+    "userScopes": [
+      "pins:read"
+    ]
+  },
+  {
+    "method": "pins.remove",
+    "userScopes": [
+      "pins:write"
+    ]
+  },
+  {
+    "method": "reactions.add",
+    "userScopes": [
+      "reactions:write"
+    ]
+  },
+  {
+    "method": "reactions.get",
+    "userScopes": [
+      "reactions:read"
+    ]
+  },
+  {
+    "method": "reactions.list",
+    "userScopes": [
+      "reactions:read"
+    ]
+  },
+  {
+    "method": "reactions.remove",
+    "userScopes": [
+      "reactions:write"
+    ]
+  },
+  {
+    "method": "reminders.add",
+    "userScopes": [
+      "reminders:write"
+    ]
+  },
+  {
+    "method": "reminders.complete",
+    "userScopes": [
+      "reminders:write"
+    ]
+  },
+  {
+    "method": "reminders.delete",
+    "userScopes": [
+      "reminders:write"
+    ]
+  },
+  {
+    "method": "reminders.info",
+    "userScopes": [
+      "reminders:read"
+    ]
+  },
+  {
+    "method": "reminders.list",
+    "userScopes": [
+      "reminders:read"
+    ]
+  },
+  {
+    "method": "rtm.connect",
+    "userScopes": []
+  },
+  {
+    "method": "rtm.start",
+    "userScopes": []
+  },
+  {
+    "method": "search.all",
+    "userScopes": [
+      "search:read"
+    ]
+  },
+  {
+    "method": "search.files",
+    "userScopes": [
+      "search:read"
+    ]
+  },
+  {
+    "method": "search.messages",
+    "userScopes": [
+      "search:read"
+    ]
+  },
+  {
+    "method": "slackLists.access.delete",
+    "userScopes": [
+      "lists:write"
+    ]
+  },
+  {
+    "method": "slackLists.access.set",
+    "userScopes": [
+      "lists:write"
+    ]
+  },
+  {
+    "method": "slackLists.create",
+    "userScopes": [
+      "lists:write"
+    ]
+  },
+  {
+    "method": "slackLists.download.get",
+    "userScopes": [
+      "lists:read"
+    ]
+  },
+  {
+    "method": "slackLists.download.start",
+    "userScopes": [
+      "lists:read"
+    ]
+  },
+  {
+    "method": "slackLists.items.create",
+    "userScopes": [
+      "lists:write"
+    ]
+  },
+  {
+    "method": "slackLists.items.delete",
+    "userScopes": [
+      "lists:write"
+    ]
+  },
+  {
+    "method": "slackLists.items.deleteMultiple",
+    "userScopes": [
+      "lists:write"
+    ]
+  },
+  {
+    "method": "slackLists.items.info",
+    "userScopes": [
+      "lists:read"
+    ]
+  },
+  {
+    "method": "slackLists.items.list",
+    "userScopes": [
+      "lists:read"
+    ]
+  },
+  {
+    "method": "slackLists.items.update",
+    "userScopes": [
+      "lists:write"
+    ]
+  },
+  {
+    "method": "slackLists.update",
+    "userScopes": [
+      "lists:write"
+    ]
+  },
+  {
+    "method": "stars.add",
+    "userScopes": [
+      "stars:write"
+    ]
+  },
+  {
+    "method": "stars.list",
+    "userScopes": [
+      "stars:read"
+    ]
+  },
+  {
+    "method": "stars.remove",
+    "userScopes": [
+      "stars:write"
+    ]
+  },
+  {
+    "method": "team.accessLogs",
+    "userScopes": [
+      "admin"
+    ]
+  },
+  {
+    "method": "team.billableInfo",
+    "userScopes": [
+      "admin"
+    ]
+  },
+  {
+    "method": "team.billing.info",
+    "userScopes": [
+      "team.billing:read"
+    ]
+  },
+  {
+    "method": "team.externalTeams.disconnect",
+    "userScopes": []
+  },
+  {
+    "method": "team.externalTeams.list",
+    "userScopes": []
+  },
+  {
+    "method": "team.info",
+    "userScopes": [
+      "team:read"
+    ]
+  },
+  {
+    "method": "team.integrationLogs",
+    "userScopes": [
+      "admin"
+    ]
+  },
+  {
+    "method": "team.preferences.list",
+    "userScopes": [
+      "team.preferences:read"
+    ]
+  },
+  {
+    "method": "team.profile.get",
+    "userScopes": [
+      "users.profile:read"
+    ]
+  },
+  {
+    "method": "tooling.tokens.rotate",
+    "userScopes": []
+  },
+  {
+    "method": "usergroups.create",
+    "userScopes": [
+      "usergroups:write"
+    ]
+  },
+  {
+    "method": "usergroups.disable",
+    "userScopes": [
+      "usergroups:write"
+    ]
+  },
+  {
+    "method": "usergroups.enable",
+    "userScopes": [
+      "usergroups:write"
+    ]
+  },
+  {
+    "method": "usergroups.list",
+    "userScopes": [
+      "usergroups:read"
+    ]
+  },
+  {
+    "method": "usergroups.update",
+    "userScopes": [
+      "usergroups:write"
+    ]
+  },
+  {
+    "method": "usergroups.users.list",
+    "userScopes": [
+      "usergroups:read"
+    ]
+  },
+  {
+    "method": "usergroups.users.update",
+    "userScopes": [
+      "usergroups:write"
+    ]
+  },
+  {
+    "method": "users.conversations",
+    "userScopes": [
+      "channels:read",
+      "groups:read",
+      "im:read",
+      "mpim:read"
+    ]
+  },
+  {
+    "method": "users.deletePhoto",
+    "userScopes": [
+      "users.profile:write"
+    ]
+  },
+  {
+    "method": "users.discoverableContacts.lookup",
+    "userScopes": []
+  },
+  {
+    "method": "users.getPresence",
+    "userScopes": [
+      "users:read"
+    ]
+  },
+  {
+    "method": "users.identity",
+    "userScopes": [
+      "identity:read"
+    ]
+  },
+  {
+    "method": "users.info",
+    "userScopes": [
+      "users:read"
+    ]
+  },
+  {
+    "method": "users.list",
+    "userScopes": [
+      "users:read"
+    ]
+  },
+  {
+    "method": "users.lookupByEmail",
+    "userScopes": [
+      "users:read.email"
+    ]
+  },
+  {
+    "method": "users.profile.get",
+    "userScopes": [
+      "users.profile:read"
+    ]
+  },
+  {
+    "method": "users.profile.set",
+    "userScopes": [
+      "users.profile:write"
+    ]
+  },
+  {
+    "method": "users.setActive",
+    "userScopes": [
+      "users:write"
+    ]
+  },
+  {
+    "method": "users.setPhoto",
+    "userScopes": [
+      "users.profile:write"
+    ]
+  },
+  {
+    "method": "users.setPresence",
+    "userScopes": [
+      "users:write"
+    ]
+  },
+  {
+    "method": "views.open",
+    "userScopes": []
+  },
+  {
+    "method": "views.publish",
+    "userScopes": []
+  },
+  {
+    "method": "views.push",
+    "userScopes": []
+  },
+  {
+    "method": "views.update",
+    "userScopes": []
+  },
+  {
+    "method": "workflows.featured.add",
+    "userScopes": [
+      "bookmarks:write"
+    ]
+  },
+  {
+    "method": "workflows.featured.list",
+    "userScopes": [
+      "bookmarks:read"
+    ]
+  },
+  {
+    "method": "workflows.featured.remove",
+    "userScopes": [
+      "bookmarks:write"
+    ]
+  },
+  {
+    "method": "workflows.featured.set",
+    "userScopes": [
+      "bookmarks:write"
+    ]
+  },
+  {
+    "method": "workflows.triggers.permissions.add",
+    "userScopes": []
+  },
+  {
+    "method": "workflows.triggers.permissions.list",
+    "userScopes": []
+  },
+  {
+    "method": "workflows.triggers.permissions.remove",
+    "userScopes": []
+  },
+  {
+    "method": "workflows.triggers.permissions.set",
+    "userScopes": []
+  }
+]
