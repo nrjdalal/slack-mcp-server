@@ -39,6 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# stray dts the slack-core dts build emits for scripts/ it imports from tests
+scripts/*.d.ts
 
 # custom directories
 .playwright-cli/
