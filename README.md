@@ -14,9 +14,9 @@ A user-token (xoxp) Slack MCP server. Tools mirror the Slack Web API.
 ```json
 {
   "mcpServers": {
-    "better-slack-mcp": {
+    "slack-mcp-server": {
       "command": "npx",
-      "args": ["-y", "better-slack-mcp"],
+      "args": ["-y", "@nrjdalal/slack-mcp-server"],
       "env": { "SLACK_MCP_XOXP_TOKEN": "xoxp-your-token" }
     }
   }

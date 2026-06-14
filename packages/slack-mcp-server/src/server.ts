@@ -15,7 +15,7 @@ export const createServer = ({
   client = createClient(),
   allowWrite = false,
 }: CreateServerOptions = {}): McpServer => {
-  const server = new McpServer({ name: "better-slack-mcp", version })
+  const server = new McpServer({ name: "slack-mcp-server", version })
 
   for (const tool of enabledTools(allowWrite)) {
     server.registerTool(
