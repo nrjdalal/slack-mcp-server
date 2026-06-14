@@ -47,11 +47,21 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 - Rate-limit handling (respect `Retry-After`) + bounded retries in the client.
 - `conversations_unreads` bounded concurrency.
 - Type-check `scripts/`.
+- Context: since 2025-05-29, non-Marketplace apps are throttled on
+  `conversations.history` / `.replies` (~1 req/min), so pagination and caching
+  matter most here.
 
 ### M5 - release
 
 - Publish to npm via the `canary` -> `main` -> auto-release flow; bin, changelog,
-  install docs.
+  install docs. May need a dedicated publish workflow if `auto-release` does not
+  already `npm publish`.
+
+### M6 - inscope integration
+
+- Make inscope's Slack MCP server swappable (it currently pins `slack-mcp-server`)
+  so a workspace can point at `better-slack-mcp`. Token plumbing
+  (`SLACK_MCP_XOXP_TOKEN`) is unchanged, so per-directory identity keeps working.
 
 ## Parking lot (post-parity)
 
@@ -63,6 +73,10 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 
 ## Locked decisions
 
-- Package/bin: `@packages/slack-mcp` internally, `better-slack-mcp` as the bin.
-- M2 default exposure: read-only (writes gated in M3).
-- M2 transport: stdio only.
+- **Published package**: `better-slack-mcp` (npm `name`, `private: false`, bin
+  `better-slack-mcp`), built from the `packages/slack-mcp` workspace. It is the one
+  public package (the deliberate exception to zerostarter's all-private norm,
+  required for `npx better-slack-mcp`). `@packages/slack-core` stays private and is
+  consumed as a `workspace:*` dependency.
+- **M2 default exposure**: read-only (write tools gated in M3).
+- **M2 transport**: stdio only.

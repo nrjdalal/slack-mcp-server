@@ -42,4 +42,4 @@ export SLACK_MCP_XOXP_TOKEN=xoxp-your-token
 | [`usergroups.users.update`](https://docs.slack.dev/reference/methods/usergroups.users.update) | `usergroups_users_update` | [`usergroups:write`](https://docs.slack.dev/reference/scopes/usergroups.write) |
 | [`users.conversations`](https://docs.slack.dev/reference/methods/users.conversations) | `users_conversations` | [`channels:read`](https://docs.slack.dev/reference/scopes/channels.read) · [`groups:read`](https://docs.slack.dev/reference/scopes/groups.read) · [`im:read`](https://docs.slack.dev/reference/scopes/im.read) · [`mpim:read`](https://docs.slack.dev/reference/scopes/mpim.read) |
 
-See [docs/coverage.md](docs/coverage.md) for the full non-admin Slack Web API surface (205 methods).
+See [docs/coverage.md](docs/coverage.md) for the full non-admin Slack Web API surface (205 methods), and the [roadmap](docs/ROADMAP.md) for milestones.
