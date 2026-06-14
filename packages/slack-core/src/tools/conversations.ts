@@ -1,6 +1,11 @@
 import { z } from "zod"
 
+import { mapLimit } from "@/concurrency"
 import { defineTool } from "@/types"
+
+// conversations.info is Tier 3; a small fan-out keeps the unreads scan quick
+// without bursting past the per-method rate limit.
+const UNREADS_CONCURRENCY = 4
 
 // scope sets per the Slack method reference (user-token scopes)
 const readScopes = ["channels:read", "groups:read", "im:read", "mpim:read"]
@@ -238,15 +243,22 @@ export const conversationsUnreads = defineTool({
       types: args.types,
       limit: args.max_channels,
     })
-    const unreads: Array<{ id: string; name?: string; unread_count: number }> = []
-    for (const ch of conv.channels ?? []) {
-      if (!ch.id) continue
-      const info = await client.conversations.info({ channel: ch.id })
-      const c = info.channel as { unread_count_display?: number; unread_count?: number } | undefined
-      const count = c?.unread_count_display ?? c?.unread_count ?? 0
-      if (count > 0) unreads.push({ id: ch.id, name: ch.name, unread_count: count })
-    }
-    return { unreads }
+    const scanned = await mapLimit(conv.channels ?? [], UNREADS_CONCURRENCY, async (ch) => {
+      if (!ch.id) return undefined
+      try {
+        const info = await client.conversations.info({ channel: ch.id })
+        const c = info.channel as
+          | { unread_count_display?: number; unread_count?: number }
+          | undefined
+        const count = c?.unread_count_display ?? c?.unread_count ?? 0
+        return count > 0 ? { id: ch.id, name: ch.name, unread_count: count } : undefined
+      } catch {
+        // best effort: a single inaccessible or throttled channel shouldn't
+        // sink the whole scan, so skip it and keep the rest.
+        return undefined
+      }
+    })
+    return { unreads: scanned.filter((u) => u !== undefined) }
   },
 })
 

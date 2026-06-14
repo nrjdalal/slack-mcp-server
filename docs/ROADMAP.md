@@ -10,7 +10,8 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 - **M1 `slack-core`** (tool layer): done (PR #2, merged)
 - **M2 `slack-mcp`** (stdio server): done
 - **M3 write gating**: done
-- **M4 resilience**: next
+- **M4 resilience**: done
+- **M5 release**: next
 
 ## What shaped the current design
 
@@ -52,14 +53,21 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
   `SLACK_MCP_ALLOW_WRITE` (relevant to the M6 inscope swap).
 - Tests: env helper truthiness + env-driven tool exposure end to end.
 
-### M4 - resilience (issue #4)
+### M4 - resilience (issue #4) [done]
 
-- Rate-limit handling (respect `Retry-After`) + bounded retries in the client.
-- `conversations_unreads` bounded concurrency.
-- Type-check `scripts/`.
+- Rate-limit handling: `@slack/web-api` already honours 429 `Retry-After` and
+  retries, so `createClient` sets the policy _explicitly_ and tunes it for
+  interactive use - `retries: 3` (vs the SDK's ~30-min default) so a throttled
+  call surfaces an error in minutes, plus an explicit `maxRequestConcurrency`.
+  Overridable via a `WebClientOptions` arg.
+- `conversations_unreads` bounded concurrency via `mapLimit` (`@/concurrency`),
+  replacing the serial scan; fan-out capped so it doesn't burst the Tier-3 limit.
+- Type-check `scripts/` (`scripts/tsconfig.json`), wired into `check-types`;
+  `check-types` now also runs in CI.
+- Bonus: `SLACK_MCP_ALLOW_WRITE` warns on a set-but-unrecognized value.
 - Context: since 2025-05-29, non-Marketplace apps are throttled on
-  `conversations.history` / `.replies` (~1 req/min), so pagination and caching
-  matter most here.
+  `conversations.history` / `.replies` (~1 req/min), which is why retries are
+  capped low rather than left at the SDK default.
 
 ### M5 - release
 

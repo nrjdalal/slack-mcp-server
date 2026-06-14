@@ -27,6 +27,7 @@ jobs:
         run: |
           bun audit --audit-level high
           bun run lint
+          bun run check-types
           bun run build
           bun run test
         env:
