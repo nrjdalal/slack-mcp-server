@@ -9,7 +9,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { allTools, toolByName } from "../packages/slack-core/src/registry"
 import rawMethods from "./slack-methods.json"
 
-const methods = rawMethods as Array<{ method: string; userScopes: string[] }>
+const methods = rawMethods as Array<{ method: string; userScopes: string[]; tier?: string }>
 const ROOT = new URL("..", import.meta.url).pathname
 
 const code = (v: string) => "`" + v + "`"
@@ -26,14 +26,16 @@ const scopeLink = (s: string) =>
   `[${code(s)}](https://docs.slack.dev/reference/scopes/${s.replaceAll(":", ".")})`
 const scopeCell = (userScopes: string[]) =>
   userScopes.length ? userScopes.map(scopeLink).join(" · ") : code("-")
-const row = (m: { method: string; userScopes: string[] }) =>
-  `| ${methodLink(m.method)} | ${isImplemented(m.method) ? code(toSnake(m.method)) : code("-")} | ${scopeCell(m.userScopes)} |`
+const tierCell = (tier?: string) => code(tier || "-")
+const row = (m: { method: string; userScopes: string[]; tier?: string }) =>
+  `| ${methodLink(m.method)} | ${isImplemented(m.method) ? code(toSnake(m.method)) : code("-")} | ${scopeCell(m.userScopes)} | ${tierCell(m.tier)} |`
 
 const methodSnakes = new Set(methods.map((m) => toSnake(m.method)))
 const composites = allTools.filter((t) => !methodSnakes.has(t.name)).map((t) => t.name)
 const implementedCount = methods.filter((m) => isImplemented(m.method)).length
 
-const header = "| slack api | slack-mcp-server | user token scopes |\n| --- | --- | --- |"
+const header =
+  "| slack api | slack-mcp-server | user token scopes | tier |\n| --- | --- | --- | --- |"
 const doneRows = methods
   .filter((m) => isImplemented(m.method))
   .map(row)
@@ -41,7 +43,7 @@ const doneRows = methods
 const allRows = methods.map(row).join("\n")
 
 const legend =
-  "**slack-mcp-server** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope)."
+  "**slack-mcp-server** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope). **tier** is Slack's documented [rate-limit tier](https://docs.slack.dev/apis/web-api/rate-limits) for the method."
 
 const compositeLine = `${implementedCount} methods covered 1:1, plus ${composites.length} composite tools that wrap no single method: ${composites.map(code).join(", ")} (${allTools.length} tools total).`
 
@@ -95,11 +97,20 @@ ${header}
 ${allRows}
 `
 
-export const buildDocs = () => ({ readme, coverage })
+// method -> documented rate-limit tier, consumed by slack-core's rate limiter.
+const tiers =
+  JSON.stringify(
+    Object.fromEntries(methods.filter((m) => m.tier).map((m) => [m.method, m.tier])),
+    null,
+    2,
+  ) + "\n"
+
+export const buildDocs = () => ({ readme, coverage, tiers })
 
 const files: ReadonlyArray<readonly [string, string]> = [
   [`${ROOT}README.md`, readme],
   [`${ROOT}docs/coverage.md`, coverage],
+  [`${ROOT}packages/slack-core/src/tiers.json`, tiers],
 ]
 
 if (import.meta.main) {
