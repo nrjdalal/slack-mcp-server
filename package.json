@@ -27,9 +27,11 @@
   "scripts": {
     "build": "turbo run build",
     "check-types": "turbo run check-types",
+    "check:manifests": "bun scripts/gen-manifests.ts --check",
     "dev": "turbo run dev",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
+    "gen:manifests": "bun scripts/gen-manifests.ts",
     "lint": "oxlint",
     "prepare": "bunx lefthook install",
     "test": "turbo run test"

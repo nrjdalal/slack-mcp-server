@@ -13,7 +13,13 @@
       "persistent": true,
       "cache": false
     },
-    "test": {}
+    "test": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/manifest.full.yaml",
+        "$TURBO_ROOT$/manifest.readonly.yaml"
+      ]
+    }
   },
   "globalEnv": ["SKIP_ENV_VALIDATION", "NODE_ENV"]
 }
