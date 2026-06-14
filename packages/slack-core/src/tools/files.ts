@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { getToken } from "@/client"
 import { defineTool } from "@/types"
 
 const MAX_BYTES = 5 * 1024 * 1024
@@ -39,7 +40,7 @@ export const filesInfo = defineTool({
         }
       | undefined
     const url = file?.url_private_download ?? file?.url_private
-    const token = (client as { token?: string }).token
+    const token = getToken(client)
     let content: { encoding: "utf8" | "base64"; data: string } | undefined
     if (url && token && (file?.size ?? 0) <= MAX_BYTES) {
       const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
