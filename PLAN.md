@@ -65,13 +65,13 @@ Goal: cover the **whole useful `xoxp` Web API surface**, not a token subset. Eac
 
 **Reactions** — `add_reaction` (`reactions.add`, W), `remove_reaction` (`reactions.remove`, W), `get_reactions` (`reactions.get`, R), `my_reactions` (`reactions.list`, R).
 
-**Files** — `list_files` (`files.list`, R), `file_info` (`files.info`, R), `upload_file` (`files.uploadV2`, W), `delete_file` (`files.delete`, W), `share_public_url` (`files.sharedPublicURL`, W).
+**Files** — `list_files` (`files.list`, R), `file_info` (`files.info`, R), `download_file` (content as text/base64, ≤5MB, R), `upload_file` (upload v2: `files.getUploadURLExternal` + `files.completeUploadExternal`, W — `files.upload` is sunset), `delete_file` (`files.delete`, W), `share_public_url` (`files.sharedPublicURL`, W, **xoxp-only**).
 
 **Users & profile** — `list_users` (`users.list`, R), `find_user_by_email` (`users.lookupByEmail`, R), `user_profile` (`users.info`/`users.profile.get`, R), `set_my_profile` (`users.profile.set`, W), `get_presence` (`users.getPresence`, R), `set_presence` (`users.setPresence`, W).
 
 **Usergroups** — `usergroups_list` (R), `usergroups_create` (W), `usergroups_update` (W), `usergroups_enable`/`usergroups_disable` (W), `usergroups_members` (`usergroups.users.list`, R), `usergroups_set_members` (`usergroups.users.update`, W).
 
-**Pins / Bookmarks / Stars / Reminders** — pins: `pins_list`/`pin`/`unpin` (R/W/W); bookmarks: `bookmarks_list`/`add`/`edit`/`remove` (R/W); reminders: `reminders_list`/`add`/`complete`/`delete` (R/W); stars: `stars_list`/`add`/`remove` (R/W/W, **D**).
+**Pins / Bookmarks** — pins: `pins_list`/`pin`/`unpin` (R/W/W); bookmarks: `bookmarks_list`/`add`/`edit`/`remove` (R/W). **Legacy/avoid:** `reminders.*` (degraded since 2023) and `stars.*` (sunset). Their replacement **Save-for-Later** (`saved_list`/`saved_update`/`saved_clear_completed`) lives on Slack's internal client API → **xoxc/xoxd only**, not `xoxp`.
 
 **Canvases** — `create_canvas`/`edit_canvas`/`delete_canvas` (`canvases.*`, W), `read_canvas` (R), `set_canvas_access` (`canvases.access.set`, W).
 
@@ -85,9 +85,11 @@ Ceiling: internal-client-only endpoints (one-shot unread counts, edge search) ne
 
 Ship a complete, paste-ready **app manifest** at the repo root (`slack-app.manifest.yaml`) so a user creates the app with all scopes in one step ("Create New App → From a manifest"), then installs and copies the `xoxp` token. This is the primary onboarding path and is what makes it enterprise-friendly.
 
-Provide **two variants** (least-privilege):
-- `manifest.readonly.yaml` — read scopes only (for read-only deployments).
-- `manifest.full.yaml` — full union below.
+Two variants now ship at the repo root, scope names **verified against `docs.slack.dev/reference/scopes` (Jun 2026)**:
+- `manifest.readonly.yaml` — least-privilege read scopes only.
+- `manifest.full.yaml` — read + write (the union below).
+
+Also plan a Claude Desktop **DXT** manifest (`manifest-dxt.json`) like korotovsky, for one-click desktop install.
 
 ```yaml
 # manifest.full.yaml  (verify exact scope names against Slack's current scope reference)
@@ -144,6 +146,38 @@ settings:
 ```
 
 Notes: a few scopes are workspace-admin gated (kick/archive); some names differ between classic and granular apps and Slack evolves them, so the build task is to **generate** these manifests from the tool registry's declared scopes (single source of truth) and validate against Slack's scope list, rather than hand-maintaining them.
+
+---
+
+## 3b. Research findings & decisions (korotovsky + Slack's official plugin + Slack API docs)
+
+Verified against source, June 2026. (Sources: korotovsky `pkg/server/server.go` + `docs/01-authentication-setup.md`; `slackapi/slack-mcp-plugin`; `docs.slack.dev/reference/{scopes,methods}`.)
+
+**Naming & gating — adopt the best of both servers:**
+- Primary tool names task-shaped like Slack's official plugin (`slack_search`, `slack_send_message`, `slack_send_message_draft`, `slack_create_canvas`), with **korotovsky `conversations_*` aliases** for drop-in parity.
+- **Read-only by default.** Two-level write gating like korotovsky: registration (`SLACK_MCP_ALLOW_WRITE` / `SLACK_MCP_ENABLED_TOOLS`) + an optional runtime **channel allowlist** for posting (`SLACK_MCP_ADD_MESSAGE_TOOL=true | CID,CID | !CID`). Keep send vs draft as separate tools.
+
+**Architecture to copy from korotovsky:**
+- **Users + channels cache is essential, not optional** — without it `list_channels` and `#channel`/`@user` name-resolution break. Persist to an OS cache dir, TTL + stale-while-revalidate (`SLACK_MCP_CACHE_TTL`, default 24h).
+- Expose **MCP resources** `slack://<workspace>/channels` and `slack://<workspace>/users` (CSV directories) alongside tools.
+- Ship **SKILL.md** guides like the official plugin (its highest-value asset): the Slack **search DSL** (`in:`/`from:`/`has:`/`before:`/`"phrase"`/`-exclude`; Boolean AND/OR/NOT unsupported) and a **markdown→Slack formatting** table.
+- Enterprise Grid: optional `SLACK_MCP_USER_AGENT` + browser-like TLS for locked-down workspaces.
+
+**Scope facts that shaped the manifest (now verified):**
+- korotovsky's **proven** xoxp set is 16 scopes; `manifest.full.yaml` extends it with reactions/files/pins/bookmarks/users.profile/canvases/dnd/team/emoji/users:read.email.
+- **search = `search:read`** (classic, simplest). The hosted connector uses granular `search:read.public/.private/.im/.mpim/.files/.users` (private/im/mpim **consent-gated**) — offer as opt-in.
+- Granular write apps also need `*:write.topic` (topic/purpose) and `*:write.invites` (invite) — commented in the manifest.
+- `users.profile:read|write` use a **dot** (`users.profile:read`); `users:read.email` is separate and required for email.
+
+**Differentiator — user-token-only methods** (impossible with a bot): `search.*`, `conversations.unarchive`, `files.sharedPublicURL`, `users.profile.set`, `dnd.setSnooze/endSnooze`. Lead with these.
+
+**Operational caveats to document:**
+- **History rate limit:** since 2025-05-29, **non-Marketplace** apps are throttled on `conversations.history`/`.replies` to ~1 req/min, ≤15 msgs/call. We're non-Marketplace → paginate carefully, lean on cache, surface the limit.
+- **Paid-plan gates:** usergroups and canvases (`plan upgrade_required` otherwise).
+- **Grid/admin gates:** `conversations.join/rename/archive` may return `enterprise_is_restricted`; `usergroups.users.update` may need an admin token.
+- **Deprecations:** `files.upload` sunset (use upload v2); `stars.*` sunset; `reminders.*` degraded — treat as legacy.
+
+**`slackapi/slack-mcp-plugin` is not a server** — it's client config (`.mcp.json` with `oauth.clientId`) for the hosted `mcp.slack.com` connector, plus slash commands + skills. No manifest, no source. We borrow its **skill files** and **task-shaped naming**, nothing else.
 
 ---
 
