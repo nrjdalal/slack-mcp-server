@@ -71,7 +71,7 @@ A user-token (xoxp) Slack MCP server. Tools mirror the Slack Web API.
 }
 \`\`\`
 
-The server speaks MCP over stdio and exposes the read-only tools below by default. Write tools land behind opt-in env gates in a later milestone.
+The server speaks MCP over stdio and exposes the read-only tools below by default. To also enable the write tools, add \`"SLACK_MCP_ALLOW_WRITE": "true"\` to \`env\`.
 
 ## Implemented tools
 

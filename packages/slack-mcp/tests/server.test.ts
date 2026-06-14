@@ -5,6 +5,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
 import { allTools, readTools, TOKEN_ENV } from "@packages/slack-core"
 import type { WebClient } from "@slack/web-api"
 
+import { ALLOW_WRITE_ENV, allowWriteFromEnv } from "@/env"
 import { createServer } from "@/server"
 
 type Call = { method: string; args: unknown }
@@ -49,6 +50,18 @@ test("allowWrite exposes the full tool set", async () => {
   const { tools } = await client.listTools()
   expect(tools).toHaveLength(allTools.length)
   expect(tools.some((t) => t.name === "chat_post_message")).toBe(true)
+})
+
+test("the env flag drives write-tool exposure end to end", async () => {
+  const { client: slack } = fakeClient()
+  const hasWrite = async (env: NodeJS.ProcessEnv) => {
+    const client = await connect({ client: slack, allowWrite: allowWriteFromEnv(env) })
+    const { tools } = await client.listTools()
+    return tools.some((t) => t.name === "chat_post_message")
+  }
+
+  expect(await hasWrite({ [ALLOW_WRITE_ENV]: "true" })).toBe(true)
+  expect(await hasWrite({})).toBe(false)
 })
 
 test("write tool roundtrip under allowWrite returns the mapped result", async () => {

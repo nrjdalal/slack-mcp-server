@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 
+import { allowWriteFromEnv } from "@/env"
 import { createServer } from "@/server"
 
 const main = async () => {
-  const server = createServer()
+  const allowWrite = allowWriteFromEnv()
+  const server = createServer({ allowWrite })
   await server.connect(new StdioServerTransport())
-  console.error("better-slack-mcp: listening on stdio")
+  console.error(`better-slack-mcp: listening on stdio (${allowWrite ? "read+write" : "read-only"})`)
 }
 
 main().catch((error: unknown) => {

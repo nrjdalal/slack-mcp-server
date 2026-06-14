@@ -9,7 +9,8 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 - **M0 Bootstrap**: done
 - **M1 `slack-core`** (tool layer): done (PR #2, merged)
 - **M2 `slack-mcp`** (stdio server): done
-- **M3 write gating + safety**: next
+- **M3 write gating**: done
+- **M4 resilience**: next
 
 ## What shaped the current design
 
@@ -19,8 +20,9 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
   are generated from the `docs.slack.dev` reference and pinned by drift tests
   (`scripts/gen-manifests.ts`, `scripts/gen-docs.ts`, `scripts/slack-methods.json`).
 - **Gating lives in the server layer.** The core only tags each tool with a
-  read/write `tier`; the runtime write-gating policy follows korotovsky's
-  per-tool env convention and lands in M3.
+  read/write `tier`; the server reads a single `SLACK_MCP_ALLOW_WRITE` flag and
+  selects `enabledTools(allowWrite)`. We deliberately diverged from korotovsky's
+  per-tool env gates (`SLACK_MCP_ADD_MESSAGE_TOOL`, ...) in favour of one switch.
 - **No frontend.**
 - **Resilience and two small gaps** are tracked in issue #4.
 
@@ -38,12 +40,17 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 - `slack-core` is bundled into the published artifact (it stays private/unpublished),
   so the only runtime deps are `@modelcontextprotocol/sdk`, `@slack/web-api`, `zod`.
 
-### M3 - write gating + safety [next]
+### M3 - write gating [done]
 
-- Per-tool env gates: `SLACK_MCP_ADD_MESSAGE_TOOL`, `SLACK_MCP_REACTION_TOOL`,
-  `SLACK_MCP_ATTACHMENT_TOOL`, `SLACK_MCP_MARK_TOOL`.
-- `SLACK_MCP_ENABLED_TOOLS` allow-list; channel scoping (`true` / id-list / `!id`).
-- Wire into the server's tool selection; tests.
+- Single `SLACK_MCP_ALLOW_WRITE` flag (default off; truthy = `true` / `1`,
+  case-insensitive). The server reads it (`packages/slack-mcp/src/env.ts`) and
+  passes `allowWrite` to `createServer`, which selects `enabledTools(allowWrite)`:
+  10 read tools off, all 19 on.
+- Deliberately simpler than korotovsky: no per-tool gates, no
+  `SLACK_MCP_ENABLED_TOOLS` allow-list, no channel scoping. Trade-off: a config
+  switching from `slack-mcp-server` must rename its write env to
+  `SLACK_MCP_ALLOW_WRITE` (relevant to the M6 inscope swap).
+- Tests: env helper truthiness + env-driven tool exposure end to end.
 
 ### M4 - resilience (issue #4)
 
@@ -65,6 +72,7 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
 - Make inscope's Slack MCP server swappable (it currently pins `slack-mcp-server`)
   so a workspace can point at `better-slack-mcp`. Token plumbing
   (`SLACK_MCP_XOXP_TOKEN`) is unchanged, so per-directory identity keeps working.
+  Writes move from korotovsky's per-tool gates to our `SLACK_MCP_ALLOW_WRITE`.
 
 ## Parking lot (post-parity)
 
@@ -83,3 +91,5 @@ Work lands PR-by-PR into `canary`; `main` is release-only.
   consumed as a `workspace:*` dependency.
 - **M2 default exposure**: read-only (write tools gated in M3).
 - **M2 transport**: stdio only.
+- **M3 write gating**: one `SLACK_MCP_ALLOW_WRITE` boolean, not korotovsky's
+  per-tool env gates. Simpler over parity, knowingly.
