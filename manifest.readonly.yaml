@@ -1,10 +1,11 @@
-# Slack app manifest — better-slack-mcp (READ ONLY, user token / xoxp) — least privilege
+# Slack app manifest: better-slack-mcp (read only, user token / xoxp), least privilege
 #
 # Create the app:  api.slack.com/apps  ->  Create New App  ->  From a manifest
 #                  -> paste -> Create -> Install -> copy the "User OAuth Token".
 #
-# Verified read-only scope set (https://docs.slack.dev/reference/scopes, Jun 2026).
-# Every scope here is read-only; no message can be sent or mutated with this app.
+# These user scopes are the exact set the read tools in packages/slack-core
+# declare; no message can be sent or mutated with this app. For read + write
+# use manifest.full.yaml instead.
 display_information:
   name: better-slack-mcp (read-only)
   description: Read-only personal Slack MCP server (user token)
@@ -12,27 +13,19 @@ display_information:
 oauth_config:
   scopes:
     user:
-      - channels:read
-      - groups:read
-      - im:read
-      - mpim:read
       - channels:history
-      - groups:history
-      - im:history
-      - mpim:history
-      - search:read
-      - reactions:read
+      - channels:read
       - files:read
-      - users:read
-      - users.profile:read
+      - groups:history
+      - groups:read
+      - im:history
+      - im:read
+      - mpim:history
+      - mpim:read
+      - search:read
       - usergroups:read
-      - pins:read
-      - bookmarks:read
-      - emoji:read
-      - team:read
-      - dnd:read
-      # - users:read.email   # add only if you need email addresses
-      # - canvases:read      # add only if you read canvases (paid plans)
+      - users:read
+      - users:read.email
 settings:
   org_deploy_enabled: true
   socket_mode_enabled: false
