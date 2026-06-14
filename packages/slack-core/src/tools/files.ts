@@ -6,7 +6,6 @@ const MAX_BYTES = 5 * 1024 * 1024
 
 export const filesInfo = defineTool({
   name: "files_info",
-  alias: "attachment_get_data",
   description:
     "Get a file's metadata and, when under 5MB, its content (text as-is, binary as base64).",
   tier: "read",

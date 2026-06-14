@@ -4,7 +4,6 @@ import { defineTool } from "@/types"
 
 export const searchMessages = defineTool({
   name: "search_messages",
-  alias: "conversations_search_messages",
   description: 'Search messages using Slack search syntax (in:#channel from:@user "phrase").',
   tier: "read",
   scopes: ["search:read"],

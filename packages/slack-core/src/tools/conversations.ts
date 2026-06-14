@@ -13,7 +13,6 @@ const writeScopes = ["channels:write", "groups:write", "im:write", "mpim:write"]
 
 export const conversationsList = defineTool({
   name: "conversations_list",
-  alias: "channels_list",
   description: "List channels in the workspace, optionally filtered by type.",
   tier: "read",
   scopes: readScopes,
@@ -39,7 +38,6 @@ export const conversationsList = defineTool({
 
 export const usersConversations = defineTool({
   name: "users_conversations",
-  alias: "channels_me",
   description: "List channels the authenticated user is a member of.",
   tier: "read",
   scopes: readScopes,

@@ -3,8 +3,7 @@ import { z } from "zod"
 import { defineTool } from "@/types"
 
 export const chatPostMessage = defineTool({
-  name: "chat_postMessage",
-  alias: "conversations_add_message",
+  name: "chat_post_message",
   description: "Post a message to a channel, DM, or thread.",
   tier: "write",
   scopes: ["chat:write"],

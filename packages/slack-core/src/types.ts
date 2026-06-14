@@ -5,7 +5,6 @@ export type Tier = "read" | "write"
 
 export interface SlackTool {
   name: string
-  alias?: string
   description: string
   tier: Tier
   scopes: string[]
@@ -15,7 +14,6 @@ export interface SlackTool {
 
 export const defineTool = <I extends z.ZodTypeAny>(tool: {
   name: string
-  alias?: string
   description: string
   tier: Tier
   scopes: string[]

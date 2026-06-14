@@ -55,4 +55,4 @@ export const enabledTools = (
 ): SlackTool[] => (allowWrite ? allTools : readTools)
 
 export const toolByName = (name: string): SlackTool | undefined =>
-  allTools.find((tool) => tool.name === name || tool.alias === name)
+  allTools.find((tool) => tool.name === name)

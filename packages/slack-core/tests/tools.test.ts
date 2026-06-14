@@ -83,7 +83,7 @@ test("users_search filters users.list by query", async () => {
   expect(out.matches.map((m) => m.id)).toEqual(["U1"])
 })
 
-test("chat_postMessage (write) posts and returns ts", async () => {
+test("chat_post_message (write) posts and returns ts", async () => {
   const { client, calls } = fakeClient({
     "chat.postMessage": { ok: true, ts: "123.45", channel: "C1" },
   })
@@ -109,11 +109,9 @@ test("registry: read/write tiers and the write gate", () => {
   expect(enabledTools(true)).toHaveLength(19)
 })
 
-test("toolByName resolves names and korotovsky aliases", () => {
+test("toolByName resolves tool names", () => {
   expect(toolByName("conversations_list")?.name).toBe("conversations_list")
-  expect(toolByName("channels_list")?.name).toBe("conversations_list")
-  expect(toolByName("chat_postMessage")?.name).toBe("chat_postMessage")
-  expect(toolByName("conversations_add_message")?.name).toBe("chat_postMessage")
+  expect(toolByName("chat_post_message")?.name).toBe("chat_post_message")
   expect(toolByName("nope")).toBeUndefined()
 })
 
