@@ -3,11 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", ".source/**", "bundle/**", "dist/**"]
-    },
-    "build:vercel": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", "vercel-bundle/**"]
+      "outputs": ["dist/**"]
     },
     "check-types": {
       "dependsOn": ["^build"]
@@ -17,34 +13,18 @@
       "persistent": true,
       "cache": false
     },
-    "lint": {},
-    "start": {
-      "persistent": true,
-      "cache": false
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/manifest.full.yaml",
+        "$TURBO_ROOT$/manifest.readonly.yaml",
+        "$TURBO_ROOT$/README.md",
+        "$TURBO_ROOT$/docs/coverage.md",
+        "$TURBO_ROOT$/scripts/gen-docs.ts",
+        "$TURBO_ROOT$/scripts/slack-methods.json"
+      ]
     }
   },
-  "globalEnv": [
-    // CI variables
-    "SKIP_ENV_VALIDATION",
-    // Server variables
-    "NODE_ENV",
-    "BETTER_AUTH_SECRET",
-    "GITHUB_CLIENT_ID",
-    "GITHUB_CLIENT_SECRET",
-    "GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET",
-    "HONO_APP_URL",
-    "HONO_PORT",
-    "HONO_RATE_LIMIT",
-    "HONO_RATE_LIMIT_WINDOW_MS",
-    "HONO_TRUSTED_ORIGINS",
-    "INTERNAL_API_URL",
-    "POSTGRES_URL",
-    // Client variables
-    "NEXT_PUBLIC_API_URL",
-    "NEXT_PUBLIC_APP_URL",
-    "NEXT_PUBLIC_POSTHOG_HOST",
-    "NEXT_PUBLIC_POSTHOG_KEY",
-    "NEXT_PUBLIC_USERJOT_URL"
-  ]
+  "globalEnv": ["SKIP_ENV_VALIDATION", "NODE_ENV"]
 }
