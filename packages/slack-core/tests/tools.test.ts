@@ -3,6 +3,7 @@ import { expect, test } from "bun:test"
 import type { WebClient } from "@slack/web-api"
 
 import { createClient, TOKEN_ENV } from "@/client"
+import { invoke } from "@/invoke"
 import { allTools, readTools, toolByName } from "@/registry"
 import { channelHistory, listChannels } from "@/tools/conversations"
 import { listEmoji } from "@/tools/misc"
@@ -91,4 +92,16 @@ test("registry exposes read-only tools whose names and aliases resolve", () => {
   expect(toolByName("list_channels")?.name).toBe("list_channels")
   expect(toolByName("channels_list")?.name).toBe("list_channels")
   expect(toolByName("nope")).toBeUndefined()
+})
+
+test("invoke parses input and applies declared defaults", async () => {
+  const { client, calls } = fakeClient()
+  await invoke(listChannels, client, {})
+  expect(calls[0]?.method).toBe("conversations.list")
+  expect(calls[0]?.args).toMatchObject({ exclude_archived: true, limit: 200 })
+})
+
+test("invoke rejects input that violates the schema", async () => {
+  const { client } = fakeClient()
+  await expect(invoke(listChannels, client, { limit: 99999 })).rejects.toThrow()
 })
