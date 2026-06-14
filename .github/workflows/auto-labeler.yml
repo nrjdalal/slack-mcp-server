@@ -47,7 +47,20 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            const { globbySync } = require('globby');
+
+            const SKIP = new Set(['node_modules', '.git', 'dist', 'bundle', '.turbo', '.next']);
+            const findPackageJsons = (dir) => {
+              const out = [];
+              for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+                if (entry.isDirectory()) {
+                  if (SKIP.has(entry.name) || entry.name.startsWith('.')) continue;
+                  out.push(...findPackageJsons(path.join(dir, entry.name)));
+                } else if (entry.name === 'package.json') {
+                  out.push(path.join(dir, entry.name).replace(/^\.\//, ''));
+                }
+              }
+              return out;
+            };
 
             const { number: prNumber } = context.payload.pull_request;
             const { owner, repo } = context.repo;
@@ -67,10 +80,7 @@ jobs:
 
             const findPackages = () => {
               const packageMap = new Map();
-              const paths = globbySync(['**/package.json'], {
-                gitignore: true,
-                ignore: ['**/node_modules/**']
-              });
+              const paths = findPackageJsons('.');
 
               for (const pkgPath of paths) {
                 const dir = path.dirname(pkgPath);
