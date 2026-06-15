@@ -15,10 +15,10 @@ This is a point-in-time snapshot — re-audit when either side moves.
 
 ## Headline: is rate limiting done the same way?
 
-**Now close — both proactively throttle, honor `Retry-After`, and cache
-users/channels.** With per-method tier throttling and the layered cache both in
-place, the remaining real difference is pagination (koro auto-paginates), not the
-throttle or caching.
+**Matched on the xoxp surface — both proactively throttle, honor `Retry-After`,
+cache users/channels, resolve names, and can fetch all list pages.** The only
+remaining differences are deliberate scope (token model, transport, write-gating
+granularity, tool names) or places where ours is ahead (uniform retry).
 
 - **koro**: proactive token-bucket throttling per Slack tier
   (`golang.org/x/time/rate`) on its multi-call loops, search, and cache refresh
@@ -49,7 +49,7 @@ retries `conversations.history`/`.replies`; koro calls those through directly.**
 | `history`/`replies` under limit | Direct call, **no retry** → 429 surfaces                             | Retried 3× by SDK                                                                          | DIVERGENT (ours more resilient)             |
 | Concurrency control             | Time-pacing via token buckets (intra-loop)                           | Global cap 8; per-method tier pacing; `mapLimit(4)` in unreads                             | DIVERGENT                                   |
 | Caching                         | Users + channels to disk, 24h TTL, team-scoped                       | In-memory + on-disk (token-scoped, `SLACK_MCP_CACHE_TTL`, default 24h), lazy               | SAME                                        |
-| Pagination                      | Auto-paginates list methods internally                               | Single page; returns `next_cursor`                                                         | DIVERGENT                                   |
+| Pagination                      | Auto-paginates list methods internally                               | Single page + `next_cursor`; opt-in `fetch_all` returns all pages (list tools)             | SAME (ours opt-in)                          |
 | Persistent-limit behavior       | Error after ≤2 retries (or immediate, direct calls)                  | Error after 3 retries                                                                      | DIVERGENT                                   |
 
 Refs — koro: `pkg/limiter/{limits,retry}.go`, `pkg/handler/conversations.go`
@@ -102,6 +102,8 @@ Functional coverage is at parity (~19 `xoxp` tools each). The difference is the
   selective and ours is uniform; otherwise the request-reduction story matches.
 - **Name resolution**: now at parity — `#channel`/`@handle` resolve via the cache
   in `invoke`, with IDs passing through.
-- **Deliberate divergences**: single write flag, stdio-only, `xoxp`-only,
-  no `saved_*`, method-snake-case tool names. See [ROADMAP](ROADMAP.md) locked
-  decisions. The remaining real difference is pagination (koro auto-paginates).
+- **Pagination**: at parity — `conversations_list` / `users_conversations` take
+  an opt-in `fetch_all` that returns every page (koro auto-paginates by default).
+- **Deliberate divergences (not gaps)**: single write flag, stdio-only,
+  `xoxp`-only, no `saved_*`, method-snake-case tool names, JSON vs koro's CSV
+  output. See [ROADMAP](ROADMAP.md) locked decisions.

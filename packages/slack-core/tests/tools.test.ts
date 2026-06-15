@@ -54,6 +54,25 @@ test("conversations_list maps channels and cursor", async () => {
   expect(out).toEqual({ channels: [{ id: "C1", name: "general" }], next_cursor: "CUR" })
 })
 
+test("conversations_list fetch_all follows the cursor across pages", async () => {
+  let call = 0
+  const pages = [
+    { ok: true, channels: [{ id: "C1" }], response_metadata: { next_cursor: "CUR" } },
+    { ok: true, channels: [{ id: "C2" }], response_metadata: { next_cursor: "" } },
+  ]
+  const client = {
+    conversations: { list: async () => pages[call++] },
+  } as unknown as WebClient
+  const out = (await conversationsList.handler(client, {
+    fetch_all: true,
+    exclude_archived: true,
+    limit: 200,
+  })) as { channels: Array<{ id: string }>; next_cursor?: string }
+  expect(out.channels.map((c) => c.id)).toEqual(["C1", "C2"])
+  expect(out.next_cursor).toBeUndefined()
+  expect(call).toBe(2)
+})
+
 test("conversations_history maps messages and has_more", async () => {
   const { client } = fakeClient({
     "conversations.history": { ok: true, messages: [{ text: "hi" }], has_more: true },

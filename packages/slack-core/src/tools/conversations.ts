@@ -24,6 +24,29 @@ const types = z
   .describe(
     "Mix and match channel types by providing a comma-separated list of any combination of public_channel, private_channel, mpim, im.",
   )
+const fetchAll = z
+  .boolean()
+  .default(false)
+  .describe(
+    "Fetch every page and return the full list (ignoring cursor) instead of one page. May be slow on large workspaces.",
+  )
+
+// Loop a cursor-paginated channels endpoint and return all pages.
+const collectAll = async (
+  page: (
+    cursor: string | undefined,
+  ) => Promise<{ channels?: unknown[]; response_metadata?: { next_cursor?: string } }>,
+  start?: string,
+): Promise<unknown[]> => {
+  const all: unknown[] = []
+  let cursor = start
+  do {
+    const res = await page(cursor)
+    if (res.channels) all.push(...res.channels)
+    cursor = res.response_metadata?.next_cursor || undefined
+  } while (cursor)
+  return all
+}
 
 export const conversationsHistory = defineTool({
   name: "conversations_history",
@@ -160,15 +183,20 @@ export const conversationsList = defineTool({
       .optional()
       .describe("Encoded team id to list channels in, required if token belongs to org-wide app."),
     types,
+    fetch_all: fetchAll,
   }),
   handler: async (client, args) => {
-    const res = await client.conversations.list({
-      cursor: args.cursor,
-      exclude_archived: args.exclude_archived,
-      limit: args.limit,
-      team_id: args.team_id,
-      types: args.types,
-    })
+    const page = (cursor: string | undefined) =>
+      client.conversations.list({
+        cursor,
+        exclude_archived: args.exclude_archived,
+        limit: args.limit,
+        team_id: args.team_id,
+        types: args.types,
+      })
+    if (args.fetch_all)
+      return { channels: await collectAll(page, args.cursor), next_cursor: undefined }
+    const res = await page(args.cursor)
     return {
       channels: res.channels ?? [],
       next_cursor: res.response_metadata?.next_cursor || undefined,
@@ -205,16 +233,21 @@ export const usersConversations = defineTool({
       .string()
       .optional()
       .describe("Browse conversations by a specific user ID's membership."),
+    fetch_all: fetchAll,
   }),
   handler: async (client, args) => {
-    const res = await client.users.conversations({
-      cursor: args.cursor,
-      exclude_archived: args.exclude_archived,
-      limit: args.limit,
-      team_id: args.team_id,
-      types: args.types,
-      user: args.user,
-    })
+    const page = (cursor: string | undefined) =>
+      client.users.conversations({
+        cursor,
+        exclude_archived: args.exclude_archived,
+        limit: args.limit,
+        team_id: args.team_id,
+        types: args.types,
+        user: args.user,
+      })
+    if (args.fetch_all)
+      return { channels: await collectAll(page, args.cursor), next_cursor: undefined }
+    const res = await page(args.cursor)
     return {
       channels: res.channels ?? [],
       next_cursor: res.response_metadata?.next_cursor || undefined,
