@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.1.1
+
+[compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.0...v0.1.1)
+
+### 🚀 Enhancements
+
+- Proactive per-method tier throttling from scraped Slack tiers ([a7b8a6f](https://github.com/nrjdalal/slack-mcp-server/commit/a7b8a6f))
+
+### 📖 Documentation
+
+- Add parity audit and improvements assessment ([c1591f1](https://github.com/nrjdalal/slack-mcp-server/commit/c1591f1))
+
+### ❤️ Contributors
+
+- Neeraj Dalal @nrjdalal
+
 ## v0.1.0
 
 ### 🚀 Enhancements
