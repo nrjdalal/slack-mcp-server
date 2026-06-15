@@ -6,6 +6,7 @@ zerostarter toolchain.
 Work lands PR-by-PR into `canary`; `main` is release-only.
 
 Related: [phases.md](phases.md) (forward plan / sequence) ·
+[extensions.md](extensions.md) (extend catalog: tools + scopes) ·
 [parity.md](parity.md) (behavior comparison vs korotovsky) ·
 [improvements.md](improvements.md) (standing do/leave/remove assessment) ·
 [audit.md](audit.md) (scored implementation snapshot).

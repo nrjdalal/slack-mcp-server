@@ -2,9 +2,10 @@
 
 The forward plan for `@nrjdalal/slack-mcp-server`. Milestones M0–M5 (bootstrap →
 release) are done and koro xoxp parity is reached; this doc sequences what comes
-next. It is the single source for ordering — the "next" notes in
-[improvements.md](improvements.md), the backlog in [audit.md](audit.md), and the
-parking lot in [ROADMAP.md](ROADMAP.md) all defer here for sequence.
+next. It is the single source for **ordering**; the **what** for the extend phases
+lives in the [extension catalog](extensions.md). The "next" notes in
+[improvements.md](improvements.md) and the backlog in [audit.md](audit.md) defer
+here for sequence.
 
 ## North star
 
@@ -75,48 +76,20 @@ policy **before** building them.
 
 ## P3 — Extend, Batch A: free tools (zero new scopes)
 
-24 unimplemented methods need only scopes we already request, so existing installs
-keep working with no re-consent. Ship the highest-value first:
-
-| Tool                    | Method                         | Note                           |
-| ----------------------- | ------------------------------ | ------------------------------ |
-| `chat_update`           | `chat.update`                  | edit a message                 |
-| `chat_delete`           | `chat.delete`                  | **destructive** (needs P2)     |
-| `conversations_open`    | `conversations.open`           | start a DM / group DM          |
-| `conversations_members` | `conversations.members`        | who's in a channel             |
-| `users_info`            | `users.info`                   | direct lookup by ID            |
-| `users_lookup_by_email` | `users.lookupByEmail`          | find a user by email           |
-| `chat_schedule_message` | `chat.scheduleMessage` (+ del) | send later                     |
-| `search_files`          | `search.files`                 | broaden search beyond messages |
-
-Candidates held for later within Batch A: `conversations_create`/`archive`/
-`rename`/`kick` (channel lifecycle, several destructive), `files_list`,
-`chat_post_ephemeral`, `users_get_presence`.
+The ~8 highest-value tools that need only scopes we already request, so existing
+installs keep working with no re-consent. Tool list: [extensions.md § Batch
+A](extensions.md#batch-a--free-zero-new-scopes).
 
 **Exit:** new tools shipped with **shaped** outputs (per P1) and respecting the P2
 gate; manifests unchanged (drift confirms zero new scopes); tests + docs green.
 
 ## P4 — Extend, Batch B: curated new scopes
 
-Each row adds OAuth scope(s), so users must re-install with the updated manifest —
-spend them deliberately and document the re-consent step.
-
-| Capability              | Methods                                                                 | New scope(s)                        |
-| ----------------------- | ----------------------------------------------------------------------- | ----------------------------------- |
-| Read reactions          | `reactions.get` / `.list`                                               | `reactions:read`                    |
-| Pins                    | `pins.list/add/remove`                                                  | `pins:read`, `pins:write`           |
-| Reminders ("remind me") | `reminders.add/list/complete`                                           | `reminders:read`, `reminders:write` |
-| Profile + set status    | `users.profile.get/set`                                                 | `users.profile:read`, `:write`      |
-| Files: upload / delete  | `files.getUploadURLExternal` → `completeUploadExternal`, `files.delete` | `files:write`                       |
+A deliberate set that adds a handful of new OAuth scopes (re-install required).
+Tool list: [extensions.md § Batch B](extensions.md#batch-b--curated-new-scopes).
 
 **Exit:** manifests regenerated, README documents the re-install; tools shaped +
 gated; tests + drift green.
 
-## Parking lot (post-extend or explicit ask)
-
-- **Larger Slack surfaces:** Lists (`lists:*`), Canvases (`canvases:*`), Calls
-  (`calls:*`) — big, niche; only on demand.
-- **Beyond xoxp:** `xoxc`/`xoxd` browser-token model, SSE/HTTP transport, `saved_*`
-  — the original superset goal; revisit once the xoxp surface is best-in-class.
-- **Skip:** `stars:*` (deprecated), anything `admin`/`team.billing`/`accessLogs`
-  (non-admin server).
+The parking lot (Lists/Canvases/Calls, beyond-xoxp, skips) lives in the
+[extension catalog](extensions.md#parking-lot-post-extend-or-explicit-ask).
