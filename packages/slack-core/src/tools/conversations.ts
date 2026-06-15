@@ -24,6 +24,35 @@ const types = z
   .describe(
     "Mix and match channel types by providing a comma-separated list of any combination of public_channel, private_channel, mpim, im.",
   )
+const fetchAll = z
+  .boolean()
+  .default(false)
+  .describe(
+    "Fetch every page and return the full list instead of one page. Bounded to ~50 pages; if more remain, next_cursor is returned to continue. May be slow on large workspaces.",
+  )
+
+// Safety bound for fetch_all (~50k channels at limit 999).
+const MAX_PAGES = 50
+
+// Drain a cursor-paginated channels endpoint, up to MAX_PAGES. Returns the
+// accumulated channels and, if the cap is hit before exhaustion, the cursor to
+// continue from - so a truncated fetch_all is resumable, not silently cut.
+const collectAll = async (
+  page: (
+    cursor: string | undefined,
+  ) => Promise<{ channels?: unknown[]; response_metadata?: { next_cursor?: string } }>,
+  start?: string,
+): Promise<{ channels: unknown[]; next_cursor?: string }> => {
+  const channels: unknown[] = []
+  let cursor = start
+  for (let i = 0; i < MAX_PAGES; i++) {
+    const res = await page(cursor)
+    if (res.channels) channels.push(...res.channels)
+    cursor = res.response_metadata?.next_cursor || undefined
+    if (!cursor) return { channels }
+  }
+  return { channels, next_cursor: cursor }
+}
 
 export const conversationsHistory = defineTool({
   name: "conversations_history",
@@ -160,15 +189,19 @@ export const conversationsList = defineTool({
       .optional()
       .describe("Encoded team id to list channels in, required if token belongs to org-wide app."),
     types,
+    fetch_all: fetchAll,
   }),
   handler: async (client, args) => {
-    const res = await client.conversations.list({
-      cursor: args.cursor,
-      exclude_archived: args.exclude_archived,
-      limit: args.limit,
-      team_id: args.team_id,
-      types: args.types,
-    })
+    const page = (cursor: string | undefined) =>
+      client.conversations.list({
+        cursor,
+        exclude_archived: args.exclude_archived,
+        limit: args.fetch_all ? 999 : args.limit,
+        team_id: args.team_id,
+        types: args.types,
+      })
+    if (args.fetch_all) return collectAll(page, args.cursor)
+    const res = await page(args.cursor)
     return {
       channels: res.channels ?? [],
       next_cursor: res.response_metadata?.next_cursor || undefined,
@@ -205,16 +238,20 @@ export const usersConversations = defineTool({
       .string()
       .optional()
       .describe("Browse conversations by a specific user ID's membership."),
+    fetch_all: fetchAll,
   }),
   handler: async (client, args) => {
-    const res = await client.users.conversations({
-      cursor: args.cursor,
-      exclude_archived: args.exclude_archived,
-      limit: args.limit,
-      team_id: args.team_id,
-      types: args.types,
-      user: args.user,
-    })
+    const page = (cursor: string | undefined) =>
+      client.users.conversations({
+        cursor,
+        exclude_archived: args.exclude_archived,
+        limit: args.fetch_all ? 999 : args.limit,
+        team_id: args.team_id,
+        types: args.types,
+        user: args.user,
+      })
+    if (args.fetch_all) return collectAll(page, args.cursor)
+    const res = await page(args.cursor)
     return {
       channels: res.channels ?? [],
       next_cursor: res.response_metadata?.next_cursor || undefined,
