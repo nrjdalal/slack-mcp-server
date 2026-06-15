@@ -6,7 +6,8 @@ zerostarter toolchain.
 Work lands PR-by-PR into `canary`; `main` is release-only.
 
 Related: [parity.md](parity.md) (behavior comparison vs korotovsky) ·
-[improvements.md](improvements.md) (standing do/leave/remove assessment).
+[improvements.md](improvements.md) (standing do/leave/remove assessment) ·
+[audit.md](audit.md) (scored implementation snapshot).
 
 ## Status
 
