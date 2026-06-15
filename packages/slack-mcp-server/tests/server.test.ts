@@ -33,23 +33,23 @@ const connect = async (opts?: Parameters<typeof createServer>[0]) => {
   return client
 }
 
-test("lists the read-only tool set by default", async () => {
+test("exposes the full tool set by default", async () => {
   const { client: slack } = fakeClient()
   const client = await connect({ client: slack })
+
+  const { tools } = await client.listTools()
+  expect(tools).toHaveLength(allTools.length)
+  expect(tools.some((t) => t.name === "chat_post_message")).toBe(true)
+})
+
+test("allowWrite: false lists only the read-only tool set", async () => {
+  const { client: slack } = fakeClient()
+  const client = await connect({ client: slack, allowWrite: false })
 
   const { tools } = await client.listTools()
   expect(tools.map((t) => t.name).sort()).toEqual(readTools.map((t) => t.name).sort())
   expect(tools.every((t) => t.annotations?.readOnlyHint === true)).toBe(true)
   expect(tools.some((t) => t.name === "chat_post_message")).toBe(false)
-})
-
-test("allowWrite exposes the full tool set", async () => {
-  const { client: slack } = fakeClient()
-  const client = await connect({ client: slack, allowWrite: true })
-
-  const { tools } = await client.listTools()
-  expect(tools).toHaveLength(allTools.length)
-  expect(tools.some((t) => t.name === "chat_post_message")).toBe(true)
 })
 
 test("the env flag drives write-tool exposure end to end", async () => {
@@ -60,8 +60,8 @@ test("the env flag drives write-tool exposure end to end", async () => {
     return tools.some((t) => t.name === "chat_post_message")
   }
 
-  expect(await hasWrite({ [ALLOW_WRITE_ENV]: "true" })).toBe(true)
-  expect(await hasWrite({})).toBe(false)
+  expect(await hasWrite({})).toBe(true)
+  expect(await hasWrite({ [ALLOW_WRITE_ENV]: "false" })).toBe(false)
 })
 
 test("write tool roundtrip under allowWrite returns the mapped result", async () => {

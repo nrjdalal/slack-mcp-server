@@ -1,0 +1,38 @@
+{
+  "display_information": {
+    "name": "slack-mcp-server",
+    "description": "Personal, per-workspace Slack MCP server (user token)",
+    "background_color": "#0b1221"
+  },
+  "oauth_config": {
+    "scopes": {
+      "user": [
+        "channels:history",
+        "channels:read",
+        "files:read",
+        "groups:history",
+        "groups:read",
+        "im:history",
+        "im:read",
+        "mpim:history",
+        "mpim:read",
+        "search:read",
+        "usergroups:read",
+        "users:read",
+        "users:read.email",
+        "channels:write",
+        "chat:write",
+        "groups:write",
+        "im:write",
+        "mpim:write",
+        "reactions:write",
+        "usergroups:write"
+      ]
+    }
+  },
+  "settings": {
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

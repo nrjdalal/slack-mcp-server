@@ -48,10 +48,11 @@ Related: [parity.md](parity.md) (behavior comparison vs korotovsky) ·
 
 ### M3 - write gating [done]
 
-- Single `SLACK_MCP_ALLOW_WRITE` flag (default off; truthy = `true` / `1`,
-  case-insensitive). The server reads it (`packages/slack-mcp-server/src/env.ts`) and
-  passes `allowWrite` to `createServer`, which selects `enabledTools(allowWrite)`:
-  10 read tools off, all 19 on.
+- Single `SLACK_MCP_ALLOW_WRITE` flag, **writes on by default**; set a falsy
+  value (`false` / `0`, case-insensitive) to run read-only. The server reads it
+  (`packages/slack-mcp-server/src/env.ts`) and passes `allowWrite` to
+  `createServer`, which selects `enabledTools(allowWrite)`: all 19 tools on,
+  10 read-only when disabled.
 - Deliberately simpler than korotovsky: no per-tool gates, no
   `SLACK_MCP_ENABLED_TOOLS` allow-list, no channel scoping. Trade-off: a config
   switching from `slack-mcp-server` must rename its write env to
@@ -114,4 +115,6 @@ Related: [parity.md](parity.md) (behavior comparison vs korotovsky) ·
 - **M2 default exposure**: read-only (write tools gated in M3).
 - **M2 transport**: stdio only.
 - **M3 write gating**: one `SLACK_MCP_ALLOW_WRITE` boolean, not korotovsky's
-  per-tool env gates. Simpler over parity, knowingly.
+  per-tool env gates. Simpler over parity, knowingly. Default flipped to
+  **writes-on** so the npx/inscope swap needs no write env at all (set
+  `SLACK_MCP_ALLOW_WRITE=false` for read-only).

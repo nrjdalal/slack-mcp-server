@@ -8,18 +8,18 @@ import type { SlackTool } from "@/types"
 const ROOT = `${import.meta.dir}/../../..`
 const uniq = (tools: SlackTool[]) => [...new Set(tools.flatMap((t) => t.scopes))].sort()
 
-// parse the `user:` scope list out of a manifest yaml
-const manifestScopes = (file: string) =>
-  readFileSync(`${ROOT}/${file}`, "utf8")
-    .split("\n")
-    .filter((l) => /^\s+-\s/.test(l))
-    .map((l) => l.replace(/^\s+-\s*/, "").trim())
-    .sort()
+// pull the user scope list out of a JSON manifest
+const manifestScopes = (file: string): string[] => {
+  const m = JSON.parse(readFileSync(`${ROOT}/${file}`, "utf8")) as {
+    oauth_config: { scopes: { user: string[] } }
+  }
+  return [...m.oauth_config.scopes.user].sort()
+}
 
-test("manifest.readonly.yaml is in sync with readTools scopes", () => {
-  expect(manifestScopes("manifest.readonly.yaml")).toEqual(uniq(readTools))
+test("manifest.readonly.json is in sync with readTools scopes", () => {
+  expect(manifestScopes("manifest.readonly.json")).toEqual(uniq(readTools))
 })
 
-test("manifest.full.yaml is in sync with allTools scopes", () => {
-  expect(manifestScopes("manifest.full.yaml")).toEqual(uniq(allTools))
+test("manifest.full.json is in sync with allTools scopes", () => {
+  expect(manifestScopes("manifest.full.json")).toEqual(uniq(allTools))
 })

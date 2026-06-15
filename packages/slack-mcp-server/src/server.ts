@@ -9,11 +9,11 @@ export interface CreateServerOptions {
   allowWrite?: boolean
 }
 
-// Wraps the slack-core registry in an McpServer. Read-only by default; write
-// tools stay gated until the M3 policy layer decides exposure.
+// Wraps the slack-core registry in an McpServer. Writes are enabled by default;
+// pass allowWrite: false to expose only the read-only tools.
 export const createServer = ({
   client = createClient(),
-  allowWrite = false,
+  allowWrite = true,
 }: CreateServerOptions = {}): McpServer => {
   const server = new McpServer({ name: "slack-mcp-server", version })
 
