@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.6
+
+[compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.5...v0.1.6)
+
+### 📖 Documentation
+
+- Add phase plan and extension catalog ([69a4632](https://github.com/nrjdalal/slack-mcp-server/commit/69a4632))
+
+### ❤️ Contributors
+
+- Neeraj Dalal @nrjdalal
+
 ## v0.1.5
 
 [compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.4...v0.1.5)
