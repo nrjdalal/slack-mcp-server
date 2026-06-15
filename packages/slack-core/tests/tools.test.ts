@@ -5,7 +5,12 @@ import type { WebClient } from "@slack/web-api"
 import { createClient, TOKEN_ENV } from "@/client"
 import { invoke } from "@/invoke"
 import { allTools, enabledTools, readTools, toolByName, writeTools } from "@/registry"
-import { chatPostMessage, chatScheduleMessage, chatUpdate } from "@/tools/chat"
+import {
+  chatDeleteScheduledMessage,
+  chatPostMessage,
+  chatScheduleMessage,
+  chatUpdate,
+} from "@/tools/chat"
 import {
   conversationsHistory,
   conversationsList,
@@ -217,6 +222,24 @@ test("chat_schedule_message (write) returns the scheduled id", async () => {
   } as unknown as WebClient
   const out = await chatScheduleMessage.handler(client, { channel: "C1", post_at: 123, text: "hi" })
   expect(out).toEqual({ scheduled_message_id: "Q1", channel: "C1", post_at: 123 })
+})
+
+test("chat_delete_scheduled_message (write) deletes and returns ok", async () => {
+  let received: unknown
+  const client = {
+    chat: {
+      deleteScheduledMessage: async (a: unknown) => {
+        received = a
+        return { ok: true }
+      },
+    },
+  } as unknown as WebClient
+  const out = await chatDeleteScheduledMessage.handler(client, {
+    channel: "C1",
+    scheduled_message_id: "Q1",
+  })
+  expect((received as { scheduled_message_id?: string }).scheduled_message_id).toBe("Q1")
+  expect(out).toEqual({ ok: true })
 })
 
 test("conversations_members maps members and cursor", async () => {
