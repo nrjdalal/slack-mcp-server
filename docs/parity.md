@@ -40,17 +40,17 @@ retries `conversations.history`/`.replies`; koro calls those through directly.**
 
 ## Dimension 1 — rate limiting & resilience
 
-| Behavior                        | koro                                                                 | ours                                                                                       | Verdict                                     |
-| ------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------- |
-| 429 / `Retry-After`             | Honored via `CallWithRetry` on **wrapped** calls only                | Honored by `@slack/web-api` on **every** call                                              | SAME primitive, DIVERGENT coverage          |
-| Proactive tier throttle         | Token buckets: Tier2 1/3s b3, Tier2boost 1/300ms b5, Tier3 1/1.2s b4 | Per-method token buckets sized by each method's documented (scraped) tier, via interceptor | SAME (ours per-method; koro per-invocation) |
-| Retry count / backoff           | `maxRetries: 2`, wait = exact `Retry-After`                          | `retries: 3`, factor 2, min 1s, max 30s, randomized                                        | DIVERGENT                                   |
-| Calls retried                   | search, unreads internals, cache refresh, edge                       | All calls (uniform via SDK)                                                                | DIVERGENT                                   |
-| `history`/`replies` under limit | Direct call, **no retry** → 429 surfaces                             | Retried 3× by SDK                                                                          | DIVERGENT (ours more resilient)             |
-| Concurrency control             | Time-pacing via token buckets (intra-loop)                           | Global cap 8; per-method tier pacing; `mapLimit(4)` in unreads                             | DIVERGENT                                   |
-| Caching                         | Users + channels to disk, 24h TTL, team-scoped                       | In-memory + on-disk (token-scoped, `SLACK_MCP_CACHE_TTL`, default 24h), lazy               | SAME                                        |
-| Pagination                      | Auto-paginates list methods internally                               | Single page + `next_cursor`; opt-in `fetch_all` returns all pages (list tools)             | SAME (ours opt-in)                          |
-| Persistent-limit behavior       | Error after ≤2 retries (or immediate, direct calls)                  | Error after 3 retries                                                                      | DIVERGENT                                   |
+| Behavior                        | koro                                                                 | ours                                                                                                     | Verdict                                     |
+| ------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 429 / `Retry-After`             | Honored via `CallWithRetry` on **wrapped** calls only                | Honored by `@slack/web-api` on **every** call                                                            | SAME primitive, DIVERGENT coverage          |
+| Proactive tier throttle         | Token buckets: Tier2 1/3s b3, Tier2boost 1/300ms b5, Tier3 1/1.2s b4 | Per-method token buckets sized by each method's documented (scraped) tier, via interceptor               | SAME (ours per-method; koro per-invocation) |
+| Retry count / backoff           | `maxRetries: 2`, wait = exact `Retry-After`                          | `retries: 3`, factor 2, min 1s, max 30s, randomized                                                      | DIVERGENT                                   |
+| Calls retried                   | search, unreads internals, cache refresh, edge                       | All calls (uniform via SDK)                                                                              | DIVERGENT                                   |
+| `history`/`replies` under limit | Direct call, **no retry** → 429 surfaces                             | Retried 3× by SDK                                                                                        | DIVERGENT (ours more resilient)             |
+| Concurrency control             | Time-pacing via token buckets (intra-loop)                           | Global cap 8; per-method tier pacing; `mapLimit(4)` in unreads                                           | DIVERGENT                                   |
+| Caching                         | Users + channels to disk, 24h TTL, team-scoped                       | In-memory + on-disk (token-scoped, `SLACK_MCP_CACHE_TTL`, default 24h), lazy                             | SAME                                        |
+| Pagination                      | Auto-paginates list methods internally                               | Single page + `next_cursor`; opt-in `fetch_all` drains pages (bounded ~50, then `next_cursor` to resume) | SAME (ours opt-in)                          |
+| Persistent-limit behavior       | Error after ≤2 retries (or immediate, direct calls)                  | Error after 3 retries                                                                                    | DIVERGENT                                   |
 
 Refs — koro: `pkg/limiter/{limits,retry}.go`, `pkg/handler/conversations.go`
 (`:550`, `:590`, `:622`, `:1027`, `:1108`), `pkg/provider/api.go`
@@ -103,7 +103,8 @@ Functional coverage is at parity (~19 `xoxp` tools each). The difference is the
 - **Name resolution**: now at parity — `#channel`/`@handle` resolve via the cache
   in `invoke`, with IDs passing through.
 - **Pagination**: at parity — `conversations_list` / `users_conversations` take
-  an opt-in `fetch_all` that returns every page (koro auto-paginates by default).
+  an opt-in `fetch_all` that drains pages (bounded to ~50, returning `next_cursor`
+  to continue past the cap; koro auto-paginates by default).
 - **Deliberate divergences (not gaps)**: single write flag, stdio-only,
   `xoxp`-only, no `saved_*`, method-snake-case tool names, JSON vs koro's CSV
   output. See [ROADMAP](ROADMAP.md) locked decisions.

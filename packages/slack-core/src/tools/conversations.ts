@@ -28,24 +28,30 @@ const fetchAll = z
   .boolean()
   .default(false)
   .describe(
-    "Fetch every page and return the full list (ignoring cursor) instead of one page. May be slow on large workspaces.",
+    "Fetch every page and return the full list instead of one page. Bounded to ~50 pages; if more remain, next_cursor is returned to continue. May be slow on large workspaces.",
   )
 
-// Loop a cursor-paginated channels endpoint and return all pages.
+// Safety bound for fetch_all (~50k channels at limit 999).
+const MAX_PAGES = 50
+
+// Drain a cursor-paginated channels endpoint, up to MAX_PAGES. Returns the
+// accumulated channels and, if the cap is hit before exhaustion, the cursor to
+// continue from - so a truncated fetch_all is resumable, not silently cut.
 const collectAll = async (
   page: (
     cursor: string | undefined,
   ) => Promise<{ channels?: unknown[]; response_metadata?: { next_cursor?: string } }>,
   start?: string,
-): Promise<unknown[]> => {
-  const all: unknown[] = []
+): Promise<{ channels: unknown[]; next_cursor?: string }> => {
+  const channels: unknown[] = []
   let cursor = start
-  do {
+  for (let i = 0; i < MAX_PAGES; i++) {
     const res = await page(cursor)
-    if (res.channels) all.push(...res.channels)
+    if (res.channels) channels.push(...res.channels)
     cursor = res.response_metadata?.next_cursor || undefined
-  } while (cursor)
-  return all
+    if (!cursor) return { channels }
+  }
+  return { channels, next_cursor: cursor }
 }
 
 export const conversationsHistory = defineTool({
@@ -190,12 +196,11 @@ export const conversationsList = defineTool({
       client.conversations.list({
         cursor,
         exclude_archived: args.exclude_archived,
-        limit: args.limit,
+        limit: args.fetch_all ? 999 : args.limit,
         team_id: args.team_id,
         types: args.types,
       })
-    if (args.fetch_all)
-      return { channels: await collectAll(page, args.cursor), next_cursor: undefined }
+    if (args.fetch_all) return collectAll(page, args.cursor)
     const res = await page(args.cursor)
     return {
       channels: res.channels ?? [],
@@ -240,13 +245,12 @@ export const usersConversations = defineTool({
       client.users.conversations({
         cursor,
         exclude_archived: args.exclude_archived,
-        limit: args.limit,
+        limit: args.fetch_all ? 999 : args.limit,
         team_id: args.team_id,
         types: args.types,
         user: args.user,
       })
-    if (args.fetch_all)
-      return { channels: await collectAll(page, args.cursor), next_cursor: undefined }
+    if (args.fetch_all) return collectAll(page, args.cursor)
     const res = await page(args.cursor)
     return {
       channels: res.channels ?? [],
