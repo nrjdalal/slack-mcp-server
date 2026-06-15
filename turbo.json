@@ -17,8 +17,8 @@
       "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/manifest.full.yaml",
-        "$TURBO_ROOT$/manifest.readonly.yaml",
+        "$TURBO_ROOT$/manifest.full.json",
+        "$TURBO_ROOT$/manifest.readonly.json",
         "$TURBO_ROOT$/README.md",
         "$TURBO_ROOT$/docs/coverage.md",
         "$TURBO_ROOT$/scripts/gen-docs.ts",
