@@ -60,14 +60,14 @@ Refs — koro: `pkg/limiter/{limits,retry}.go`, `pkg/handler/conversations.go`
 
 ## Dimension 2 — other cross-cutting behaviors
 
-| Behavior                          | koro                                                                        | ours                                                        | Verdict                |
-| --------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------- |
-| Token model                       | `xoxc`/`xoxd` (edge) **and** `xoxp`; detects bot tokens                     | `xoxp` only                                                 | N/A (token model)      |
-| Transport                         | stdio **and** SSE/HTTP (`SLACK_MCP_HOST`/`PORT`)                            | stdio only                                                  | OURS-LACKS (by design) |
-| Write gating                      | Per-tool env gates + `SLACK_MCP_ENABLED_TOOLS` allow-list + channel scoping | Single `SLACK_MCP_ALLOW_WRITE` boolean                      | DIVERGENT (deliberate) |
-| `@handle` / `#channel` resolution | Yes — via the user/channel cache                                            | Yes — resolved in `invoke` via the cache (IDs pass through) | SAME                   |
-| Result shape                      | Text, often CSV/markdown via `text_processor`                               | `JSON.stringify` of the mapped object                       | DIVERGENT              |
-| Tool errors                       | Returned as MCP results                                                     | Thrown → SDK wraps as `isError`                             | DIVERGENT              |
+| Behavior                          | koro                                                                                        | ours                                                                              | Verdict                |
+| --------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------- |
+| Token model                       | `xoxc`/`xoxd` (edge) **and** `xoxp`; detects bot tokens                                     | `xoxp` only                                                                       | N/A (token model)      |
+| Transport                         | stdio **and** SSE/HTTP (`SLACK_MCP_HOST`/`PORT`)                                            | stdio only                                                                        | OURS-LACKS (by design) |
+| Write gating                      | Per-tool env gates + `SLACK_MCP_ENABLED_TOOLS` allow-list + channel scoping, off by default | Single `SLACK_MCP_ALLOW_WRITE` boolean, **on by default** (`false` for read-only) | DIVERGENT (deliberate) |
+| `@handle` / `#channel` resolution | Yes — via the user/channel cache                                                            | Yes — resolved in `invoke` via the cache (IDs pass through)                       | SAME                   |
+| Result shape                      | Text, often CSV/markdown via `text_processor`                                               | `JSON.stringify` of the mapped object                                             | DIVERGENT              |
+| Tool errors                       | Returned as MCP results                                                                     | Thrown → SDK wraps as `isError`                                                   | DIVERGENT              |
 
 ## Dimension 3 — tool parity
 

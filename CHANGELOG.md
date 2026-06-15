@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.3
+
+[compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.2...v0.1.3)
+
+### 🚀 Enhancements
+
+- Opt-in fetch_all for list tools ([1a33039](https://github.com/nrjdalal/slack-mcp-server/commit/1a33039))
+
+### ❤️ Contributors
+
+- Neeraj Dalal @nrjdalal
+
 ## v0.1.2
 
 [compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.1...v0.1.2)
