@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.4
+
+[compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.3...v0.1.4)
+
+### 🚀 Enhancements
+
+- Writes on by default; generate app manifests as JSON ([3453725](https://github.com/nrjdalal/slack-mcp-server/commit/3453725))
+
+### ❤️ Contributors
+
+- Neeraj Dalal @nrjdalal
+
 ## v0.1.3
 
 [compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.2...v0.1.3)
