@@ -8,6 +8,7 @@ import type { WebClient } from "@slack/web-api"
 import { invoke } from "@/invoke"
 import { resolveChannel, resolveUser } from "@/resolve"
 import { conversationsHistory } from "@/tools/conversations"
+import { usergroupsUsersUpdate } from "@/tools/usergroups"
 
 type Member = { id: string; name?: string; profile?: { display_name?: string } }
 type Channel = { id: string; name?: string }
@@ -103,4 +104,40 @@ test("invoke resolves a #channel arg before the handler runs", async () => {
   } as unknown as WebClient
   await invoke(conversationsHistory, client, { channel: "#general", limit: 1 })
   expect(recorded[0]?.channel).toBe("C1")
+})
+
+test("invoke resolves a users array (names -> ids, ids pass through)", async () => {
+  const recorded: Array<{ users?: string }> = []
+  let userFetches = 0
+  const client = {
+    users: {
+      list: async () => {
+        userFetches++
+        return {
+          ok: true,
+          members: [
+            { id: "U1", name: "alice" },
+            { id: "U2", name: "bob" },
+          ],
+          response_metadata: {},
+        }
+      },
+    },
+    usergroups: {
+      users: {
+        update: async (args: { users?: string }) => {
+          recorded.push(args)
+          return { ok: true, usergroup: {} }
+        },
+      },
+    },
+  } as unknown as WebClient
+  await invoke(usergroupsUsersUpdate, client, {
+    usergroup: "S1",
+    users: ["@alice", "@bob", "U0KEEPME99"],
+  })
+  // handler joins the resolved ids; @names became ids, the ID passed through
+  expect(recorded[0]?.users).toBe("U1,U2,U0KEEPME99")
+  // 3 concurrent lookups against a cold cache share a single user-list crawl
+  expect(userFetches).toBe(1)
 })

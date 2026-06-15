@@ -51,8 +51,9 @@ const load = (client: WebClient): Store => {
 
 const persist = (client: WebClient, store: Store) => {
   try {
-    mkdirSync(cacheDir(), { recursive: true })
-    writeFileSync(cacheFile(client), JSON.stringify(store))
+    // user-only perms: the file holds workspace directory data (channel/user names)
+    mkdirSync(cacheDir(), { recursive: true, mode: 0o700 })
+    writeFileSync(cacheFile(client), JSON.stringify(store), { mode: 0o600 })
   } catch {
     // best effort: a read-only or unwritable cache dir must not break tool calls
   }
@@ -95,11 +96,30 @@ const FETCHERS: Record<Kind, (client: WebClient) => Promise<Record<string, strin
   users: fetchUsers,
 }
 
+// Dedupe concurrent populates: N parallel lookups (e.g. resolving a users array)
+// against a cold cache share a single list crawl instead of one each.
+const inflight = new WeakMap<WebClient, Partial<Record<Kind, Promise<Record<string, string>>>>>()
+
+const fetchOnce = (client: WebClient, kind: Kind): Promise<Record<string, string>> => {
+  let pending = inflight.get(client)
+  if (!pending) {
+    pending = {}
+    inflight.set(client, pending)
+  }
+  const existing = pending[kind]
+  if (existing) return existing
+  const p = FETCHERS[kind](client).finally(() => {
+    delete pending[kind]
+  })
+  pending[kind] = p
+  return p
+}
+
 const ensure = async (client: WebClient, kind: Kind, force: boolean): Promise<Snapshot> => {
   const store = load(client)
   const snap = store[kind]
   if (force || !snap || Date.now() - snap.at >= TTL_MS) {
-    store[kind] = { at: Date.now(), entries: await FETCHERS[kind](client) }
+    store[kind] = { at: Date.now(), entries: await fetchOnce(client, kind) }
     persist(client, store)
   }
   return store[kind]!
