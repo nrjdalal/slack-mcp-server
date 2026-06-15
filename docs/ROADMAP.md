@@ -49,7 +49,9 @@ Related: [parity.md](parity.md) (behavior comparison vs korotovsky) ·
 ### M3 - write gating [done]
 
 - Single `SLACK_MCP_ALLOW_WRITE` flag, **writes on by default**; set a falsy
-  value (`false` / `0`, case-insensitive) to run read-only. The server reads it
+  value (`false` / `0`, case-insensitive) to run read-only. A set-but-unrecognized
+  value (e.g. `off`, `no`) **fails safe to read-only** so a fumbled disable can't
+  silently leave writes on; only unset/empty keeps the default. The server reads it
   (`packages/slack-mcp-server/src/env.ts`) and passes `allowWrite` to
   `createServer`, which selects `enabledTools(allowWrite)`: all 19 tools on,
   10 read-only when disabled.
@@ -112,7 +114,8 @@ Related: [parity.md](parity.md) (behavior comparison vs korotovsky) ·
   required for `npx @nrjdalal/slack-mcp-server`). `@packages/slack-core` stays private
   and is consumed as a `workspace:*` dependency. The GitHub repo and project are
   `slack-mcp-server` (renamed from `better-slack-mcp` during M5).
-- **M2 default exposure**: read-only (write tools gated in M3).
+- **M2 default exposure**: read-only (write tools gated in M3). _Superseded:_ the
+  default flipped to writes-on (see M3 below).
 - **M2 transport**: stdio only.
 - **M3 write gating**: one `SLACK_MCP_ALLOW_WRITE` boolean, not korotovsky's
   per-tool env gates. Simpler over parity, knowingly. Default flipped to

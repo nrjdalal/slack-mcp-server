@@ -62,6 +62,7 @@ test("the env flag drives write-tool exposure end to end", async () => {
 
   expect(await hasWrite({})).toBe(true)
   expect(await hasWrite({ [ALLOW_WRITE_ENV]: "false" })).toBe(false)
+  expect(await hasWrite({ [ALLOW_WRITE_ENV]: "off" })).toBe(false) // unrecognized fails safe
 })
 
 test("write tool roundtrip under allowWrite returns the mapped result", async () => {
