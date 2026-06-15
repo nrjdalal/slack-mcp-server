@@ -15,9 +15,10 @@ This is a point-in-time snapshot — re-audit when either side moves.
 
 ## Headline: is rate limiting done the same way?
 
-**Now close — both proactively throttle and honor `Retry-After`.** Adding
-per-method tier throttling on our side closes the main gap; what remains is
-caching and pagination, not the throttle itself.
+**Now close — both proactively throttle, honor `Retry-After`, and cache
+users/channels.** With per-method tier throttling and the layered cache both in
+place, the remaining real difference is pagination (koro auto-paginates), not the
+throttle or caching.
 
 - **koro**: proactive token-bucket throttling per Slack tier
   (`golang.org/x/time/rate`) on its multi-call loops, search, and cache refresh
@@ -28,7 +29,8 @@ caching and pagination, not the throttle itself.
   documented Slack tier (1–4 or Special, scraped from docs.slack.dev into
   `tiers.json`) via a `@slack/web-api` request interceptor, **plus** the
   SDK's reactive `Retry-After` + uniform retry (3×, randomized, 30s cap) on every
-  call, behind a concurrency cap (8). No cache; single-page pagination; bounded
+  call, behind a concurrency cap (8). In-memory + on-disk cache (lazy, name
+  resolution); single-page pagination; bounded
   fan-out (`mapLimit` 4) in `conversations_unreads`.
 
 Both honor `Retry-After`. Our throttle is **per-method and process-global**
@@ -46,7 +48,7 @@ retries `conversations.history`/`.replies`; koro calls those through directly.**
 | Calls retried                   | search, unreads internals, cache refresh, edge                       | All calls (uniform via SDK)                                                                | DIVERGENT                                   |
 | `history`/`replies` under limit | Direct call, **no retry** → 429 surfaces                             | Retried 3× by SDK                                                                          | DIVERGENT (ours more resilient)             |
 | Concurrency control             | Time-pacing via token buckets (intra-loop)                           | Global cap 8; per-method tier pacing; `mapLimit(4)` in unreads                             | DIVERGENT                                   |
-| Caching                         | Users + channels to disk, 24h TTL, team-scoped                       | None — every call hits Slack                                                               | OURS-LACKS                                  |
+| Caching                         | Users + channels to disk, 24h TTL, team-scoped                       | In-memory + on-disk (token-scoped, `SLACK_MCP_CACHE_TTL`, default 24h), lazy               | SAME                                        |
 | Pagination                      | Auto-paginates list methods internally                               | Single page; returns `next_cursor`                                                         | DIVERGENT                                   |
 | Persistent-limit behavior       | Error after ≤2 retries (or immediate, direct calls)                  | Error after 3 retries                                                                      | DIVERGENT                                   |
 
@@ -58,14 +60,14 @@ Refs — koro: `pkg/limiter/{limits,retry}.go`, `pkg/handler/conversations.go`
 
 ## Dimension 2 — other cross-cutting behaviors
 
-| Behavior                          | koro                                                                        | ours                                   | Verdict                |
-| --------------------------------- | --------------------------------------------------------------------------- | -------------------------------------- | ---------------------- |
-| Token model                       | `xoxc`/`xoxd` (edge) **and** `xoxp`; detects bot tokens                     | `xoxp` only                            | N/A (token model)      |
-| Transport                         | stdio **and** SSE/HTTP (`SLACK_MCP_HOST`/`PORT`)                            | stdio only                             | OURS-LACKS (by design) |
-| Write gating                      | Per-tool env gates + `SLACK_MCP_ENABLED_TOOLS` allow-list + channel scoping | Single `SLACK_MCP_ALLOW_WRITE` boolean | DIVERGENT (deliberate) |
-| `@handle` / `#channel` resolution | Yes — via the user/channel cache                                            | No — ID-based only                     | OURS-LACKS             |
-| Result shape                      | Text, often CSV/markdown via `text_processor`                               | `JSON.stringify` of the mapped object  | DIVERGENT              |
-| Tool errors                       | Returned as MCP results                                                     | Thrown → SDK wraps as `isError`        | DIVERGENT              |
+| Behavior                          | koro                                                                        | ours                                                        | Verdict                |
+| --------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------- |
+| Token model                       | `xoxc`/`xoxd` (edge) **and** `xoxp`; detects bot tokens                     | `xoxp` only                                                 | N/A (token model)      |
+| Transport                         | stdio **and** SSE/HTTP (`SLACK_MCP_HOST`/`PORT`)                            | stdio only                                                  | OURS-LACKS (by design) |
+| Write gating                      | Per-tool env gates + `SLACK_MCP_ENABLED_TOOLS` allow-list + channel scoping | Single `SLACK_MCP_ALLOW_WRITE` boolean                      | DIVERGENT (deliberate) |
+| `@handle` / `#channel` resolution | Yes — via the user/channel cache                                            | Yes — resolved in `invoke` via the cache (IDs pass through) | SAME                   |
+| Result shape                      | Text, often CSV/markdown via `text_processor`                               | `JSON.stringify` of the mapped object                       | DIVERGENT              |
+| Tool errors                       | Returned as MCP results                                                     | Thrown → SDK wraps as `isError`                             | DIVERGENT              |
 
 ## Dimension 3 — tool parity
 
@@ -95,9 +97,11 @@ Functional coverage is at parity (~19 `xoxp` tools each). The difference is the
 ## Summary
 
 - **Tools**: functionally at parity; names differ by convention.
-- **Rate limiting**: genuinely different — koro proactive + cached + selective;
-  ours reactive + uniform. Both honor `Retry-After`.
-- **Deliberate divergences**: single write flag, stdio-only, `xoxp`-only, ID-based
-  (no name resolution), no `saved_*`. See [ROADMAP](ROADMAP.md) locked decisions.
-- **Real gap worth closing**: `@handle`/`#channel` resolution (a users/channels
-  cache). See [improvements](improvements.md).
+- **Rate limiting & caching**: now close — both proactively throttle, honor
+  `Retry-After`, and cache users/channels (in-memory + on-disk). koro's retry is
+  selective and ours is uniform; otherwise the request-reduction story matches.
+- **Name resolution**: now at parity — `#channel`/`@handle` resolve via the cache
+  in `invoke`, with IDs passing through.
+- **Deliberate divergences**: single write flag, stdio-only, `xoxp`-only,
+  no `saved_*`, method-snake-case tool names. See [ROADMAP](ROADMAP.md) locked
+  decisions. The remaining real difference is pagination (koro auto-paginates).
