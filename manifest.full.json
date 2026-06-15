@@ -9,24 +9,24 @@
       "user": [
         "channels:history",
         "channels:read",
+        "channels:write",
+        "chat:write",
         "files:read",
         "groups:history",
         "groups:read",
+        "groups:write",
         "im:history",
         "im:read",
+        "im:write",
         "mpim:history",
         "mpim:read",
-        "search:read",
-        "usergroups:read",
-        "users:read",
-        "users:read.email",
-        "channels:write",
-        "chat:write",
-        "groups:write",
-        "im:write",
         "mpim:write",
         "reactions:write",
-        "usergroups:write"
+        "search:read",
+        "usergroups:read",
+        "usergroups:write",
+        "users:read",
+        "users:read.email"
       ]
     }
   },

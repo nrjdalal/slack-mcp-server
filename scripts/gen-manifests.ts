@@ -22,8 +22,7 @@ const settings = {
   token_rotation_enabled: false,
 }
 
-// Scope order is meaningful: read scopes first, then write scopes (each sorted),
-// so the full manifest reads least-privilege first and diffs stay stable.
+// Scopes are listed alphabetically (uniq sorts), so the manifests diff cleanly.
 const manifest = (name: string, description: string, userScopes: string[]) => ({
   display_information: { name, description, background_color: "#0b1221" },
   oauth_config: { scopes: { user: userScopes } },
@@ -36,10 +35,11 @@ const readonly = manifest(
   readScopes,
 )
 
-const full = manifest("slack-mcp-server", "Personal, per-workspace Slack MCP server (user token)", [
-  ...readScopes,
-  ...writeScopes,
-])
+const full = manifest(
+  "slack-mcp-server",
+  "Personal, per-workspace Slack MCP server (user token)",
+  fullScopes,
+)
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`
 
