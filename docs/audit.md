@@ -58,6 +58,8 @@ separate "very good" from "best".
 
 ## Backlog — to be best xoxp (no new tools)
 
+These are Phase 1 in [phases.md](phases.md), which sequences the full forward plan.
+
 1. **Response shaping** (headline) — per-tool projections of agent-useful fields
    with an opt-in `verbose` / `raw` flag. Biggest token win; keep JSON (better than
    CSV for nested data). Closes dimension H.

@@ -62,5 +62,6 @@ These are sound scope decisions; don't chase koro on them.
 
 Name resolution (the former #1) shipped — see Done above. The next headline is
 **response shaping** to cut output tokens (parity dimension H); that and the rest
-of the best-xoxp backlog are scored in [audit.md](audit.md). Of the cleanups here,
-do #2 now (a few minutes) and make the #3 retry-depth call explicitly.
+of the best-xoxp backlog are scored in [audit.md](audit.md) and sequenced in
+[phases.md](phases.md) (Phase 1). Of the cleanups here, do #2 now (a few minutes)
+and make the #3 retry-depth call explicitly.
