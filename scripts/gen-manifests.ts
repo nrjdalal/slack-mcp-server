@@ -23,23 +23,15 @@ const settings = {
 }
 
 // Scopes are listed alphabetically (uniq sorts), so the manifests diff cleanly.
-const manifest = (name: string, description: string, userScopes: string[]) => ({
-  display_information: { name, description, background_color: "#0b1221" },
+const manifest = (name: string, userScopes: string[]) => ({
+  display_information: { name },
   oauth_config: { scopes: { user: userScopes } },
   settings,
 })
 
-const readonly = manifest(
-  "slack-mcp-server (read-only)",
-  "Read-only personal Slack MCP server (user token)",
-  readScopes,
-)
+const readonly = manifest("Slack MCP", readScopes)
 
-const full = manifest(
-  "slack-mcp-server",
-  "Personal, per-workspace Slack MCP server (user token)",
-  fullScopes,
-)
+const full = manifest("Slack MCP", fullScopes)
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`
 
