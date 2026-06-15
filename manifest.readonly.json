@@ -1,8 +1,6 @@
 {
   "display_information": {
-    "name": "slack-mcp-server (read-only)",
-    "description": "Read-only personal Slack MCP server (user token)",
-    "background_color": "#0b1221"
+    "name": "Slack MCP"
   },
   "oauth_config": {
     "scopes": {
