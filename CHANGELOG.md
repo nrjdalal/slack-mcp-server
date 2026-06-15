@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.1.5
+
+[compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.4...v0.1.5)
+
+### 📖 Documentation
+
+- Add scored implementation audit; retire done items ([fd242af](https://github.com/nrjdalal/slack-mcp-server/commit/fd242af))
+
+### 🏡 Chore
+
+- Name Slack app manifests "Slack MCP"; drop description and color ([#28](https://github.com/nrjdalal/slack-mcp-server/pull/28))
+
+### ❤️ Contributors
+
+- Neeraj Dalal @nrjdalal
+
 ## v0.1.4
 
 [compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.3...v0.1.4)
