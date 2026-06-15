@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.2
+
+[compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.1...v0.1.2)
+
+### 🚀 Enhancements
+
+- Users/channels cache with #channel/@handle name resolution ([f2af579](https://github.com/nrjdalal/slack-mcp-server/commit/f2af579))
+
+### ❤️ Contributors
+
+- Neeraj Dalal @nrjdalal
+
 ## v0.1.1
 
 [compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.0...v0.1.1)
