@@ -96,8 +96,9 @@ Related: [parity.md](parity.md) (behavior comparison vs korotovsky) ·
 
 ## Parking lot (post-parity)
 
-- users/channels caching for `@handle` / `#channel` resolution (koro does this;
-  our tools are ID-based today).
+- ~~users/channels caching for `@handle` / `#channel` resolution~~ — done
+  (in-memory + on-disk cache, resolved in `invoke`; see
+  [improvements](improvements.md)).
 - HTTP/SSE transport (M2 is stdio only).
 - Methods beyond korotovsky's set (the original superset goal).
 - `saved_*` stays out (xoxc/xoxd only; we are xoxp).

@@ -7,21 +7,16 @@ the [parity audit](parity.md) against korotovsky/slack-mcp-server.
 The codebase is healthy: lean, generated, drift-guarded, tested, published. None
 of the below is urgent.
 
-## Worth doing
+## Done
 
-### 1. Name resolution via a TTL'd users/channels cache `[high impact]`
+### Name resolution via a users/channels cache `[was #1, shipped]`
 
-Every tool is ID-only today, so an agent must call `conversations_list` /
-`users_search` first just to turn `#general` or `@alice` into `C0…` / `U0…`. This
-is the single change that most improves how an LLM uses the server — fewer
-round-trips, fewer tokens, no "which ID?" friction. It is koro's headline feature
-and is already in the [ROADMAP](ROADMAP.md) parking lot; promote it to the next
-feature after M6.
-
-- Effort: medium — an in-memory (optionally disk-persisted) TTL cache plus a
-  `resolve(name)` helper the tools call before hitting the API.
-- Caveat: keep it `xoxp`-friendly; populate lazily from `conversations.list` /
-  `users.list` rather than koro's bulk edge calls.
+Tools now accept `#channel` / `@handle` (or a bare name) and resolve to IDs in
+`invoke`; IDs pass through untouched. Backed by a layered cache (`cache.ts`):
+in-memory per client + a token-scoped on-disk file under the OS cache dir, with a
+`SLACK_MCP_CACHE_TTL` (default 24h) and a forced refresh on a miss. Populated
+lazily from `conversations.list` / `users.list`, only when a name actually needs
+resolving. This closes koro's last real advantage (request reduction + name UX).
 
 ## Cleanups (small, low-risk)
 
