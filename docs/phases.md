@@ -33,6 +33,13 @@ any time; not blocked by P1–P4.
 
 ## P1 — Quality: be the best at 19 tools
 
+> **Re-sequenced (2026-06-15): extend first, shape later.** Response shaping is
+> deferred until the extend batches land — more tools across more response types
+> will reveal a concrete, consistent projection (shaping ~7 tools now would be a
+> guess). New tools return raw mapped objects until a single cross-surface shaping
+> pass. So **P3 (extend) runs before this phase's shaping item**; the other P1
+> findings (files_info cap, users_search pagination, scraper) can land any time.
+
 Close the [audit](audit.md) findings. No new tools, no new scopes; pure depth.
 
 **Work items**

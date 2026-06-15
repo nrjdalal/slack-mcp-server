@@ -37,3 +37,35 @@ export const usersSearch = defineTool({
     return { matches }
   },
 })
+
+export const usersInfo = defineTool({
+  name: "users_info",
+  description: "Gets information about a user.",
+  tier: "read",
+  scopes: ["users:read"],
+  input: z.object({
+    user: z.string().describe("User to get info on."),
+    include_locale: z
+      .boolean()
+      .optional()
+      .describe("Set this to true to receive the locale for this user."),
+  }),
+  handler: async (client, args) => {
+    const res = await client.users.info({ user: args.user, include_locale: args.include_locale })
+    return { user: res.user }
+  },
+})
+
+export const usersLookupByEmail = defineTool({
+  name: "users_lookup_by_email",
+  description: "Find a user with an email address.",
+  tier: "read",
+  scopes: ["users:read.email"],
+  input: z.object({
+    email: z.string().describe("An email address belonging to a user in the workspace."),
+  }),
+  handler: async (client, args) => {
+    const res = await client.users.lookupByEmail({ email: args.email })
+    return { user: res.user }
+  },
+})

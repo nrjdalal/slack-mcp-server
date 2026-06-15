@@ -1,17 +1,24 @@
-import { chatPostMessage } from "@/tools/chat"
+import {
+  chatDeleteScheduledMessage,
+  chatPostMessage,
+  chatScheduleMessage,
+  chatUpdate,
+} from "@/tools/chat"
 import {
   conversationsHistory,
   conversationsJoin,
   conversationsLeave,
   conversationsList,
   conversationsMark,
+  conversationsMembers,
+  conversationsOpen,
   conversationsReplies,
   conversationsUnreads,
   usersConversations,
 } from "@/tools/conversations"
 import { filesInfo } from "@/tools/files"
 import { reactionsAdd, reactionsRemove } from "@/tools/reactions"
-import { searchMessages } from "@/tools/search"
+import { searchFiles, searchMessages } from "@/tools/search"
 import {
   usergroupsCreate,
   usergroupsList,
@@ -19,17 +26,21 @@ import {
   usergroupsUpdate,
   usergroupsUsersUpdate,
 } from "@/tools/usergroups"
-import { usersSearch } from "@/tools/users"
+import { usersInfo, usersLookupByEmail, usersSearch } from "@/tools/users"
 import type { SlackTool } from "@/types"
 
 export const readTools: SlackTool[] = [
   conversationsHistory,
   conversationsReplies,
   conversationsList,
+  conversationsMembers,
   usersConversations,
   conversationsUnreads,
   searchMessages,
+  searchFiles,
   usersSearch,
+  usersInfo,
+  usersLookupByEmail,
   usergroupsList,
   usergroupsMe,
   filesInfo,
@@ -37,9 +48,13 @@ export const readTools: SlackTool[] = [
 
 export const writeTools: SlackTool[] = [
   chatPostMessage,
+  chatUpdate,
+  chatScheduleMessage,
+  chatDeleteScheduledMessage,
   reactionsAdd,
   reactionsRemove,
   conversationsMark,
+  conversationsOpen,
   conversationsJoin,
   conversationsLeave,
   usergroupsCreate,

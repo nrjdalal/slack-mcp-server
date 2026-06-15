@@ -59,17 +59,17 @@ All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/metho
 | [`canvases.sections.lookup`](https://docs.slack.dev/reference/methods/canvases.sections.lookup) | `-` | [`canvases:read`](https://docs.slack.dev/reference/scopes/canvases.read) | `Tier 3` |
 | [`chat.appendStream`](https://docs.slack.dev/reference/methods/chat.appendStream) | `-` | `-` | `Tier 4` |
 | [`chat.delete`](https://docs.slack.dev/reference/methods/chat.delete) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
-| [`chat.deleteScheduledMessage`](https://docs.slack.dev/reference/methods/chat.deleteScheduledMessage) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
+| [`chat.deleteScheduledMessage`](https://docs.slack.dev/reference/methods/chat.deleteScheduledMessage) | `chat_delete_scheduled_message` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.getPermalink`](https://docs.slack.dev/reference/methods/chat.getPermalink) | `-` | `-` | `Special` |
 | [`chat.meMessage`](https://docs.slack.dev/reference/methods/chat.meMessage) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.postEphemeral`](https://docs.slack.dev/reference/methods/chat.postEphemeral) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 4` |
 | [`chat.postMessage`](https://docs.slack.dev/reference/methods/chat.postMessage) | `chat_post_message` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Special` |
 | [`chat.scheduledMessages.list`](https://docs.slack.dev/reference/methods/chat.scheduledMessages.list) | `-` | `-` | `Tier 3` |
-| [`chat.scheduleMessage`](https://docs.slack.dev/reference/methods/chat.scheduleMessage) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
+| [`chat.scheduleMessage`](https://docs.slack.dev/reference/methods/chat.scheduleMessage) | `chat_schedule_message` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.startStream`](https://docs.slack.dev/reference/methods/chat.startStream) | `-` | `-` | `Tier 2` |
 | [`chat.stopStream`](https://docs.slack.dev/reference/methods/chat.stopStream) | `-` | `-` | `Tier 2` |
 | [`chat.unfurl`](https://docs.slack.dev/reference/methods/chat.unfurl) | `-` | [`links:write`](https://docs.slack.dev/reference/scopes/links.write) | `Tier 3` |
-| [`chat.update`](https://docs.slack.dev/reference/methods/chat.update) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
+| [`chat.update`](https://docs.slack.dev/reference/methods/chat.update) | `chat_update` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`conversations.acceptSharedInvite`](https://docs.slack.dev/reference/methods/conversations.acceptSharedInvite) | `-` | `-` | `Tier 2` |
 | [`conversations.approveSharedInvite`](https://docs.slack.dev/reference/methods/conversations.approveSharedInvite) | `-` | `-` | `Tier 3` |
 | [`conversations.archive`](https://docs.slack.dev/reference/methods/conversations.archive) | `-` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) · [`groups:write`](https://docs.slack.dev/reference/scopes/groups.write) · [`im:write`](https://docs.slack.dev/reference/scopes/im.write) · [`mpim:write`](https://docs.slack.dev/reference/scopes/mpim.write) | `Tier 2` |
@@ -88,8 +88,8 @@ All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/metho
 | [`conversations.list`](https://docs.slack.dev/reference/methods/conversations.list) | `conversations_list` | [`channels:read`](https://docs.slack.dev/reference/scopes/channels.read) · [`groups:read`](https://docs.slack.dev/reference/scopes/groups.read) · [`im:read`](https://docs.slack.dev/reference/scopes/im.read) · [`mpim:read`](https://docs.slack.dev/reference/scopes/mpim.read) | `Tier 2` |
 | [`conversations.listConnectInvites`](https://docs.slack.dev/reference/methods/conversations.listConnectInvites) | `-` | `-` | `Tier 1` |
 | [`conversations.mark`](https://docs.slack.dev/reference/methods/conversations.mark) | `conversations_mark` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) · [`groups:write`](https://docs.slack.dev/reference/scopes/groups.write) · [`im:write`](https://docs.slack.dev/reference/scopes/im.write) · [`mpim:write`](https://docs.slack.dev/reference/scopes/mpim.write) | `Tier 3` |
-| [`conversations.members`](https://docs.slack.dev/reference/methods/conversations.members) | `-` | [`channels:read`](https://docs.slack.dev/reference/scopes/channels.read) · [`groups:read`](https://docs.slack.dev/reference/scopes/groups.read) · [`im:read`](https://docs.slack.dev/reference/scopes/im.read) · [`mpim:read`](https://docs.slack.dev/reference/scopes/mpim.read) | `Tier 4` |
-| [`conversations.open`](https://docs.slack.dev/reference/methods/conversations.open) | `-` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) · [`groups:write`](https://docs.slack.dev/reference/scopes/groups.write) · [`im:write`](https://docs.slack.dev/reference/scopes/im.write) · [`mpim:write`](https://docs.slack.dev/reference/scopes/mpim.write) | `Tier 3` |
+| [`conversations.members`](https://docs.slack.dev/reference/methods/conversations.members) | `conversations_members` | [`channels:read`](https://docs.slack.dev/reference/scopes/channels.read) · [`groups:read`](https://docs.slack.dev/reference/scopes/groups.read) · [`im:read`](https://docs.slack.dev/reference/scopes/im.read) · [`mpim:read`](https://docs.slack.dev/reference/scopes/mpim.read) | `Tier 4` |
+| [`conversations.open`](https://docs.slack.dev/reference/methods/conversations.open) | `conversations_open` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) · [`groups:write`](https://docs.slack.dev/reference/scopes/groups.write) · [`im:write`](https://docs.slack.dev/reference/scopes/im.write) · [`mpim:write`](https://docs.slack.dev/reference/scopes/mpim.write) | `Tier 3` |
 | [`conversations.rename`](https://docs.slack.dev/reference/methods/conversations.rename) | `-` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) · [`groups:write`](https://docs.slack.dev/reference/scopes/groups.write) · [`im:write`](https://docs.slack.dev/reference/scopes/im.write) · [`mpim:write`](https://docs.slack.dev/reference/scopes/mpim.write) | `Tier 2` |
 | [`conversations.replies`](https://docs.slack.dev/reference/methods/conversations.replies) | `conversations_replies` | [`channels:history`](https://docs.slack.dev/reference/scopes/channels.history) · [`groups:history`](https://docs.slack.dev/reference/scopes/groups.history) · [`im:history`](https://docs.slack.dev/reference/scopes/im.history) · [`mpim:history`](https://docs.slack.dev/reference/scopes/mpim.history) | `Tier 3` |
 | [`conversations.requestSharedInvite.approve`](https://docs.slack.dev/reference/methods/conversations.requestSharedInvite.approve) | `-` | `-` | `Tier 2` |
@@ -154,7 +154,7 @@ All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/metho
 | [`rtm.connect`](https://docs.slack.dev/reference/methods/rtm.connect) | `-` | `-` | `Tier 1` |
 | [`rtm.start`](https://docs.slack.dev/reference/methods/rtm.start) | `-` | `-` | `Tier 1` |
 | [`search.all`](https://docs.slack.dev/reference/methods/search.all) | `-` | [`search:read`](https://docs.slack.dev/reference/scopes/search.read) | `Tier 2` |
-| [`search.files`](https://docs.slack.dev/reference/methods/search.files) | `-` | [`search:read`](https://docs.slack.dev/reference/scopes/search.read) | `Tier 2` |
+| [`search.files`](https://docs.slack.dev/reference/methods/search.files) | `search_files` | [`search:read`](https://docs.slack.dev/reference/scopes/search.read) | `Tier 2` |
 | [`search.messages`](https://docs.slack.dev/reference/methods/search.messages) | `search_messages` | [`search:read`](https://docs.slack.dev/reference/scopes/search.read) | `Tier 2` |
 | [`slackLists.access.delete`](https://docs.slack.dev/reference/methods/slackLists.access.delete) | `-` | [`lists:write`](https://docs.slack.dev/reference/scopes/lists.write) | `Tier 3` |
 | [`slackLists.access.set`](https://docs.slack.dev/reference/methods/slackLists.access.set) | `-` | [`lists:write`](https://docs.slack.dev/reference/scopes/lists.write) | `Tier 3` |
@@ -193,9 +193,9 @@ All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/metho
 | [`users.discoverableContacts.lookup`](https://docs.slack.dev/reference/methods/users.discoverableContacts.lookup) | `-` | `-` | `Tier 2` |
 | [`users.getPresence`](https://docs.slack.dev/reference/methods/users.getPresence) | `-` | [`users:read`](https://docs.slack.dev/reference/scopes/users.read) | `Tier 3` |
 | [`users.identity`](https://docs.slack.dev/reference/methods/users.identity) | `-` | [`identity:read`](https://docs.slack.dev/reference/scopes/identity.read) | `Tier 3` |
-| [`users.info`](https://docs.slack.dev/reference/methods/users.info) | `-` | [`users:read`](https://docs.slack.dev/reference/scopes/users.read) | `Tier 4` |
+| [`users.info`](https://docs.slack.dev/reference/methods/users.info) | `users_info` | [`users:read`](https://docs.slack.dev/reference/scopes/users.read) | `Tier 4` |
 | [`users.list`](https://docs.slack.dev/reference/methods/users.list) | `-` | [`users:read`](https://docs.slack.dev/reference/scopes/users.read) | `Tier 2` |
-| [`users.lookupByEmail`](https://docs.slack.dev/reference/methods/users.lookupByEmail) | `-` | [`users:read.email`](https://docs.slack.dev/reference/scopes/users.read.email) | `Tier 3` |
+| [`users.lookupByEmail`](https://docs.slack.dev/reference/methods/users.lookupByEmail) | `users_lookup_by_email` | [`users:read.email`](https://docs.slack.dev/reference/scopes/users.read.email) | `Tier 3` |
 | [`users.profile.get`](https://docs.slack.dev/reference/methods/users.profile.get) | `-` | [`users.profile:read`](https://docs.slack.dev/reference/scopes/users.profile.read) | `Tier 4` |
 | [`users.profile.set`](https://docs.slack.dev/reference/methods/users.profile.set) | `-` | [`users.profile:write`](https://docs.slack.dev/reference/scopes/users.profile.write) | `Tier 3` |
 | [`users.setActive`](https://docs.slack.dev/reference/methods/users.setActive) | `-` | [`users:write`](https://docs.slack.dev/reference/scopes/users.write) | `Tier 2` |
