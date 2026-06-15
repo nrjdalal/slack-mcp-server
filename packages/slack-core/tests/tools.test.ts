@@ -5,15 +5,17 @@ import type { WebClient } from "@slack/web-api"
 import { createClient, TOKEN_ENV } from "@/client"
 import { invoke } from "@/invoke"
 import { allTools, enabledTools, readTools, toolByName, writeTools } from "@/registry"
-import { chatPostMessage } from "@/tools/chat"
+import { chatPostMessage, chatScheduleMessage, chatUpdate } from "@/tools/chat"
 import {
   conversationsHistory,
   conversationsList,
   conversationsMark,
+  conversationsMembers,
+  conversationsOpen,
   conversationsUnreads,
 } from "@/tools/conversations"
-import { searchMessages } from "@/tools/search"
-import { usersSearch } from "@/tools/users"
+import { searchFiles, searchMessages } from "@/tools/search"
+import { usersInfo, usersLookupByEmail, usersSearch } from "@/tools/users"
 
 type Call = { method: string; args: unknown }
 
@@ -194,6 +196,93 @@ test("conversations_unreads skips a channel whose info call fails", async () => 
   expect(out.unreads.map((u) => u.id)).toEqual(["C1", "C3"])
 })
 
+test("chat_update (write) returns the updated ts/channel/text", async () => {
+  const client = {
+    chat: { update: async () => ({ ok: true, ts: "1.2", channel: "C1", text: "edited" }) },
+  } as unknown as WebClient
+  const out = await chatUpdate.handler(client, { channel: "C1", ts: "1.2", text: "edited" })
+  expect(out).toEqual({ ts: "1.2", channel: "C1", text: "edited" })
+})
+
+test("chat_schedule_message (write) returns the scheduled id", async () => {
+  const client = {
+    chat: {
+      scheduleMessage: async () => ({
+        ok: true,
+        scheduled_message_id: "Q1",
+        channel: "C1",
+        post_at: 123,
+      }),
+    },
+  } as unknown as WebClient
+  const out = await chatScheduleMessage.handler(client, { channel: "C1", post_at: 123, text: "hi" })
+  expect(out).toEqual({ scheduled_message_id: "Q1", channel: "C1", post_at: 123 })
+})
+
+test("conversations_members maps members and cursor", async () => {
+  const client = {
+    conversations: {
+      members: async () => ({
+        ok: true,
+        members: ["U1", "U2"],
+        response_metadata: { next_cursor: "CUR" },
+      }),
+    },
+  } as unknown as WebClient
+  const out = (await conversationsMembers.handler(client, { channel: "C1", limit: 100 })) as {
+    members: string[]
+    next_cursor?: string
+  }
+  expect(out).toEqual({ members: ["U1", "U2"], next_cursor: "CUR" })
+})
+
+test("conversations_open joins users into a csv and returns the channel", async () => {
+  let received: unknown
+  const client = {
+    conversations: {
+      open: async (args: unknown) => {
+        received = args
+        return { ok: true, channel: { id: "D1" }, no_op: false, already_open: false }
+      },
+    },
+  } as unknown as WebClient
+  const out = (await conversationsOpen.handler(client, { users: ["U1", "U2"] })) as {
+    channel: { id: string }
+  }
+  expect((received as { users?: string }).users).toBe("U1,U2")
+  expect(out.channel).toEqual({ id: "D1" })
+})
+
+test("users_info returns the user", async () => {
+  const client = {
+    users: { info: async () => ({ ok: true, user: { id: "U1", name: "alice" } }) },
+  } as unknown as WebClient
+  const out = (await usersInfo.handler(client, { user: "U1" })) as {
+    user: { id: string; name: string }
+  }
+  expect(out.user).toEqual({ id: "U1", name: "alice" })
+})
+
+test("users_lookup_by_email returns the user", async () => {
+  const client = {
+    users: { lookupByEmail: async () => ({ ok: true, user: { id: "U9", name: "bob" } }) },
+  } as unknown as WebClient
+  const out = (await usersLookupByEmail.handler(client, { email: "bob@x.dev" })) as {
+    user: { id: string; name: string }
+  }
+  expect(out.user).toEqual({ id: "U9", name: "bob" })
+})
+
+test("search_files unwraps file matches and total", async () => {
+  const client = {
+    search: {
+      files: async () => ({ ok: true, files: { matches: [{ id: "F1" }], total: 1 } }),
+    },
+  } as unknown as WebClient
+  const out = (await searchFiles.handler(client, { query: "x", count: 20 })) as { total: number }
+  expect(out.total).toBe(1)
+})
+
 test("conversations_mark (write) marks read", async () => {
   const { client, calls } = fakeClient()
   const out = await conversationsMark.handler(client, { channel: "C1", ts: "1.2" })
@@ -202,13 +291,13 @@ test("conversations_mark (write) marks read", async () => {
 })
 
 test("registry: read/write tiers and the enabledTools selector", () => {
-  expect(readTools).toHaveLength(10)
-  expect(writeTools).toHaveLength(9)
-  expect(allTools).toHaveLength(19)
+  expect(readTools).toHaveLength(14)
+  expect(writeTools).toHaveLength(13)
+  expect(allTools).toHaveLength(27)
   expect(readTools.every((t) => t.tier === "read")).toBe(true)
   expect(writeTools.every((t) => t.tier === "write")).toBe(true)
-  expect(enabledTools(false)).toHaveLength(10)
-  expect(enabledTools(true)).toHaveLength(19)
+  expect(enabledTools(false)).toHaveLength(14)
+  expect(enabledTools(true)).toHaveLength(27)
 })
 
 test("toolByName resolves tool names", () => {
