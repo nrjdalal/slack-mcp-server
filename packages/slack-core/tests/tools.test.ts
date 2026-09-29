@@ -201,6 +201,14 @@ test("conversations_mark (write) marks read", async () => {
   expect(out).toEqual({ ok: true })
 })
 
+test("registry: every tool has a title, and every write tool states both hints", () => {
+  for (const tool of allTools) expect(tool.title.length).toBeGreaterThan(0)
+  for (const tool of writeTools) {
+    expect(typeof tool.destructive).toBe("boolean")
+    expect(typeof tool.idempotent).toBe("boolean")
+  }
+})
+
 test("registry: read/write tiers and the enabledTools selector", () => {
   expect(readTools).toHaveLength(10)
   expect(writeTools).toHaveLength(9)

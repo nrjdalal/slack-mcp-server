@@ -4,6 +4,7 @@ import { defineTool } from "@/types"
 
 export const usersSearch = defineTool({
   name: "users_search",
+  title: "Search users",
   description:
     "Find users by matching a query against id, name, real name, display name, or email (case-insensitive). Composite over users.list.",
   // users.list needs users:read; users:read.email is required for the email field this tool matches on.
