@@ -90,7 +90,8 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
   fixes: the bumped version is mirrored into the workspace manifest, the
   `catalog:` protocol is resolved to concrete versions npm can read, and
   `scripts`/`devDependencies` are stripped before publishing.
-- Auto-derived versioning (changelogen) is kept; `NPM_TOKEN` gates the run.
+- Auto-derived versioning (changelogen) is kept. Publishing authenticates via npm Trusted
+  Publishing (OIDC, tied to this repo + `auto-release.yml`); there is no `NPM_TOKEN` secret.
 
 ### M6 - inscope integration
 
