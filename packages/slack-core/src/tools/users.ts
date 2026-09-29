@@ -69,6 +69,7 @@ export const usersSearch = defineTool({
 
 export const usersInfo = defineTool({
   name: "users_info",
+  title: "Get user info",
   description: "Gets information about a user.",
   tier: "read",
   scopes: ["users:read"],
@@ -78,23 +79,26 @@ export const usersInfo = defineTool({
       .boolean()
       .optional()
       .describe("Set this to true to receive the locale for this user."),
+    raw: rawInput,
   }),
   handler: async (client, args) => {
     const res = await client.users.info({ user: args.user, include_locale: args.include_locale })
-    return { user: res.user }
+    return { user: args.raw ? res.user : shapeUser(res.user) }
   },
 })
 
 export const usersLookupByEmail = defineTool({
   name: "users_lookup_by_email",
+  title: "Look up user by email",
   description: "Find a user with an email address.",
   tier: "read",
   scopes: ["users:read.email"],
   input: z.object({
     email: z.string().describe("An email address belonging to a user in the workspace."),
+    raw: rawInput,
   }),
   handler: async (client, args) => {
     const res = await client.users.lookupByEmail({ email: args.email })
-    return { user: res.user }
+    return { user: args.raw ? res.user : shapeUser(res.user) }
   },
 })

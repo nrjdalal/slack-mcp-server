@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { rawInput, shapeAll, shapeMessage } from "@/shape"
+import { rawInput, shapeAll, shapeFile, shapeMessage } from "@/shape"
 import { defineTool } from "@/types"
 
 export const searchMessages = defineTool({
@@ -62,6 +62,7 @@ export const searchMessages = defineTool({
 
 export const searchFiles = defineTool({
   name: "search_files",
+  title: "Search files",
   description: "Searches for files matching a query.",
   tier: "read",
   scopes: ["search:read"],
@@ -94,6 +95,7 @@ export const searchFiles = defineTool({
       .string()
       .optional()
       .describe("Encoded team id to search in, required if org token is used."),
+    raw: rawInput,
   }),
   handler: async (client, args) => {
     // cursor is a valid search.files param (cursormark) but missing from the SDK type
@@ -108,7 +110,7 @@ export const searchFiles = defineTool({
       team_id: args.team_id,
     } as Parameters<typeof client.search.files>[0])
     return {
-      matches: res.files?.matches ?? [],
+      matches: shapeAll(args.raw, (res.files ?? {}).matches ?? [], shapeFile),
       total: res.files?.total ?? 0,
       pagination: res.files?.pagination,
       next_cursor: res.response_metadata?.next_cursor || undefined,

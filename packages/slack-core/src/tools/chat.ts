@@ -90,8 +90,11 @@ export const chatPostMessage = defineTool({
 
 export const chatUpdate = defineTool({
   name: "chat_update",
+  title: "Edit message",
   description: "Updates a message.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["chat:write"],
   input: z.object({
     channel: z.string().describe("Channel containing the message to be updated."),
@@ -126,8 +129,11 @@ export const chatUpdate = defineTool({
 
 export const chatScheduleMessage = defineTool({
   name: "chat_schedule_message",
+  title: "Schedule message",
   description: "Schedules a message to be sent to a channel at a future time.",
   tier: "write",
+  destructive: false,
+  idempotent: false,
   scopes: ["chat:write"],
   input: z.object({
     channel: z.string().describe("Channel, private group, or DM channel to send the message to."),
@@ -173,8 +179,11 @@ export const chatScheduleMessage = defineTool({
 
 export const chatDeleteScheduledMessage = defineTool({
   name: "chat_delete_scheduled_message",
+  title: "Delete scheduled message",
   description: "Deletes a pending scheduled message from the queue.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["chat:write"],
   input: z.object({
     channel: z.string().describe("The channel the scheduled message is posting to."),

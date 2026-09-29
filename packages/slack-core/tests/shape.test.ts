@@ -4,6 +4,8 @@ import type { WebClient } from "@slack/web-api"
 
 import { shapeChannel, shapeFile, shapeMessage, shapeUser } from "@/shape"
 import { conversationsHistory } from "@/tools/conversations"
+import { searchFiles } from "@/tools/search"
+import { usersInfo } from "@/tools/users"
 
 const slackMessage = {
   type: "message",
@@ -143,4 +145,36 @@ test("raw: true returns Slack's objects untouched", async () => {
   expect(JSON.stringify(shaped.messages[0]).length).toBeLessThan(
     JSON.stringify(slackMessage).length / 2,
   )
+})
+
+test("users_info returns a trimmed user, and Slack's object with raw", async () => {
+  const slackUser = {
+    id: "U1",
+    name: "ada",
+    color: "9f69e7",
+    profile: { email: "ada@x.dev", image_512: "https://x" },
+  }
+  const client = {
+    users: { info: async () => ({ ok: true, user: slackUser }) },
+  } as unknown as WebClient
+  const shaped = (await usersInfo.handler(client, { user: "U1" })) as { user: unknown }
+  const raw = (await usersInfo.handler(client, { user: "U1", raw: true })) as { user: unknown }
+  expect(shaped.user).toEqual({ id: "U1", name: "ada", email: "ada@x.dev" })
+  expect(raw.user).toBe(slackUser)
+})
+
+test("search_files trims each matched file", async () => {
+  const client = {
+    search: {
+      files: async () => ({
+        ok: true,
+        files: {
+          matches: [{ id: "F1", name: "a.txt", url_private: "https://x", thumb_64: "https://t" }],
+          total: 1,
+        },
+      }),
+    },
+  } as unknown as WebClient
+  const out = (await searchFiles.handler(client, { query: "a" })) as { matches: unknown[] }
+  expect(out.matches).toEqual([{ id: "F1", name: "a.txt" }])
 })

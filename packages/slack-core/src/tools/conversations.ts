@@ -388,6 +388,7 @@ export const conversationsLeave = defineTool({
 
 export const conversationsMembers = defineTool({
   name: "conversations_members",
+  title: "List conversation members",
   description: "Retrieve members of a conversation.",
   tier: "read",
   scopes: readScopes,
@@ -417,9 +418,12 @@ export const conversationsMembers = defineTool({
 
 export const conversationsOpen = defineTool({
   name: "conversations_open",
+  title: "Open conversation",
   description:
     "Opens or resumes a direct message or multi-person direct message. Pass users to start a DM, or channel to resume one.",
   tier: "write",
+  destructive: false,
+  idempotent: true,
   scopes: writeScopes,
   input: z.object({
     channel: z
