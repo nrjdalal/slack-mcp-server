@@ -345,3 +345,69 @@ export const conversationsLeave = defineTool({
     return { ok: true }
   },
 })
+
+export const conversationsMembers = defineTool({
+  name: "conversations_members",
+  description: "Retrieve members of a conversation.",
+  tier: "read",
+  scopes: readScopes,
+  input: z.object({
+    channel: z.string().describe("ID of the conversation to retrieve members for."),
+    cursor,
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(1000)
+      .default(100)
+      .describe("The maximum number of items to return."),
+  }),
+  handler: async (client, args) => {
+    const res = await client.conversations.members({
+      channel: args.channel,
+      cursor: args.cursor,
+      limit: args.limit,
+    })
+    return {
+      members: res.members ?? [],
+      next_cursor: res.response_metadata?.next_cursor || undefined,
+    }
+  },
+})
+
+export const conversationsOpen = defineTool({
+  name: "conversations_open",
+  description:
+    "Opens or resumes a direct message or multi-person direct message. Pass users to start a DM, or channel to resume one.",
+  tier: "write",
+  scopes: writeScopes,
+  input: z.object({
+    channel: z
+      .string()
+      .optional()
+      .describe("Resume a conversation by supplying an im or mpim's ID."),
+    users: z
+      .array(z.string())
+      .optional()
+      .describe("A list of user IDs. If only one is given, opens a 1:1 DM, otherwise an mpim."),
+    return_im: z
+      .boolean()
+      .optional()
+      .describe("Indicates you want the full IM channel definition in the response."),
+    prevent_creation: z
+      .boolean()
+      .optional()
+      .describe(
+        "Do not create a direct message or multi-person direct message if one does not exist.",
+      ),
+  }),
+  handler: async (client, args) => {
+    const res = await client.conversations.open({
+      channel: args.channel,
+      users: args.users?.join(","),
+      return_im: args.return_im,
+      prevent_creation: args.prevent_creation,
+    } as Parameters<typeof client.conversations.open>[0])
+    return { channel: res.channel, no_op: res.no_op, already_open: res.already_open }
+  },
+})
