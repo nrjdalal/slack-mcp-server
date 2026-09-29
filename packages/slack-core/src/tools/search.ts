@@ -4,6 +4,7 @@ import { defineTool } from "@/types"
 
 export const searchMessages = defineTool({
   name: "search_messages",
+  title: "Search messages",
   description: "Searches for messages matching a query.",
   tier: "read",
   scopes: ["search:read"],

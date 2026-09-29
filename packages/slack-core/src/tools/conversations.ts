@@ -1,7 +1,8 @@
+import type { WebClient } from "@slack/web-api"
 import { z } from "zod"
 
 import { mapLimit } from "@/concurrency"
-import { defineTool } from "@/types"
+import { defineTool, NO_CONTEXT, type ToolContext } from "@/types"
 
 // conversations.info is Tier 3; a small fan-out keeps the unreads scan quick
 // without bursting past the per-method rate limit.
@@ -42,13 +43,16 @@ const collectAll = async (
     cursor: string | undefined,
   ) => Promise<{ channels?: unknown[]; response_metadata?: { next_cursor?: string } }>,
   start?: string,
+  ctx: ToolContext = NO_CONTEXT,
 ): Promise<{ channels: unknown[]; next_cursor?: string }> => {
   const channels: unknown[] = []
   let cursor = start
   for (let i = 0; i < MAX_PAGES; i++) {
+    ctx.signal.throwIfAborted()
     const res = await page(cursor)
     if (res.channels) channels.push(...res.channels)
     cursor = res.response_metadata?.next_cursor || undefined
+    await ctx.progress(i + 1)
     if (!cursor) return { channels }
   }
   return { channels, next_cursor: cursor }
@@ -56,6 +60,7 @@ const collectAll = async (
 
 export const conversationsHistory = defineTool({
   name: "conversations_history",
+  title: "Read conversation history",
   description: "Fetches a conversation's history of messages and events.",
   tier: "read",
   scopes: historyScopes,
@@ -110,6 +115,7 @@ export const conversationsHistory = defineTool({
 
 export const conversationsReplies = defineTool({
   name: "conversations_replies",
+  title: "Read thread replies",
   description: "Retrieve a thread of messages posted to a conversation.",
   tier: "read",
   scopes: historyScopes,
@@ -168,6 +174,7 @@ export const conversationsReplies = defineTool({
 
 export const conversationsList = defineTool({
   name: "conversations_list",
+  title: "List channels",
   description: "Lists all channels in a Slack team.",
   tier: "read",
   scopes: readScopes,
@@ -191,7 +198,7 @@ export const conversationsList = defineTool({
     types,
     fetch_all: fetchAll,
   }),
-  handler: async (client, args) => {
+  handler: async (client, args, ctx = NO_CONTEXT) => {
     const page = (cursor: string | undefined) =>
       client.conversations.list({
         cursor,
@@ -200,7 +207,7 @@ export const conversationsList = defineTool({
         team_id: args.team_id,
         types: args.types,
       })
-    if (args.fetch_all) return collectAll(page, args.cursor)
+    if (args.fetch_all) return collectAll(page, args.cursor, ctx)
     const res = await page(args.cursor)
     return {
       channels: res.channels ?? [],
@@ -211,6 +218,7 @@ export const conversationsList = defineTool({
 
 export const usersConversations = defineTool({
   name: "users_conversations",
+  title: "List my conversations",
   description: "List conversations the calling user is a member of.",
   tier: "read",
   scopes: readScopes,
@@ -240,7 +248,7 @@ export const usersConversations = defineTool({
       .describe("Browse conversations by a specific user ID's membership."),
     fetch_all: fetchAll,
   }),
-  handler: async (client, args) => {
+  handler: async (client, args, ctx = NO_CONTEXT) => {
     const page = (cursor: string | undefined) =>
       client.users.conversations({
         cursor,
@@ -250,7 +258,7 @@ export const usersConversations = defineTool({
         types: args.types,
         user: args.user,
       })
-    if (args.fetch_all) return collectAll(page, args.cursor)
+    if (args.fetch_all) return collectAll(page, args.cursor, ctx)
     const res = await page(args.cursor)
     return {
       channels: res.channels ?? [],
@@ -259,8 +267,24 @@ export const usersConversations = defineTool({
   },
 })
 
+const unreadCount = async (client: WebClient, ch: { id?: string; name?: string }) => {
+  if (!ch.id) return undefined
+  try {
+    const info = await client.conversations.info({ channel: ch.id })
+    const c = info.channel as { unread_count_display?: number; unread_count?: number } | undefined
+    if (!c) return undefined
+    const count = c.unread_count_display ?? c.unread_count ?? 0
+    return count > 0 ? { id: ch.id, name: ch.name, unread_count: count } : undefined
+  } catch {
+    // best effort: a single inaccessible or throttled channel shouldn't
+    // sink the whole scan, so skip it and keep the rest.
+    return undefined
+  }
+}
+
 export const conversationsUnreads = defineTool({
   name: "conversations_unreads",
+  title: "Find unread conversations",
   description:
     "List the calling user's channels that have unread messages. Composite over users.conversations and conversations.info; partial on large workspaces.",
   tier: "read",
@@ -272,28 +296,24 @@ export const conversationsUnreads = defineTool({
       .int()
       .min(1)
       .max(200)
-      .default(50)
-      .describe("Maximum number of member channels to scan for unreads."),
+      .default(25)
+      .describe(
+        "Maximum number of member channels to scan for unreads. Each check is a rate-limited conversations.info call (about a second each), so large values can outlast an MCP client's request timeout.",
+      ),
   }),
-  handler: async (client, args) => {
+  handler: async (client, args, ctx = NO_CONTEXT) => {
     const conv = await client.users.conversations({
       types: args.types,
       limit: args.max_channels,
     })
-    const scanned = await mapLimit(conv.channels ?? [], UNREADS_CONCURRENCY, async (ch) => {
-      if (!ch.id) return undefined
-      try {
-        const info = await client.conversations.info({ channel: ch.id })
-        const c = info.channel as
-          | { unread_count_display?: number; unread_count?: number }
-          | undefined
-        const count = c?.unread_count_display ?? c?.unread_count ?? 0
-        return count > 0 ? { id: ch.id, name: ch.name, unread_count: count } : undefined
-      } catch {
-        // best effort: a single inaccessible or throttled channel shouldn't
-        // sink the whole scan, so skip it and keep the rest.
-        return undefined
-      }
+    const channels = conv.channels ?? []
+    let done = 0
+    const scanned = await mapLimit(channels, UNREADS_CONCURRENCY, async (ch) => {
+      ctx.signal.throwIfAborted()
+      const unread = await unreadCount(client, ch)
+      done += 1
+      await ctx.progress(done, channels.length)
+      return unread
     })
     return { unreads: scanned.filter((u) => u !== undefined) }
   },
@@ -301,8 +321,11 @@ export const conversationsUnreads = defineTool({
 
 export const conversationsMark = defineTool({
   name: "conversations_mark",
+  title: "Mark conversation read",
   description: "Sets the read cursor in a channel.",
   tier: "write",
+  destructive: false,
+  idempotent: true,
   scopes: writeScopes,
   input: z.object({
     channel: z.string().describe("Channel or conversation to set the read cursor for."),
@@ -320,8 +343,11 @@ export const conversationsMark = defineTool({
 
 export const conversationsJoin = defineTool({
   name: "conversations_join",
+  title: "Join conversation",
   description: "Joins an existing conversation.",
   tier: "write",
+  destructive: false,
+  idempotent: true,
   scopes: ["channels:write"],
   input: z.object({
     channel: z.string().describe("ID of conversation to join."),
@@ -334,8 +360,11 @@ export const conversationsJoin = defineTool({
 
 export const conversationsLeave = defineTool({
   name: "conversations_leave",
+  title: "Leave conversation",
   description: "Leaves a conversation.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: writeScopes,
   input: z.object({
     channel: z.string().describe("Conversation to leave."),

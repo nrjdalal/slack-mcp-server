@@ -30,6 +30,7 @@ const teamId = z
 
 export const usergroupsList = defineTool({
   name: "usergroups_list",
+  title: "List user groups",
   description: "List all User Groups for a team.",
   tier: "read",
   scopes: ["usergroups:read"],
@@ -58,6 +59,7 @@ export const usergroupsList = defineTool({
 
 export const usergroupsMe = defineTool({
   name: "usergroups_me",
+  title: "List my user groups",
   description:
     "List the user groups the authenticated user belongs to. Composite over auth.test and usergroups.list.",
   tier: "read",
@@ -75,8 +77,11 @@ export const usergroupsMe = defineTool({
 
 export const usergroupsCreate = defineTool({
   name: "usergroups_create",
+  title: "Create user group",
   description: "Create a User Group.",
   tier: "write",
+  destructive: false,
+  idempotent: false,
   scopes: ["usergroups:write"],
   input: z.object({
     name: z.string().describe("A name for the User Group. Must be unique among User Groups."),
@@ -110,8 +115,11 @@ export const usergroupsCreate = defineTool({
 
 export const usergroupsUpdate = defineTool({
   name: "usergroups_update",
+  title: "Update user group",
   description: "Update an existing User Group.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["usergroups:write"],
   input: z.object({
     usergroup: z.string().describe("The encoded ID of the User Group to update."),
@@ -145,8 +153,11 @@ export const usergroupsUpdate = defineTool({
 
 export const usergroupsUsersUpdate = defineTool({
   name: "usergroups_users_update",
+  title: "Set user group members",
   description: "Update the list of users for a user group.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["usergroups:write"],
   input: z.object({
     usergroup: z.string().describe("The encoded ID of the user group to update."),
