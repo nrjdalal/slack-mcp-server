@@ -77,6 +77,8 @@ The server speaks MCP over stdio, to clients on any protocol revision from 2024-
 
 \`npx\` asks the npm registry about the package on every launch, so on a slow network a client can give up before the server starts, and it reads the current project's \`package.json\`, which fails in a Bun project with \`catalog:\` versions. Installing once avoids both: \`npm i -g @nrjdalal/slack-mcp-server\` (rerun it to update), then use \`"command": "slack-mcp-server"\` with no \`args\`.
 
+Behind a proxy, set \`HTTPS_PROXY\` together with \`"NODE_USE_ENV_PROXY": "1"\` in \`env\` (Node 22.21+ or 24.5+). Slack's client ignores \`HTTPS_PROXY\` on its own; that flag makes Node route it through the proxy.
+
 ## Implemented tools
 
 ${legend}

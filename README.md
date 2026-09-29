@@ -27,6 +27,8 @@ The server speaks MCP over stdio, to clients on any protocol revision from 2024-
 
 `npx` asks the npm registry about the package on every launch, so on a slow network a client can give up before the server starts, and it reads the current project's `package.json`, which fails in a Bun project with `catalog:` versions. Installing once avoids both: `npm i -g @nrjdalal/slack-mcp-server` (rerun it to update), then use `"command": "slack-mcp-server"` with no `args`.
 
+Behind a proxy, set `HTTPS_PROXY` together with `"NODE_USE_ENV_PROXY": "1"` in `env` (Node 22.21+ or 24.5+). Slack's client ignores `HTTPS_PROXY` on its own; that flag makes Node route it through the proxy.
+
 ## Implemented tools
 
 **slack-mcp-server** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope). **tier** is Slack's documented [rate-limit tier](https://docs.slack.dev/apis/web-api/rate-limits) for the method.
