@@ -3,13 +3,14 @@ import { z } from "zod"
 import { getToken } from "@/client"
 import { defineTool } from "@/types"
 
+const DEFAULT_MAX_BYTES = 256 * 1024
 const MAX_BYTES = 5 * 1024 * 1024
 
 export const filesInfo = defineTool({
   name: "files_info",
   title: "Get file info",
   description:
-    "Gets information about a file (and, when under 5MB, its content: text as-is, binary as base64).",
+    "Gets information about a file, and its content when it fits under max_bytes (text as-is, binary as base64). Otherwise content_omitted says why.",
   tier: "read",
   scopes: ["files:read"],
   input: z.object({
@@ -23,6 +24,15 @@ export const filesInfo = defineTool({
       ),
     limit: z.number().int().optional().describe("The maximum number of items to return."),
     page: z.number().int().optional().describe("Page number of comments to return."),
+    max_bytes: z
+      .number()
+      .int()
+      .min(0)
+      .max(MAX_BYTES)
+      .default(DEFAULT_MAX_BYTES)
+      .describe(
+        "Largest file, in bytes, whose content is returned inline. Base64 is a third larger than the file, so keep this small for binaries. 0 returns metadata only.",
+      ),
   }),
   handler: async (client, args) => {
     const res = await client.files.info({
@@ -40,16 +50,23 @@ export const filesInfo = defineTool({
           size?: number
         }
       | undefined
-    const url = file?.url_private_download ?? file?.url_private
+    if (!file) return { file: res.file }
+    const url = file.url_private_download ?? file.url_private
     const token = getToken(client)
-    let content: { encoding: "utf8" | "base64"; data: string } | undefined
-    if (url && token && (file?.size ?? 0) <= MAX_BYTES) {
-      const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-      const buf = Buffer.from(await r.arrayBuffer())
-      content = (file?.mimetype ?? "").startsWith("text/")
-        ? { encoding: "utf8", data: buf.toString("utf8") }
-        : { encoding: "base64", data: buf.toString("base64") }
+    const size = file.size ?? 0
+    if (!url || !token) return { file: res.file, content_omitted: "no downloadable URL" }
+    if (size > args.max_bytes) {
+      return {
+        file: res.file,
+        content_omitted: `file is ${size} bytes, over max_bytes (${args.max_bytes})`,
+      }
     }
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (!r.ok) return { file: res.file, content_omitted: `download failed with HTTP ${r.status}` }
+    const buf = Buffer.from(await r.arrayBuffer())
+    const content = (file.mimetype ?? "").startsWith("text/")
+      ? { encoding: "utf8" as const, data: buf.toString("utf8") }
+      : { encoding: "base64" as const, data: buf.toString("base64") }
     return { file: res.file, content }
   },
 })

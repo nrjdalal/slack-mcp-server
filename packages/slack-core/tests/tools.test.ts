@@ -127,8 +127,62 @@ test("users_search filters users.list by query", async () => {
   })
   const out = (await usersSearch.handler(client, { query: "ALICE", limit: 200 })) as {
     matches: Array<{ id: string }>
+    scanned: number
+    next_cursor?: string
   }
   expect(out.matches.map((m) => m.id)).toEqual(["U1"])
+  expect(out.scanned).toBe(2)
+  expect(out.next_cursor).toBeUndefined()
+})
+
+const pagedUsers = (pages: Array<Array<{ id: string; name: string }>>) => {
+  const calls: Array<{ limit?: number; cursor?: string }> = []
+  const client = {
+    users: {
+      list: async (args: { limit?: number; cursor?: string }) => {
+        calls.push(args)
+        const i = args.cursor ? Number(args.cursor) : 0
+        return {
+          ok: true,
+          members: pages[i],
+          response_metadata: { next_cursor: i + 1 < pages.length ? String(i + 1) : "" },
+        }
+      },
+    },
+  } as unknown as WebClient
+  return { client, calls }
+}
+
+test("users_search finds a user past the first users.list page", async () => {
+  const { client, calls } = pagedUsers([
+    [{ id: "U1", name: "alice" }],
+    [{ id: "U2", name: "bob" }],
+    [{ id: "U3", name: "carol" }],
+  ])
+  const out = (await usersSearch.handler(client, { query: "carol", limit: 1000 })) as {
+    matches: Array<{ id: string }>
+    scanned: number
+  }
+  expect(out.matches.map((m) => m.id)).toEqual(["U3"])
+  expect(out.scanned).toBe(3)
+  expect(calls).toHaveLength(3)
+})
+
+test("users_search stops at limit and returns a cursor to resume from", async () => {
+  const { client, calls } = pagedUsers([
+    [
+      { id: "U1", name: "alice" },
+      { id: "U2", name: "bob" },
+    ],
+    [{ id: "U3", name: "carol" }],
+  ])
+  const out = (await usersSearch.handler(client, { query: "carol", limit: 2 })) as {
+    matches: unknown[]
+    next_cursor?: string
+  }
+  expect(out.matches).toEqual([])
+  expect(out.next_cursor).toBe("1")
+  expect(calls[0]!.limit).toBe(2)
 })
 
 test("chat_post_message (write) posts and returns ts", async () => {
