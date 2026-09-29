@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { rawInput, shapeAll, shapeUser } from "@/shape"
 import { defineTool, NO_CONTEXT } from "@/types"
 
 // Slack recommends no more than 200 users per users.list page.
@@ -30,6 +31,7 @@ export const usersSearch = defineTool({
       .string()
       .optional()
       .describe("Continue a previous scan from the next_cursor it returned."),
+    raw: rawInput,
   }),
   handler: async (client, args, ctx = NO_CONTEXT) => {
     const q = args.query.toLowerCase()
@@ -61,6 +63,6 @@ export const usersSearch = defineTool({
       cursor = (res.response_metadata ?? {}).next_cursor || undefined
       await ctx.progress(scanned)
     } while (cursor && scanned < args.limit)
-    return { matches, scanned, next_cursor: cursor }
+    return { matches: shapeAll(args.raw, matches, shapeUser), scanned, next_cursor: cursor }
   },
 })

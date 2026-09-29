@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 import { getToken } from "@/client"
+import { rawInput, shapeFile } from "@/shape"
 import { defineTool } from "@/types"
 
 const DEFAULT_MAX_BYTES = 256 * 1024
@@ -33,6 +34,7 @@ export const filesInfo = defineTool({
       .describe(
         "Largest file, in bytes, whose content is returned inline. Base64 is a third larger than the file, so keep this small for binaries. 0 returns metadata only.",
       ),
+    raw: rawInput,
   }),
   handler: async (client, args) => {
     const res = await client.files.info({
@@ -50,23 +52,24 @@ export const filesInfo = defineTool({
           size?: number
         }
       | undefined
-    if (!file) return { file: res.file }
+    const shown = args.raw ? res.file : shapeFile(res.file)
+    if (!file) return { file: shown }
     const url = file.url_private_download ?? file.url_private
     const token = getToken(client)
     const size = file.size ?? 0
-    if (!url || !token) return { file: res.file, content_omitted: "no downloadable URL" }
+    if (!url || !token) return { file: shown, content_omitted: "no downloadable URL" }
     if (size > args.max_bytes) {
       return {
-        file: res.file,
+        file: shown,
         content_omitted: `file is ${size} bytes, over max_bytes (${args.max_bytes})`,
       }
     }
     const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-    if (!r.ok) return { file: res.file, content_omitted: `download failed with HTTP ${r.status}` }
+    if (!r.ok) return { file: shown, content_omitted: `download failed with HTTP ${r.status}` }
     const buf = Buffer.from(await r.arrayBuffer())
     const content = (file.mimetype ?? "").startsWith("text/")
       ? { encoding: "utf8" as const, data: buf.toString("utf8") }
       : { encoding: "base64" as const, data: buf.toString("base64") }
-    return { file: res.file, content }
+    return { file: shown, content }
   },
 })
