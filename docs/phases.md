@@ -25,9 +25,8 @@ before new ones).
 | P4    | Extend — Batch B (curated) | ~10       | ~6         | after P3                    |
 | —     | Parking lot                | n/a       | n/a        | post-extend / explicit ask  |
 
-Parallel track: **M6 inscope integration** (point inscope at this package, drop
-`SLACK_MCP_ADD_MESSAGE_TOOL` since writes are default-on) — orthogonal, can land
-any time; not blocked by P1–P4.
+Parallel track: **M6 inscope integration** is done: inscope has defaulted to this package since
+2026-06-15, and maps its write toggle to `SLACK_MCP_ALLOW_WRITE`.
 
 ---
 
