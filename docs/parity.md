@@ -13,6 +13,8 @@ This is a point-in-time snapshot — re-audit when either side moves.
 | ours | `@nrjdalal/slack-mcp-server@0.1.0` (TypeScript, `@slack/web-api`) |
 | date | 2026-06-15                                                        |
 
+The tool annotations, MCP resources, proxy and CA, and GovSlack rows were added on 2026-09-30, comparing the same koro commit with this server after its move to MCP SDK v2 (#33).
+
 ## Headline: is rate limiting done the same way?
 
 **Matched on the xoxp surface — both proactively throttle, honor `Retry-After`,
@@ -60,14 +62,18 @@ Refs — koro: `pkg/limiter/{limits,retry}.go`, `pkg/handler/conversations.go`
 
 ## Dimension 2 — other cross-cutting behaviors
 
-| Behavior                          | koro                                                                                        | ours                                                                              | Verdict                |
-| --------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------- |
-| Token model                       | `xoxc`/`xoxd` (edge) **and** `xoxp`; detects bot tokens                                     | `xoxp` only                                                                       | N/A (token model)      |
-| Transport                         | stdio **and** SSE/HTTP (`SLACK_MCP_HOST`/`PORT`)                                            | stdio only                                                                        | OURS-LACKS (by design) |
-| Write gating                      | Per-tool env gates + `SLACK_MCP_ENABLED_TOOLS` allow-list + channel scoping, off by default | Single `SLACK_MCP_ALLOW_WRITE` boolean, **on by default** (`false` for read-only) | DIVERGENT (deliberate) |
-| `@handle` / `#channel` resolution | Yes — via the user/channel cache                                                            | Yes — resolved in `invoke` via the cache (IDs pass through)                       | SAME                   |
-| Result shape                      | Text, often CSV/markdown via `text_processor`                                               | `JSON.stringify` of the mapped object                                             | DIVERGENT              |
-| Tool errors                       | Returned as MCP results                                                                     | Thrown → SDK wraps as `isError`                                                   | DIVERGENT              |
+| Behavior                          | koro                                                                                                                  | ours                                                                                                                          | Verdict                |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| Token model                       | `xoxc`/`xoxd` (edge) **and** `xoxp`; detects bot tokens                                                               | `xoxp` only                                                                                                                   | N/A (token model)      |
+| Transport                         | stdio **and** SSE/HTTP (`SLACK_MCP_HOST`/`PORT`)                                                                      | stdio only                                                                                                                    | OURS-LACKS (by design) |
+| Write gating                      | Per-tool env gates + `SLACK_MCP_ENABLED_TOOLS` allow-list + channel scoping, off by default                           | Single `SLACK_MCP_ALLOW_WRITE` boolean, **on by default** (`false` for read-only)                                             | DIVERGENT (deliberate) |
+| `@handle` / `#channel` resolution | Yes — via the user/channel cache                                                                                      | Yes — resolved in `invoke` via the cache (IDs pass through)                                                                   | SAME                   |
+| Result shape                      | Text, often CSV/markdown via `text_processor`                                                                         | `JSON.stringify` of the mapped object                                                                                         | DIVERGENT              |
+| Tool errors                       | Returned as MCP results                                                                                               | Thrown → SDK wraps as `isError`                                                                                               | DIVERGENT              |
+| Tool annotations                  | `title` on every tool, `readOnlyHint` on reads, `destructiveHint` on writes, `idempotentHint` on one                  | `title` on every tool, `readOnlyHint` on reads, `destructiveHint` and `idempotentHint` on every write, `openWorldHint` on all | SAME                   |
+| MCP resources                     | `slack://<workspace>/channels` and `/users` directory resources                                                       | None; `#channel` / `@handle` names resolve inside tools                                                                       | OURS-LACKS             |
+| Proxy and CA                      | `SLACK_MCP_PROXY`, `SLACK_MCP_SERVER_CA*`, custom User-Agent and TLS (`SLACK_MCP_USER_AGENT`, `SLACK_MCP_CUSTOM_TLS`) | Node's own: `HTTPS_PROXY` with `NODE_USE_ENV_PROXY=1`, and `NODE_EXTRA_CA_CERTS`; no custom User-Agent or TLS                 | DIVERGENT              |
+| GovSlack                          | `SLACK_MCP_GOVSLACK` routes calls to `slack-gov.com`                                                                  | Not supported                                                                                                                 | OURS-LACKS             |
 
 ## Dimension 3 — tool parity
 
