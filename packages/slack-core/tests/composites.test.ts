@@ -66,6 +66,8 @@ const withFetch = async (impl: () => Promise<Response>, fn: () => Promise<void>)
   }
 }
 
+const DEFAULT_CAP = 256 * 1024
+
 const fileClient = (file: unknown) =>
   ({ files: { info: async () => ({ file }) } }) as unknown as WebClient
 
@@ -75,7 +77,7 @@ test("files_info returns text content as utf8 under the size cap", async () => {
     async () => {
       const out = (await filesInfo.handler(
         fileClient({ mimetype: "text/plain", size: 5, url_private: "https://files.slack.com/x" }),
-        { file: "F1" },
+        { file: "F1", max_bytes: DEFAULT_CAP },
       )) as { content?: { encoding: string; data: string } }
       expect(out.content).toEqual({ encoding: "utf8", data: "hello" })
     },
@@ -88,7 +90,7 @@ test("files_info returns binary content as base64", async () => {
     async () => {
       const out = (await filesInfo.handler(
         fileClient({ mimetype: "image/png", size: 3, url_private: "https://files.slack.com/x" }),
-        { file: "F1" },
+        { file: "F1", max_bytes: DEFAULT_CAP },
       )) as { content?: { encoding: string; data: string } }
       expect(out.content).toEqual({ encoding: "base64", data: "AQID" })
     },
@@ -109,7 +111,57 @@ test("files_info skips content above the size cap", async () => {
           size: 6 * 1024 * 1024,
           url_private: "https://files.slack.com/x",
         }),
-        { file: "F1" },
+        { file: "F1", max_bytes: DEFAULT_CAP },
+      )) as { content?: unknown; content_omitted?: string }
+      expect(out.content).toBeUndefined()
+      expect(out.content_omitted).toContain("over max_bytes")
+      expect(fetched).toBe(false)
+    },
+  )
+})
+
+test("files_info inlines a larger file when max_bytes is raised", async () => {
+  await withFetch(
+    async () => new Response("x".repeat(300 * 1024)),
+    async () => {
+      const out = (await filesInfo.handler(
+        fileClient({
+          mimetype: "text/plain",
+          size: 300 * 1024,
+          url_private: "https://files.slack.com/x",
+        }),
+        { file: "F1", max_bytes: 1024 * 1024 },
+      )) as { content?: { data: string } }
+      expect(out.content!.data).toHaveLength(300 * 1024)
+    },
+  )
+})
+
+test("files_info reports a failed download instead of inlining the error page", async () => {
+  await withFetch(
+    async () => new Response("<html>forbidden</html>", { status: 403 }),
+    async () => {
+      const out = (await filesInfo.handler(
+        fileClient({ mimetype: "text/plain", size: 5, url_private: "https://files.slack.com/x" }),
+        { file: "F1", max_bytes: DEFAULT_CAP },
+      )) as { content?: unknown; content_omitted?: string }
+      expect(out.content).toBeUndefined()
+      expect(out.content_omitted).toBe("download failed with HTTP 403")
+    },
+  )
+})
+
+test("files_info with max_bytes 0 returns metadata only", async () => {
+  let fetched = false
+  await withFetch(
+    async () => {
+      fetched = true
+      return new Response("hello")
+    },
+    async () => {
+      const out = (await filesInfo.handler(
+        fileClient({ mimetype: "text/plain", size: 5, url_private: "https://files.slack.com/x" }),
+        { file: "F1", max_bytes: 0 },
       )) as { content?: unknown }
       expect(out.content).toBeUndefined()
       expect(fetched).toBe(false)
