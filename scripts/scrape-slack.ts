@@ -6,7 +6,7 @@
 //
 // The method list and its reference order are the committed seed; this only
 // refreshes the userScopes / tier values, and preserves existing values on a
-// failed fetch so a transient error never zeroes committed data.
+// failed fetch, or on a page that no longer parses, so neither zeroes committed data.
 import { readFileSync, writeFileSync } from "node:fs"
 
 const PATH = new URL("./slack-methods.json", import.meta.url).pathname
@@ -38,6 +38,7 @@ const tier = (html: string): string => {
   return ""
 }
 
+const kept: string[] = []
 let idx = 0
 const worker = async () => {
   while (idx < methods.length) {
@@ -46,8 +47,12 @@ const worker = async () => {
       const r = await fetch(`https://docs.slack.dev/reference/methods/${entry.method}`)
       if (!r.ok) continue // preserve existing values
       const html = await r.text()
-      entry.userScopes = userScopes(html)
-      entry.tier = tier(html)
+      const scopes = userScopes(html)
+      const parsedTier = tier(html)
+      if (scopes.length > 0) entry.userScopes = scopes
+      else if (entry.userScopes.length > 0) kept.push(`${entry.method} scopes`)
+      if (parsedTier) entry.tier = parsedTier
+      else if (entry.tier) kept.push(`${entry.method} tier`)
     } catch {
       // preserve existing values on a transient failure
     }
@@ -59,4 +64,7 @@ writeFileSync(PATH, JSON.stringify(methods, null, 2) + "\n")
 console.log(
   `refreshed ${methods.length} methods, ${methods.filter((m) => m.userScopes.length).length} with scopes, ${methods.filter((m) => m.tier).length} with a tier`,
 )
+if (kept.length > 0) {
+  console.warn(`kept committed values the page no longer parsed: ${kept.sort().join(", ")}`)
+}
 console.warn("Review the git diff before committing: docs.slack.dev HTML parsing is brittle.")
