@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { rawInput, shapeAll, shapeMessage } from "@/shape"
 import { defineTool } from "@/types"
 
 export const searchMessages = defineTool({
@@ -37,6 +38,7 @@ export const searchMessages = defineTool({
       .string()
       .optional()
       .describe("Encoded team id to search in, required if org token is used."),
+    raw: rawInput,
   }),
   handler: async (client, args) => {
     const res = await client.search.messages({
@@ -50,7 +52,7 @@ export const searchMessages = defineTool({
       team_id: args.team_id,
     })
     return {
-      matches: res.messages?.matches ?? [],
+      matches: shapeAll(args.raw, (res.messages ?? {}).matches ?? [], shapeMessage),
       total: res.messages?.total ?? 0,
       pagination: res.messages?.pagination,
       next_cursor: res.response_metadata?.next_cursor || undefined,

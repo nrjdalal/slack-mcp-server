@@ -2,6 +2,7 @@ import type { WebClient } from "@slack/web-api"
 import { z } from "zod"
 
 import { mapLimit } from "@/concurrency"
+import { rawInput, shapeAll, shapeChannel, shapeMessage } from "@/shape"
 import { defineTool, NO_CONTEXT, type ToolContext } from "@/types"
 
 // conversations.info is Tier 3; a small fan-out keeps the unreads scan quick
@@ -94,6 +95,7 @@ export const conversationsHistory = defineTool({
       .string()
       .optional()
       .describe("Only messages after this Unix timestamp will be included in results."),
+    raw: rawInput,
   }),
   handler: async (client, args) => {
     const res = await client.conversations.history({
@@ -106,7 +108,7 @@ export const conversationsHistory = defineTool({
       oldest: args.oldest,
     })
     return {
-      messages: res.messages ?? [],
+      messages: shapeAll(args.raw, res.messages ?? [], shapeMessage),
       has_more: res.has_more ?? false,
       next_cursor: res.response_metadata?.next_cursor || undefined,
     }
@@ -152,6 +154,7 @@ export const conversationsReplies = defineTool({
       .string()
       .optional()
       .describe("Only messages after this Unix timestamp will be included in results."),
+    raw: rawInput,
   }),
   handler: async (client, args) => {
     const res = await client.conversations.replies({
@@ -165,7 +168,7 @@ export const conversationsReplies = defineTool({
       oldest: args.oldest,
     })
     return {
-      messages: res.messages ?? [],
+      messages: shapeAll(args.raw, res.messages ?? [], shapeMessage),
       has_more: res.has_more ?? false,
       next_cursor: res.response_metadata?.next_cursor || undefined,
     }
@@ -197,6 +200,7 @@ export const conversationsList = defineTool({
       .describe("Encoded team id to list channels in, required if token belongs to org-wide app."),
     types,
     fetch_all: fetchAll,
+    raw: rawInput,
   }),
   handler: async (client, args, ctx = NO_CONTEXT) => {
     const page = (cursor: string | undefined) =>
@@ -207,10 +211,13 @@ export const conversationsList = defineTool({
         team_id: args.team_id,
         types: args.types,
       })
-    if (args.fetch_all) return collectAll(page, args.cursor, ctx)
+    if (args.fetch_all) {
+      const all = await collectAll(page, args.cursor, ctx)
+      return { ...all, channels: shapeAll(args.raw, all.channels, shapeChannel) }
+    }
     const res = await page(args.cursor)
     return {
-      channels: res.channels ?? [],
+      channels: shapeAll(args.raw, res.channels ?? [], shapeChannel),
       next_cursor: res.response_metadata?.next_cursor || undefined,
     }
   },
@@ -247,6 +254,7 @@ export const usersConversations = defineTool({
       .optional()
       .describe("Browse conversations by a specific user ID's membership."),
     fetch_all: fetchAll,
+    raw: rawInput,
   }),
   handler: async (client, args, ctx = NO_CONTEXT) => {
     const page = (cursor: string | undefined) =>
@@ -258,10 +266,13 @@ export const usersConversations = defineTool({
         types: args.types,
         user: args.user,
       })
-    if (args.fetch_all) return collectAll(page, args.cursor, ctx)
+    if (args.fetch_all) {
+      const all = await collectAll(page, args.cursor, ctx)
+      return { ...all, channels: shapeAll(args.raw, all.channels, shapeChannel) }
+    }
     const res = await page(args.cursor)
     return {
-      channels: res.channels ?? [],
+      channels: shapeAll(args.raw, res.channels ?? [], shapeChannel),
       next_cursor: res.response_metadata?.next_cursor || undefined,
     }
   },
