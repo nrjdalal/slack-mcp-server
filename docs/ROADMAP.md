@@ -128,4 +128,3 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
 - **P2 destructive tools** (2026-10-05): option A, one flag. Neeraj: _"1 [option A],
   and on by default, both should be on by default"_. `chat_update` and `chat_delete`
   are ordinary write tools, on by default; no `SLACK_MCP_ALLOW_DESTRUCTIVE` tier.
-  Reads and `#channel`/`@handle` resolution always stay on the user token.
