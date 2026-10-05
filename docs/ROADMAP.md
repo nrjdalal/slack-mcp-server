@@ -56,7 +56,7 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
   value (e.g. `off`, `no`) **fails safe to read-only** so a fumbled disable can't
   silently leave writes on; only unset/empty keeps the default. The server reads it
   (`packages/slack-mcp-server/src/env.ts`) and passes `allowWrite` to
-  `createServer`, which selects `enabledTools(allowWrite)`: all 19 tools on,
+  `createServer`, which selects `enabledTools(allowWrite)`: all 21 tools on,
   10 read-only when disabled.
 - Deliberately simpler than korotovsky: no per-tool gates, no
   `SLACK_MCP_ENABLED_TOOLS` allow-list, no channel scoping. Trade-off: a config
@@ -125,3 +125,6 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
   per-tool env gates. Simpler over parity, knowingly. Default flipped to
   **writes-on** so the npx/inscope swap needs no write env at all (set
   `SLACK_MCP_ALLOW_WRITE=false` for read-only).
+- **P2 destructive tools** (2026-10-05): option A, one flag. Neeraj: _"1 [option A],
+  and on by default, both should be on by default"_. `chat_update` and `chat_delete`
+  are ordinary write tools, on by default; no `SLACK_MCP_ALLOW_DESTRUCTIVE` tier.

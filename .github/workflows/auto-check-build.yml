@@ -24,8 +24,10 @@ jobs:
         run: bun install --ignore-scripts
 
       - name: Audit, Lint, Build, and Test
+        # GHSA-vfj7-8cjw-p6xm: braces <=3.0.3 has no patched release; it is reached only
+        # via devDependency globby (auto-labeler, static patterns). Drop once braces ships a fix.
         run: |
-          bun audit --audit-level high
+          bun audit --audit-level high --ignore GHSA-vfj7-8cjw-p6xm
           bun run lint
           bun run check-types
           bun run build

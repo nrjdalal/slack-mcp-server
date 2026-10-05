@@ -1,14 +1,15 @@
 # Extension catalog
 
-The menu of tools/scopes we could add beyond the current 19, ordered
+The menu of tools/scopes we could add beyond the current 21, ordered
 cheapest-first (no new OAuth scopes before new ones). This is the **what**;
 [phases.md](phases.md) decides the **when** (Batch A = P3, Batch B = P4). Derived
 from the scraped `scripts/slack-methods.json` (non-admin, xoxp methods only).
 
-Inventory: of the unimplemented methods with a user scope, **24 need only scopes
+Inventory: of the unimplemented methods with a user scope, **22 need only scopes
 we already request** (Batch A) and **~90 would add ~47 new scopes** (Batch B +
-parking lot). Destructive, irreversible tools are marked **⚠**; they must respect
-the [phases.md](phases.md) P2 gating decision.
+parking lot). Destructive, irreversible tools are marked **⚠**; per the
+[phases.md](phases.md) P2 decision (option A) they ship as ordinary write tools, on
+by default.
 
 ## Batch A — free (zero new scopes)
 
@@ -18,8 +19,6 @@ Existing installs keep working with no re-consent. Ship the highest-value first.
 
 | Tool                    | Method                  | Note                             |
 | ----------------------- | ----------------------- | -------------------------------- |
-| `chat_update`           | `chat.update`           | edit a message                   |
-| `chat_delete` ⚠         | `chat.delete`           | delete a message                 |
 | `conversations_open`    | `conversations.open`    | start a DM / group DM            |
 | `conversations_members` | `conversations.members` | who's in a channel               |
 | `users_info`            | `users.info`            | direct lookup by ID              |
