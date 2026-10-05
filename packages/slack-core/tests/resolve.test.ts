@@ -52,6 +52,7 @@ afterEach(() => {
 test("an ID ref passes through without touching the cache", async () => {
   const { client, calls } = fakeClient()
   expect(await resolveChannel(client, "C0ABCDE123")).toBe("C0ABCDE123")
+  expect(await resolveChannel(client, "U0ABCDE123")).toBe("U0ABCDE123") // DM by user ID
   expect(await resolveUser(client, "U0ABCDE123")).toBe("U0ABCDE123")
   expect(calls).toEqual({ channels: 0, users: 0 })
 })

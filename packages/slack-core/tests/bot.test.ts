@@ -4,6 +4,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 
 import type { WebClient } from "@slack/web-api"
+import type { z } from "zod"
 
 import { BOT_TOKEN_ENV, createBotClient } from "@/client"
 import { invoke } from "@/invoke"
@@ -73,10 +74,43 @@ test("bot-capable tools are exactly post, update, delete and the reactions", () 
   expect(allTools.filter((t) => t.botCapable).every((t) => t.tier === "write")).toBe(true)
 })
 
+// zod strips undeclared keys, so a bot-capable tool missing as_user would silently
+// ignore as_user: true and act as the bot.
+test("every bot-capable tool declares as_user", () => {
+  for (const tool of allTools.filter((t) => t.botCapable)) {
+    expect((tool.input as z.ZodObject<z.ZodRawShape>).shape.as_user).toBeDefined()
+  }
+})
+
 test("without a bot client, bot-capable tools act as the user", async () => {
   const user = fakeClient()
   await invoke(chatPostMessage, user.client, { channel: "C1", text: "hi" })
   expect(user.calls).toEqual([{ method: "chat.postMessage", args: { channel: "C1", text: "hi" } }])
+})
+
+test("without a bot client, as_user is still never sent to Slack", async () => {
+  const user = fakeClient()
+  await invoke(chatUpdate, user.client, { channel: "C1", ts: "1.2", text: "x", as_user: true })
+  await invoke(chatPostMessage, user.client, { channel: "C1", text: "y", as_user: false })
+  expect(user.calls).toEqual([
+    { method: "chat.update", args: { channel: "C1", ts: "1.2", text: "x" } },
+    { method: "chat.postMessage", args: { channel: "C1", text: "y" } },
+  ])
+})
+
+test("a bot can DM a user by ID, with no channel lookup", async () => {
+  const user = fakeClient()
+  const bot = fakeClient()
+  await invoke(
+    chatPostMessage,
+    user.client,
+    { channel: "U0ABCDE123", text: "ping" },
+    { botClient: bot.client },
+  )
+  expect(bot.calls).toEqual([
+    { method: "chat.postMessage", args: { channel: "U0ABCDE123", text: "ping" } },
+  ])
+  expect(user.calls).toHaveLength(0)
 })
 
 test("with a bot client, post, update, delete and reactions act as the bot", async () => {

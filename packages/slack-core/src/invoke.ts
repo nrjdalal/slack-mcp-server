@@ -9,7 +9,7 @@ export const asUser = z
   .boolean()
   .optional()
   .describe(
-    `Act as the authed user even when ${BOT_TOKEN_ENV} is set (e.g. to edit a message posted before the bot existed). Without a bot token every call already acts as the user.`,
+    `Act as the authed user even when ${BOT_TOKEN_ENV} is set. Needed to update, delete or react on behalf of the user, since a bot can only change what it posted itself. Without a bot token every call already acts as the user.`,
   )
 
 export interface InvokeOptions {

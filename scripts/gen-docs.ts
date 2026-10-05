@@ -75,7 +75,7 @@ A user-token (xoxp) Slack MCP server. Tools mirror the Slack Web API.
 
 The server speaks MCP over stdio and exposes both read and write tools by default. To run read-only, add \`"SLACK_MCP_ALLOW_WRITE": "false"\` to \`env\`.
 
-To post as the app's bot user instead of yourself (so its messages notify you), add a bot user with the \`chat:write\` and \`reactions:write\` bot scopes to the app, reinstall it, invite the bot to each channel it should use, and pass its **Bot User OAuth Token** as \`SLACK_MCP_XOXB_TOKEN\`. \`chat_post_message\`, \`chat_update\`, \`chat_delete\`, \`reactions_add\` and \`reactions_remove\` then act as the bot (pass \`as_user: true\` to act as yourself, e.g. on a message you posted earlier); every other tool keeps using the user token.
+To post as the app's bot user instead of yourself (so its messages notify you), add a bot user with the \`chat:write\` and \`reactions:write\` bot scopes to the app, reinstall it, invite the bot to each channel it should use, and pass its **Bot User OAuth Token** as \`SLACK_MCP_XOXB_TOKEN\`. \`chat_post_message\`, \`chat_update\`, \`chat_delete\`, \`reactions_add\` and \`reactions_remove\` then act as the bot (pass \`as_user: true\` to act as yourself, e.g. on a message you posted earlier); every other tool keeps using the user token. To DM someone as the bot, pass their user ID (\`U…\`) as \`channel\`. A custom \`username\`/\`icon_*\` on bot posts also needs the \`chat:write.customize\` bot scope.
 
 ## Implemented tools
 
