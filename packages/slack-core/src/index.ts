@@ -1,6 +1,5 @@
-export { BOT_TOKEN_ENV, createBotClient, createClient, TOKEN_ENV } from "@/client"
+export { createClient, TOKEN_ENV } from "@/client"
 export { invoke } from "@/invoke"
-export type { InvokeOptions } from "@/invoke"
 export { allTools, enabledTools, readTools, toolByName, writeTools } from "@/registry"
 export { defineTool } from "@/types"
 export type { SlackTool, Tier } from "@/types"

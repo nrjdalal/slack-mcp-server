@@ -1,20 +1,7 @@
 import type { WebClient } from "@slack/web-api"
-import { z } from "zod"
 
-import { BOT_TOKEN_ENV } from "@/client"
 import { resolveChannel, resolveUser } from "@/resolve"
 import type { SlackTool } from "@/types"
-
-export const asUser = z
-  .boolean()
-  .optional()
-  .describe(
-    `Act as the authed user even when ${BOT_TOKEN_ENV} is set, e.g. to update or delete the user's own messages (a bot can only change messages it posted). Without a bot token every call already acts as the user.`,
-  )
-
-export interface InvokeOptions {
-  botClient?: WebClient
-}
 
 type Resolver = (client: WebClient, ref: string) => Promise<string>
 
@@ -38,7 +25,6 @@ export const invoke = async (
   tool: SlackTool,
   client: WebClient,
   rawArgs: unknown = {},
-  { botClient }: InvokeOptions = {},
 ): Promise<unknown> => {
   const args = tool.input.parse(rawArgs) as Record<string, unknown>
   // transparently resolve #channel / @handle refs (string or array) to IDs;
@@ -49,9 +35,5 @@ export const invoke = async (
   for (const key of USER_ARGS) {
     if (key in args) args[key] = await resolveArg(client, args[key], resolveUser)
   }
-  if (!tool.botCapable) return tool.handler(client, args)
-  // refs above always resolve on the user token; only the call itself switches
-  // to the bot, and as_user is consumed here rather than sent to Slack.
-  const { as_user: actAsUser, ...rest } = args
-  return tool.handler(botClient && actAsUser !== true ? botClient : client, rest)
+  return tool.handler(client, args)
 }

@@ -1,21 +1,18 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { createBotClient, createClient, enabledTools, invoke } from "@packages/slack-core"
+import { createClient, enabledTools, invoke } from "@packages/slack-core"
 import type { WebClient } from "@slack/web-api"
 
 import { version } from "../package.json"
 
 export interface CreateServerOptions {
   client?: WebClient
-  botClient?: WebClient
   allowWrite?: boolean
 }
 
 // Wraps the slack-core registry in an McpServer. Writes are enabled by default;
-// pass allowWrite: false to expose only the read-only tools. A botClient (from
-// SLACK_MCP_XOXB_TOKEN by default) makes bot-capable tools act as the bot.
+// pass allowWrite: false to expose only the read-only tools.
 export const createServer = ({
   client = createClient(),
-  botClient = createBotClient(),
   allowWrite = true,
 }: CreateServerOptions = {}): McpServer => {
   const server = new McpServer({ name: "slack-mcp-server", version })
@@ -31,7 +28,7 @@ export const createServer = ({
         annotations: { readOnlyHint: tool.tier === "read" },
       },
       async (args) => {
-        const result = await invoke(tool, client, args, { botClient })
+        const result = await invoke(tool, client, args)
         return { content: [{ type: "text" as const, text: JSON.stringify(result) }] }
       },
     )

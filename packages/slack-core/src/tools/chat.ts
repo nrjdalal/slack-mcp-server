@@ -1,6 +1,5 @@
 import { z } from "zod"
 
-import { asUser } from "@/invoke"
 import { defineTool } from "@/types"
 
 export const chatPostMessage = defineTool({
@@ -8,7 +7,6 @@ export const chatPostMessage = defineTool({
   description: "Sends a message to a channel.",
   tier: "write",
   scopes: ["chat:write"],
-  botCapable: true,
   input: z.object({
     channel: z
       .string()
@@ -68,7 +66,12 @@ export const chatPostMessage = defineTool({
       .optional()
       .describe("URL to an image to use as the icon for this message."),
     username: z.string().optional().describe("Set your bot's user name."),
-    as_user: asUser,
+    as_user: z
+      .boolean()
+      .optional()
+      .describe(
+        "(Legacy) Pass true to post the message as the authed user. Can only be used by classic apps.",
+      ),
   }),
   handler: async (client, args) => {
     const res = await client.chat.postMessage(args as Parameters<typeof client.chat.postMessage>[0])
@@ -81,7 +84,6 @@ export const chatUpdate = defineTool({
   description: "Updates a message.",
   tier: "write",
   scopes: ["chat:write"],
-  botCapable: true,
   input: z.object({
     channel: z
       .string()
@@ -130,7 +132,6 @@ export const chatUpdate = defineTool({
       .describe(
         "JSON object with event_type and event_payload fields. Omit to keep the message's previous metadata.",
       ),
-    as_user: asUser,
   }),
   handler: async (client, args) => {
     const res = await client.chat.update(args as Parameters<typeof client.chat.update>[0])
@@ -143,7 +144,6 @@ export const chatDelete = defineTool({
   description: "Deletes a message.",
   tier: "write",
   scopes: ["chat:write"],
-  botCapable: true,
   input: z.object({
     channel: z
       .string()
@@ -151,7 +151,6 @@ export const chatDelete = defineTool({
         "Channel containing the message to be deleted. For direct messages, use the DM ID (starts with D), not a user ID.",
       ),
     ts: z.string().describe("Timestamp of the message to be deleted."),
-    as_user: asUser,
   }),
   handler: async (client, args) => {
     const res = await client.chat.delete({ channel: args.channel, ts: args.ts })

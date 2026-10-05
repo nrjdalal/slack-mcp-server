@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, test } from "bun:test"
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
-import { allTools, BOT_TOKEN_ENV, readTools, TOKEN_ENV } from "@packages/slack-core"
+import { allTools, readTools, TOKEN_ENV } from "@packages/slack-core"
 import type { WebClient } from "@slack/web-api"
 
 import { ALLOW_WRITE_ENV, allowWriteFromEnv } from "@/env"
@@ -100,45 +100,34 @@ test("chat_update roundtrip edits the message and returns the mapped result", as
   expect(JSON.parse(content[0]!.text)).toEqual({ ts: "1.2", channel: "C1" })
 })
 
-test("with a botClient, posting goes through the bot and reads stay on the user", async () => {
-  const userCalls: string[] = []
-  const botCalls: Array<{ method: string; args: unknown }> = []
-  const user = {
-    conversations: {
-      history: async () => {
-        userCalls.push("conversations.history")
-        return { ok: true, messages: [] }
-      },
-    },
-  } as unknown as WebClient
-  const bot = {
+test("chat_delete roundtrip deletes the message and returns the mapped result", async () => {
+  const calls: unknown[] = []
+  const slack = {
     chat: {
-      postMessage: async (args: unknown) => {
-        botCalls.push({ method: "chat.postMessage", args })
+      delete: async (args: unknown) => {
+        calls.push(args)
         return { ok: true, ts: "1.2", channel: "C1" }
       },
     },
   } as unknown as WebClient
-  const client = await connect({ client: user, botClient: bot })
+  const client = await connect({ client: slack })
 
   const res = await client.callTool({
-    name: "chat_post_message",
-    arguments: { channel: "C1", text: "hi" },
+    name: "chat_delete",
+    arguments: { channel: "C1", ts: "1.2" },
   })
+  expect(calls).toEqual([{ channel: "C1", ts: "1.2" }])
   const content = res.content as Array<{ type: string; text: string }>
   expect(JSON.parse(content[0]!.text)).toEqual({ ts: "1.2", channel: "C1" })
-  await client.callTool({ name: "conversations_history", arguments: { channel: "C1" } })
-
-  expect(botCalls).toEqual([{ method: "chat.postMessage", args: { channel: "C1", text: "hi" } }])
-  expect(userCalls).toEqual(["conversations.history"])
 })
 
-test("allowWrite: false hides chat_update", async () => {
+test("allowWrite: false hides chat_update and chat_delete", async () => {
   const { client: slack } = fakeClient()
   const client = await connect({ client: slack, allowWrite: false })
 
   const { tools } = await client.listTools()
   expect(tools.some((t) => t.name === "chat_update")).toBe(false)
+  expect(tools.some((t) => t.name === "chat_delete")).toBe(false)
 })
 
 test("a handler that throws is surfaced as an isError result", async () => {
@@ -174,18 +163,13 @@ test("call roundtrip invokes the tool and returns the mapped result", async () =
   })
 })
 
-// createServer reads both tokens from env by default; keep a real bot token in
-// the developer's shell from routing these fakes' write calls to Slack.
-const saved: Record<string, string | undefined> = {}
+let savedToken: string | undefined
 beforeEach(() => {
-  for (const k of [TOKEN_ENV, BOT_TOKEN_ENV]) saved[k] = process.env[k]
-  delete process.env[BOT_TOKEN_ENV]
+  savedToken = process.env[TOKEN_ENV]
 })
 afterEach(() => {
-  for (const [k, v] of Object.entries(saved)) {
-    if (v === undefined) delete process.env[k]
-    else process.env[k] = v
-  }
+  if (savedToken === undefined) delete process.env[TOKEN_ENV]
+  else process.env[TOKEN_ENV] = savedToken
 })
 
 test("creating a server without a token throws", () => {

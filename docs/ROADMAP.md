@@ -128,8 +128,4 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
 - **P2 destructive tools** (2026-10-05): option A, one flag. Neeraj: _"1 [option A],
   and on by default, both should be on by default"_. `chat_update` and `chat_delete`
   are ordinary write tools, on by default; no `SLACK_MCP_ALLOW_DESTRUCTIVE` tier.
-- **Optional bot token** (2026-10-05): `SLACK_MCP_XOXB_TOKEN`, unset by default (no
-  behaviour change). When set, the `botCapable` tools (`chat_post_message`,
-  `chat_update`, `chat_delete`, `reactions_add`/`remove`) act as the app's bot user so
-  its posts notify the human; `as_user: true` opts a call back to the user token.
   Reads and `#channel`/`@handle` resolution always stay on the user token.
