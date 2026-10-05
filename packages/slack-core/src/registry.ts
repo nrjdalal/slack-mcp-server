@@ -1,4 +1,4 @@
-import { chatPostMessage } from "@/tools/chat"
+import { chatPostMessage, chatUpdate } from "@/tools/chat"
 import {
   conversationsHistory,
   conversationsJoin,
@@ -37,6 +37,7 @@ export const readTools: SlackTool[] = [
 
 export const writeTools: SlackTool[] = [
   chatPostMessage,
+  chatUpdate,
   reactionsAdd,
   reactionsRemove,
   conversationsMark,

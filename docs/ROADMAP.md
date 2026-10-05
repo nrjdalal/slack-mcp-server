@@ -56,7 +56,7 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
   value (e.g. `off`, `no`) **fails safe to read-only** so a fumbled disable can't
   silently leave writes on; only unset/empty keeps the default. The server reads it
   (`packages/slack-mcp-server/src/env.ts`) and passes `allowWrite` to
-  `createServer`, which selects `enabledTools(allowWrite)`: all 19 tools on,
+  `createServer`, which selects `enabledTools(allowWrite)`: all 20 tools on,
   10 read-only when disabled.
 - Deliberately simpler than korotovsky: no per-tool gates, no
   `SLACK_MCP_ENABLED_TOOLS` allow-list, no channel scoping. Trade-off: a config

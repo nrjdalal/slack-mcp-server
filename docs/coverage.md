@@ -69,7 +69,7 @@ All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/metho
 | [`chat.startStream`](https://docs.slack.dev/reference/methods/chat.startStream) | `-` | `-` | `Tier 2` |
 | [`chat.stopStream`](https://docs.slack.dev/reference/methods/chat.stopStream) | `-` | `-` | `Tier 2` |
 | [`chat.unfurl`](https://docs.slack.dev/reference/methods/chat.unfurl) | `-` | [`links:write`](https://docs.slack.dev/reference/scopes/links.write) | `Tier 3` |
-| [`chat.update`](https://docs.slack.dev/reference/methods/chat.update) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
+| [`chat.update`](https://docs.slack.dev/reference/methods/chat.update) | `chat_update` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`conversations.acceptSharedInvite`](https://docs.slack.dev/reference/methods/conversations.acceptSharedInvite) | `-` | `-` | `Tier 2` |
 | [`conversations.approveSharedInvite`](https://docs.slack.dev/reference/methods/conversations.approveSharedInvite) | `-` | `-` | `Tier 3` |
 | [`conversations.archive`](https://docs.slack.dev/reference/methods/conversations.archive) | `-` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) · [`groups:write`](https://docs.slack.dev/reference/scopes/groups.write) · [`im:write`](https://docs.slack.dev/reference/scopes/im.write) · [`mpim:write`](https://docs.slack.dev/reference/scopes/mpim.write) | `Tier 2` |

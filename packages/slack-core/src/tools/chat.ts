@@ -78,3 +78,63 @@ export const chatPostMessage = defineTool({
     return { ts: res.ts, channel: res.channel }
   },
 })
+
+export const chatUpdate = defineTool({
+  name: "chat_update",
+  description: "Updates a message.",
+  tier: "write",
+  scopes: ["chat:write"],
+  input: z.object({
+    channel: z
+      .string()
+      .describe(
+        "Channel containing the message to be updated. For direct messages, use the DM ID (starts with D), not a user ID.",
+      ),
+    ts: z.string().describe("Timestamp of the message to be updated."),
+    text: z
+      .string()
+      .optional()
+      .describe(
+        "How this field works and whether it is required depends on other fields you use in your API call.",
+      ),
+    blocks: z
+      .array(z.unknown())
+      .optional()
+      .describe(
+        "An array of structured blocks. Omit to keep the message's previous blocks; pass an empty array to remove them.",
+      ),
+    attachments: z
+      .array(z.unknown())
+      .optional()
+      .describe(
+        "An array of structured attachments. Omit to keep the message's previous attachments; pass an empty array to remove them.",
+      ),
+    markdown_text: z
+      .string()
+      .optional()
+      .describe(
+        "Accepts message text formatted in markdown. Should not be used with blocks or text. Limit to 12,000 characters.",
+      ),
+    reply_broadcast: z
+      .boolean()
+      .optional()
+      .describe(
+        "Broadcast an existing thread reply to make it visible to everyone in the channel or conversation.",
+      ),
+    parse: z
+      .string()
+      .optional()
+      .describe("Change how messages are treated. Defaults to client, unlike chat.postMessage."),
+    link_names: z.boolean().optional().describe("Find and link channel names and usernames."),
+    metadata: z
+      .unknown()
+      .optional()
+      .describe(
+        "JSON object with event_type and event_payload fields. Omit to keep the message's previous metadata.",
+      ),
+  }),
+  handler: async (client, args) => {
+    const res = await client.chat.update(args as Parameters<typeof client.chat.update>[0])
+    return { ts: res.ts, channel: res.channel }
+  },
+})
