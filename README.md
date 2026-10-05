@@ -25,14 +25,17 @@ A user-token (xoxp) Slack MCP server. Tools mirror the Slack Web API.
 
 The server speaks MCP over stdio and exposes both read and write tools by default. To run read-only, add `"SLACK_MCP_ALLOW_WRITE": "false"` to `env`.
 
+To post as the app's bot user instead of yourself (so its messages notify you), add a bot user with the `chat:write` and `reactions:write` bot scopes to the app, reinstall it, invite the bot to each channel it should use, and pass its **Bot User OAuth Token** as `SLACK_MCP_XOXB_TOKEN`. `chat_post_message`, `chat_update`, `chat_delete`, `reactions_add` and `reactions_remove` then act as the bot (pass `as_user: true` to act as yourself, e.g. on a message you posted earlier); every other tool keeps using the user token.
+
 ## Implemented tools
 
 **slack-mcp-server** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope). **tier** is Slack's documented [rate-limit tier](https://docs.slack.dev/apis/web-api/rate-limits) for the method.
 
-17 methods covered 1:1, plus 3 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me` (20 tools total).
+18 methods covered 1:1, plus 3 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me` (21 tools total).
 
 | slack api | slack-mcp-server | user token scopes | tier |
 | --- | --- | --- | --- |
+| [`chat.delete`](https://docs.slack.dev/reference/methods/chat.delete) | `chat_delete` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.postMessage`](https://docs.slack.dev/reference/methods/chat.postMessage) | `chat_post_message` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Special` |
 | [`chat.update`](https://docs.slack.dev/reference/methods/chat.update) | `chat_update` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`conversations.history`](https://docs.slack.dev/reference/methods/conversations.history) | `conversations_history` | [`channels:history`](https://docs.slack.dev/reference/scopes/channels.history) · [`groups:history`](https://docs.slack.dev/reference/scopes/groups.history) · [`im:history`](https://docs.slack.dev/reference/scopes/im.history) · [`mpim:history`](https://docs.slack.dev/reference/scopes/mpim.history) | `Tier 3` |

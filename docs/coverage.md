@@ -58,7 +58,7 @@ All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/metho
 | [`canvases.edit`](https://docs.slack.dev/reference/methods/canvases.edit) | `-` | [`canvases:write`](https://docs.slack.dev/reference/scopes/canvases.write) | `Tier 3` |
 | [`canvases.sections.lookup`](https://docs.slack.dev/reference/methods/canvases.sections.lookup) | `-` | [`canvases:read`](https://docs.slack.dev/reference/scopes/canvases.read) | `Tier 3` |
 | [`chat.appendStream`](https://docs.slack.dev/reference/methods/chat.appendStream) | `-` | `-` | `Tier 4` |
-| [`chat.delete`](https://docs.slack.dev/reference/methods/chat.delete) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
+| [`chat.delete`](https://docs.slack.dev/reference/methods/chat.delete) | `chat_delete` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.deleteScheduledMessage`](https://docs.slack.dev/reference/methods/chat.deleteScheduledMessage) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.getPermalink`](https://docs.slack.dev/reference/methods/chat.getPermalink) | `-` | `-` | `Special` |
 | [`chat.meMessage`](https://docs.slack.dev/reference/methods/chat.meMessage) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |

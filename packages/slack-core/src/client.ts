@@ -3,6 +3,7 @@ import { WebClient, type WebClientOptions } from "@slack/web-api"
 import { createRateLimitInterceptor } from "@/rate-limit"
 
 export const TOKEN_ENV = "SLACK_MCP_XOXP_TOKEN"
+export const BOT_TOKEN_ENV = "SLACK_MCP_XOXB_TOKEN"
 
 // @slack/web-api already honours 429 `Retry-After` (it sleeps for the advertised
 // delay, then retries) and bounds concurrency. We set both explicitly and tune
@@ -42,6 +43,13 @@ export const createClient = (
   tokens.set(client, token)
   return client
 }
+
+// Optional: with a bot token, bot-capable tools post and react as the app's bot
+// user instead of the human, so the human gets notified. Unset means no bot.
+export const createBotClient = (
+  token = process.env[BOT_TOKEN_ENV],
+  options: WebClientOptions = {},
+): WebClient | undefined => (token ? createClient(token, options) : undefined)
 
 export const getToken = (client: WebClient): string | undefined =>
   tokens.get(client) ?? process.env[TOKEN_ENV]

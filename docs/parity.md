@@ -62,7 +62,7 @@ Refs — koro: `pkg/limiter/{limits,retry}.go`, `pkg/handler/conversations.go`
 
 | Behavior                          | koro                                                                                        | ours                                                                              | Verdict                |
 | --------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------- |
-| Token model                       | `xoxc`/`xoxd` (edge) **and** `xoxp`; detects bot tokens                                     | `xoxp` only                                                                       | N/A (token model)      |
+| Token model                       | `xoxc`/`xoxd` (edge) **and** `xoxp`; detects bot tokens                                     | `xoxp`; optional `xoxb` (`SLACK_MCP_XOXB_TOKEN`) for posting/reacting             | N/A (token model)      |
 | Transport                         | stdio **and** SSE/HTTP (`SLACK_MCP_HOST`/`PORT`)                                            | stdio only                                                                        | OURS-LACKS (by design) |
 | Write gating                      | Per-tool env gates + `SLACK_MCP_ENABLED_TOOLS` allow-list + channel scoping, off by default | Single `SLACK_MCP_ALLOW_WRITE` boolean, **on by default** (`false` for read-only) | DIVERGENT (deliberate) |
 | `@handle` / `#channel` resolution | Yes — via the user/channel cache                                                            | Yes — resolved in `invoke` via the cache (IDs pass through)                       | SAME                   |
