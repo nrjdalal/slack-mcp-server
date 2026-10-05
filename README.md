@@ -29,11 +29,13 @@ The server speaks MCP over stdio and exposes both read and write tools by defaul
 
 **slack-mcp-server** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope). **tier** is Slack's documented [rate-limit tier](https://docs.slack.dev/apis/web-api/rate-limits) for the method.
 
-16 methods covered 1:1, plus 3 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me` (19 tools total).
+18 methods covered 1:1, plus 3 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me` (21 tools total).
 
 | slack api | slack-mcp-server | user token scopes | tier |
 | --- | --- | --- | --- |
+| [`chat.delete`](https://docs.slack.dev/reference/methods/chat.delete) | `chat_delete` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.postMessage`](https://docs.slack.dev/reference/methods/chat.postMessage) | `chat_post_message` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Special` |
+| [`chat.update`](https://docs.slack.dev/reference/methods/chat.update) | `chat_update` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`conversations.history`](https://docs.slack.dev/reference/methods/conversations.history) | `conversations_history` | [`channels:history`](https://docs.slack.dev/reference/scopes/channels.history) · [`groups:history`](https://docs.slack.dev/reference/scopes/groups.history) · [`im:history`](https://docs.slack.dev/reference/scopes/im.history) · [`mpim:history`](https://docs.slack.dev/reference/scopes/mpim.history) | `Tier 3` |
 | [`conversations.join`](https://docs.slack.dev/reference/methods/conversations.join) | `conversations_join` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) | `Tier 3` |
 | [`conversations.leave`](https://docs.slack.dev/reference/methods/conversations.leave) | `conversations_leave` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) · [`groups:write`](https://docs.slack.dev/reference/scopes/groups.write) · [`im:write`](https://docs.slack.dev/reference/scopes/im.write) · [`mpim:write`](https://docs.slack.dev/reference/scopes/mpim.write) | `Tier 3` |
