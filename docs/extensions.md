@@ -1,6 +1,6 @@
 # Extension catalog
 
-The menu of tools/scopes we could add beyond the current 29, ordered
+The menu of tools/scopes we could add beyond the current 30, ordered
 cheapest-first (no new OAuth scopes before new ones). This is the **what**;
 [phases.md](phases.md) decides the **when** (Batch A = P3, Batch B = P4). Derived
 from the scraped `scripts/slack-methods.json` (non-admin, xoxp methods only).
