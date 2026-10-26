@@ -188,6 +188,22 @@ test("every tool carries a title and hints that match its tier", async () => {
   })
 })
 
+test("every tool input types its properties and array items, as strict clients require", async () => {
+  const { client: slack } = fakeClient()
+  const client = await connect({ client: slack })
+
+  const { tools } = await client.listTools()
+  const untyped: string[] = []
+  for (const tool of tools) {
+    for (const [key, prop] of Object.entries(tool.inputSchema.properties ?? {})) {
+      const schema = prop as { type?: unknown; items?: { type?: unknown } }
+      if (!schema.type) untyped.push(`${tool.name}.${key}`)
+      if (schema.type === "array" && !schema.items?.type) untyped.push(`${tool.name}.${key}[]`)
+    }
+  }
+  expect(untyped).toEqual([])
+})
+
 test("the server describes itself, and says so when it is read-only", async () => {
   const { client: slack } = fakeClient()
   const full = await connect({ client: slack })
