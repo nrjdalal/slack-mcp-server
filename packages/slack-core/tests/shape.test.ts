@@ -187,3 +187,32 @@ test("a blocks-only post takes its text from the blocks, and text is not doubled
   )
   expect(shapeMessage({ ts: "1.3", user: "U1", text: "hello", blocks }).text).toBe("hello")
 })
+
+test("rich text keeps its paragraphs and list items apart, with bare links and mentions", () => {
+  const section = (...elements: unknown[]) => ({ type: "rich_text_section", elements })
+  const blocks = [
+    {
+      type: "rich_text",
+      elements: [
+        section({ type: "text", text: "Deploy failed" }),
+        {
+          type: "rich_text_list",
+          style: "bullet",
+          elements: [
+            section({ type: "text", text: "api" }),
+            section({ type: "text", text: "worker" }),
+          ],
+        },
+        section(
+          { type: "text", text: "logs: " },
+          { type: "link", url: "https://ci.example/run/42" },
+          { type: "text", text: " cc " },
+          { type: "user", user_id: "U9" },
+        ),
+      ],
+    },
+  ]
+  expect(shapeMessage({ ts: "1.4", bot_id: "B1", blocks }).text).toBe(
+    "Deploy failed\napi\nworker\nlogs: https://ci.example/run/42 cc <@U9>",
+  )
+})
