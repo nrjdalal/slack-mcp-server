@@ -172,3 +172,82 @@ export const chatDelete = defineTool({
     return { ts: res.ts, channel: res.channel }
   },
 })
+
+export const chatScheduleMessage = defineTool({
+  name: "chat_schedule_message",
+  title: "Schedule message",
+  description: "Schedules a message to be sent to a channel at a future time.",
+  tier: "write",
+  destructive: false,
+  idempotent: false,
+  scopes: ["chat:write"],
+  input: z.object({
+    channel: z.string().describe("Channel, private group, or DM channel to send the message to."),
+    post_at: z
+      .number()
+      .int()
+      .describe("Unix timestamp representing the future time the message should post to Slack."),
+    text: z.string().optional().describe("How this field works depends on other fields you use."),
+    blocks: z
+      .array(z.record(z.string(), z.unknown()))
+      .optional()
+      .describe("An array of structured blocks."),
+    attachments: z
+      .array(z.record(z.string(), z.unknown()))
+      .optional()
+      .describe("An array of structured attachments."),
+    markdown_text: z.string().optional().describe("Accepts message text formatted in markdown."),
+    thread_ts: z
+      .string()
+      .optional()
+      .describe("Provide another message's ts value to make this message a reply."),
+    reply_broadcast: z
+      .boolean()
+      .optional()
+      .describe("Used with thread_ts; make the reply visible to everyone in the channel."),
+    parse: z.string().optional().describe("Change how messages are treated."),
+    link_names: z.boolean().optional().describe("Find and link channel names and usernames."),
+    unfurl_links: z.boolean().optional().describe("Pass true to enable unfurling of text content."),
+    unfurl_media: z
+      .boolean()
+      .optional()
+      .describe("Pass false to disable unfurling of media content."),
+    metadata: z
+      .object({ event_type: z.string(), event_payload: z.record(z.string(), z.unknown()) })
+      .optional()
+      .describe("JSON object with event_type and event_payload fields."),
+  }),
+  handler: async (client, args) => {
+    const res = await client.chat.scheduleMessage(
+      args as Parameters<typeof client.chat.scheduleMessage>[0],
+    )
+    return {
+      scheduled_message_id: res.scheduled_message_id,
+      channel: res.channel,
+      post_at: res.post_at,
+    }
+  },
+})
+
+export const chatDeleteScheduledMessage = defineTool({
+  name: "chat_delete_scheduled_message",
+  title: "Delete scheduled message",
+  description: "Deletes a pending scheduled message from the queue.",
+  tier: "write",
+  destructive: true,
+  idempotent: true,
+  scopes: ["chat:write"],
+  input: z.object({
+    channel: z.string().describe("The channel the scheduled message is posting to."),
+    scheduled_message_id: z
+      .string()
+      .describe("The scheduled_message_id returned from a call to chat.scheduleMessage."),
+    as_user: z.boolean().optional().describe("Pass true to delete the message as the authed user."),
+  }),
+  handler: async (client, args) => {
+    await client.chat.deleteScheduledMessage(
+      args as Parameters<typeof client.chat.deleteScheduledMessage>[0],
+    )
+    return { ok: true }
+  },
+})
