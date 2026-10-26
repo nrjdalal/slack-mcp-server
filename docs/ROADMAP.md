@@ -19,7 +19,7 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
 - **M3 write gating**: done
 - **M4 resilience**: done
 - **M5 release**: done
-- **M6 inscope integration**: next
+- **M6 inscope integration**: done (inscope, 2026-06-15)
 
 ## What shaped the current design
 
@@ -94,13 +94,17 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
 - Auto-derived versioning (changelogen) is kept. Publishing authenticates via npm Trusted
   Publishing (OIDC, tied to this repo + `auto-release.yml`); there is no `NPM_TOKEN` secret.
 
-### M6 - inscope integration
+### M6 - inscope integration [done]
 
 - Make inscope's Slack MCP server swappable (it currently pins korotovsky's
   `slack-mcp-server`) so a workspace can point at `@nrjdalal/slack-mcp-server`.
   Token plumbing (`SLACK_MCP_XOXP_TOKEN`) is unchanged, so per-directory identity
   keeps working. Writes move from korotovsky's per-tool gates to our single
   `SLACK_MCP_ALLOW_WRITE`.
+- Done in inscope on 2026-06-15 (`feat(mcp): let Slack setup pick the server package`):
+  a workspace's `slack.package` picks the server, `@nrjdalal/slack-mcp-server` is the default,
+  and `diff --adopt` reads the package back from `.mcp.json`. nrjdalal/inscope#55 launches it
+  with `npx --prefix /`, so a project's own npm overrides can't stop it from starting.
 
 ## Parking lot (post-parity)
 
