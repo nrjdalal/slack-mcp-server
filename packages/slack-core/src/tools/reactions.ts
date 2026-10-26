@@ -4,8 +4,11 @@ import { defineTool } from "@/types"
 
 export const reactionsAdd = defineTool({
   name: "reactions_add",
+  title: "Add reaction",
   description: "Adds a reaction to an item.",
   tier: "write",
+  destructive: false,
+  idempotent: true,
   scopes: ["reactions:write"],
   input: z.object({
     channel: z.string().describe("Channel where the message to add reaction to was posted."),
@@ -24,8 +27,11 @@ export const reactionsAdd = defineTool({
 
 export const reactionsRemove = defineTool({
   name: "reactions_remove",
+  title: "Remove reaction",
   description: "Removes a reaction from an item.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["reactions:write"],
   input: z.object({
     name: z.string().describe("Reaction (emoji) name."),

@@ -1,7 +1,7 @@
 import type { WebClient } from "@slack/web-api"
 
 import { resolveChannel, resolveUser } from "@/resolve"
-import type { SlackTool } from "@/types"
+import { NO_CONTEXT, type SlackTool, type ToolContext } from "@/types"
 
 type Resolver = (client: WebClient, ref: string) => Promise<string>
 
@@ -25,7 +25,9 @@ export const invoke = async (
   tool: SlackTool,
   client: WebClient,
   rawArgs: unknown = {},
+  ctx: ToolContext = NO_CONTEXT,
 ): Promise<unknown> => {
+  ctx.signal.throwIfAborted()
   const args = tool.input.parse(rawArgs) as Record<string, unknown>
   // transparently resolve #channel / @handle refs (string or array) to IDs;
   // ID inputs pass through untouched and never hit the cache.
@@ -35,5 +37,5 @@ export const invoke = async (
   for (const key of USER_ARGS) {
     if (key in args) args[key] = await resolveArg(client, args[key], resolveUser)
   }
-  return tool.handler(client, args)
+  return tool.handler(client, args, ctx)
 }

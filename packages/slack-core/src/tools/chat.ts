@@ -4,8 +4,11 @@ import { defineTool } from "@/types"
 
 export const chatPostMessage = defineTool({
   name: "chat_post_message",
+  title: "Post message",
   description: "Sends a message to a channel.",
   tier: "write",
+  destructive: false,
+  idempotent: false,
   scopes: ["chat:write"],
   input: z.object({
     channel: z
@@ -19,8 +22,14 @@ export const chatPostMessage = defineTool({
       .describe(
         "How this field works and whether it is required depends on other fields you use in your API call.",
       ),
-    blocks: z.array(z.unknown()).optional().describe("An array of structured blocks."),
-    attachments: z.array(z.unknown()).optional().describe("An array of structured attachments."),
+    blocks: z
+      .array(z.record(z.string(), z.unknown()))
+      .optional()
+      .describe("An array of structured blocks."),
+    attachments: z
+      .array(z.record(z.string(), z.unknown()))
+      .optional()
+      .describe("An array of structured attachments."),
     markdown_text: z
       .string()
       .optional()
@@ -54,7 +63,7 @@ export const chatPostMessage = defineTool({
       .optional()
       .describe("Pass false to disable unfurling of media content."),
     metadata: z
-      .unknown()
+      .object({ event_type: z.string(), event_payload: z.record(z.string(), z.unknown()) })
       .optional()
       .describe("JSON object with event_type and event_payload fields."),
     icon_emoji: z
@@ -81,8 +90,11 @@ export const chatPostMessage = defineTool({
 
 export const chatUpdate = defineTool({
   name: "chat_update",
+  title: "Edit message",
   description: "Updates a message.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["chat:write"],
   input: z.object({
     channel: z
@@ -98,13 +110,13 @@ export const chatUpdate = defineTool({
         "How this field works and whether it is required depends on other fields you use in your API call.",
       ),
     blocks: z
-      .array(z.unknown())
+      .array(z.record(z.string(), z.unknown()))
       .optional()
       .describe(
         "An array of structured blocks. Omit to keep the message's previous blocks; pass an empty array to remove them.",
       ),
     attachments: z
-      .array(z.unknown())
+      .array(z.record(z.string(), z.unknown()))
       .optional()
       .describe(
         "An array of structured attachments. Omit to keep the message's previous attachments; pass an empty array to remove them.",
@@ -127,7 +139,7 @@ export const chatUpdate = defineTool({
       .describe("Change how messages are treated. Defaults to client, unlike chat.postMessage."),
     link_names: z.boolean().optional().describe("Find and link channel names and usernames."),
     metadata: z
-      .unknown()
+      .object({ event_type: z.string(), event_payload: z.record(z.string(), z.unknown()) })
       .optional()
       .describe(
         "JSON object with event_type and event_payload fields. Omit to keep the message's previous metadata.",
@@ -141,8 +153,11 @@ export const chatUpdate = defineTool({
 
 export const chatDelete = defineTool({
   name: "chat_delete",
+  title: "Delete message",
   description: "Deletes a message.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["chat:write"],
   input: z.object({
     channel: z
