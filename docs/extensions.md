@@ -13,7 +13,9 @@ by default.
 
 ## Batch A — free (zero new scopes)
 
-Existing installs keep working with no re-consent. The highest-value seven shipped in P3.
+Existing installs keep working with no re-consent, except `files.delete`, whose `files:write`
+scope came with `files_upload_v2` and needs the re-install the README describes. The
+highest-value seven shipped in P3.
 
 ### Shipped (P3)
 
