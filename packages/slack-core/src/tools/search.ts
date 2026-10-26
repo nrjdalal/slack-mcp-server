@@ -52,7 +52,7 @@ export const searchMessages = defineTool({
       team_id: args.team_id,
     })
     return {
-      matches: shapeAll(args.raw, (res.messages ?? {}).matches ?? [], shapeMessage),
+      matches: shapeAll(args.raw, res.messages?.matches ?? [], shapeMessage),
       total: res.messages?.total ?? 0,
       pagination: res.messages?.pagination,
       next_cursor: res.response_metadata?.next_cursor || undefined,

@@ -178,3 +178,75 @@ test("search_files trims each matched file", async () => {
   const out = (await searchFiles.handler(client, { query: "a" })) as { matches: unknown[] }
   expect(out.matches).toEqual([{ id: "F1", name: "a.txt" }])
 })
+
+test("a bot post with no text keeps its attachment text and its bot's name", () => {
+  const shaped = shapeMessage({
+    ts: "1.1",
+    bot_id: "B1",
+    subtype: "bot_message",
+    text: "",
+    bot_profile: { id: "B1", name: "Datadog", icons: { image_36: "https://x" } },
+    attachments: [
+      { fallback: "CPU high", title: "CPU high", text: "web-1 at 97%", color: "danger" },
+    ],
+  })
+  expect(shaped).toEqual({
+    ts: "1.1",
+    bot_id: "B1",
+    bot_name: "Datadog",
+    subtype: "bot_message",
+    text: "CPU high\nweb-1 at 97%",
+  })
+})
+
+test("a blocks-only post takes its text from the blocks, and text is not doubled", () => {
+  const blocks = [
+    { type: "header", text: { type: "plain_text", text: "Deploy done" } },
+    {
+      type: "rich_text",
+      elements: [
+        {
+          type: "rich_text_section",
+          elements: [
+            { type: "text", text: "see " },
+            { type: "link", url: "https://ci", text: "the run" },
+          ],
+        },
+      ],
+    },
+    { type: "section", fields: [{ type: "mrkdwn", text: "*env* prod" }] },
+  ]
+  expect(shapeMessage({ ts: "1.2", bot_id: "B1", blocks }).text).toBe(
+    "Deploy done\nsee the run\n*env* prod",
+  )
+  expect(shapeMessage({ ts: "1.3", user: "U1", text: "hello", blocks }).text).toBe("hello")
+})
+
+test("rich text keeps its paragraphs and list items apart, with bare links and mentions", () => {
+  const section = (...elements: unknown[]) => ({ type: "rich_text_section", elements })
+  const blocks = [
+    {
+      type: "rich_text",
+      elements: [
+        section({ type: "text", text: "Deploy failed" }),
+        {
+          type: "rich_text_list",
+          style: "bullet",
+          elements: [
+            section({ type: "text", text: "api" }),
+            section({ type: "text", text: "worker" }),
+          ],
+        },
+        section(
+          { type: "text", text: "logs: " },
+          { type: "link", url: "https://ci.example/run/42" },
+          { type: "text", text: " cc " },
+          { type: "user", user_id: "U9" },
+        ),
+      ],
+    },
+  ]
+  expect(shapeMessage({ ts: "1.4", bot_id: "B1", blocks }).text).toBe(
+    "Deploy failed\napi\nworker\nlogs: https://ci.example/run/42 cc <@U9>",
+  )
+})

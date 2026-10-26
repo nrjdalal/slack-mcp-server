@@ -280,3 +280,18 @@ test("files_download throws on a failed download or a sign-in page", async () =>
     },
   )
 })
+
+test("files_info leaves out content over max_bytes when Slack gives no size", async () => {
+  await withFetch(
+    async () => new Response("x".repeat(2048)),
+    async () => {
+      const out = (await filesInfo.handler(
+        fileClient({ mimetype: "text/plain", url_private: "https://files.slack.com/x" }),
+        { file: "F1", max_bytes: 1024 },
+      )) as { file?: unknown; content?: unknown; content_omitted?: string }
+      expect(out.file).toEqual({ mimetype: "text/plain" })
+      expect(out.content).toBeUndefined()
+      expect(out.content_omitted).toBe("file is 2048 bytes, over max_bytes (1024)")
+    },
+  )
+})
