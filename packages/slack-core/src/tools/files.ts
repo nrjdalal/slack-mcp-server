@@ -67,6 +67,12 @@ export const filesInfo = defineTool({
     const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
     if (!r.ok) return { file: shown, content_omitted: `download failed with HTTP ${r.status}` }
     const buf = Buffer.from(await r.arrayBuffer())
+    if (buf.length > args.max_bytes) {
+      return {
+        file: res.file,
+        content_omitted: `file is ${buf.length} bytes, over max_bytes (${args.max_bytes})`,
+      }
+    }
     const content = (file.mimetype ?? "").startsWith("text/")
       ? { encoding: "utf8" as const, data: buf.toString("utf8") }
       : { encoding: "base64" as const, data: buf.toString("base64") }
