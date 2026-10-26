@@ -40,6 +40,52 @@ export const shapeChannel = (value: unknown): Obj => {
   })
 }
 
+const nonEmpty = (values: unknown[]): string[] =>
+  values.filter((v): v is string => typeof v === "string" && v !== "")
+
+// Every string under a "text" key, at any depth: how most blocks hold their words.
+const texts = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.flatMap(texts)
+    : Object.entries(obj(value)).flatMap(([key, v]) =>
+        key === "text" && typeof v === "string" ? [v] : typeof v === "object" ? texts(v) : [],
+      )
+
+const inline = (e: Obj): string => {
+  if (e.type === "link") return nonEmpty([e.text, e.url])[0] ?? ""
+  if (e.type === "user") return `<@${e.user_id}>`
+  if (e.type === "channel") return `<#${e.channel_id}>`
+  if (e.type === "emoji") return `:${e.name}:`
+  return nonEmpty([e.text])[0] ?? ""
+}
+
+// A rich_text block's sections, quotes and preformatted runs are lines, and a list's items are one line each.
+const richTextLines = (block: Obj): string[] =>
+  (
+    list(block.elements, (el) =>
+      el.type === "rich_text_list"
+        ? (list(el.elements, (item) => (list(item.elements, inline) ?? []).join("")) ?? [])
+        : [(list(el.elements, inline) ?? []).join("")],
+    ) ?? []
+  ).flat()
+
+const blockText = (blocks: unknown): string =>
+  nonEmpty(
+    (list(blocks, (b) => (b.type === "rich_text" ? richTextLines(b) : texts(b))) ?? []).flat(),
+  ).join("\n")
+
+const attachmentText = (attachments: unknown): string =>
+  nonEmpty(
+    list(attachments, (a) => {
+      const fields = list(a.fields, (f) => nonEmpty([f.title, f.value]).join(": ")) ?? []
+      return nonEmpty([a.pretext, a.title, a.text, ...fields]).join("\n") || a.fallback
+    }) ?? [],
+  ).join("\n")
+
+// A bot post often leaves text empty and carries its words in blocks or attachments.
+const messageText = (m: Obj): string =>
+  nonEmpty([nonEmpty([m.text])[0] ?? blockText(m.blocks), attachmentText(m.attachments)]).join("\n")
+
 export const shapeMessage = (value: unknown): Obj => {
   const m = obj(value)
   const channel = obj(m.channel)
@@ -50,8 +96,9 @@ export const shapeMessage = (value: unknown): Obj => {
     user: m.user,
     username: m.username,
     bot_id: m.bot_id,
+    bot_name: obj(m.bot_profile).name,
     subtype: m.subtype,
-    text: m.text,
+    text: messageText(m),
     reply_count: m.reply_count,
     reactions: list(m.reactions, (r) => ({ name: r.name, count: r.count })),
     files: list(m.files, (f) => compact({ id: f.id, name: f.name, mimetype: f.mimetype })),
@@ -90,6 +137,6 @@ export const shapeFile = (value: unknown): Obj => {
   })
 }
 
-// The shared input flag: the trimmed shape by default, Slack's full objects on request.
+// Applies a shape to every item unless the caller asked for Slack's full objects.
 export const shapeAll = <T>(raw: boolean, items: T[], shape: (value: unknown) => Obj) =>
   raw ? items : items.map(shape)
