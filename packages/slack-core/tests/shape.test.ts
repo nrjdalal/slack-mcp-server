@@ -144,3 +144,46 @@ test("raw: true returns Slack's objects untouched", async () => {
     JSON.stringify(slackMessage).length / 2,
   )
 })
+
+test("a bot post with no text keeps its attachment text and its bot's name", () => {
+  const shaped = shapeMessage({
+    ts: "1.1",
+    bot_id: "B1",
+    subtype: "bot_message",
+    text: "",
+    bot_profile: { id: "B1", name: "Datadog", icons: { image_36: "https://x" } },
+    attachments: [
+      { fallback: "CPU high", title: "CPU high", text: "web-1 at 97%", color: "danger" },
+    ],
+  })
+  expect(shaped).toEqual({
+    ts: "1.1",
+    bot_id: "B1",
+    bot_name: "Datadog",
+    subtype: "bot_message",
+    text: "CPU high\nweb-1 at 97%",
+  })
+})
+
+test("a blocks-only post takes its text from the blocks, and text is not doubled", () => {
+  const blocks = [
+    { type: "header", text: { type: "plain_text", text: "Deploy done" } },
+    {
+      type: "rich_text",
+      elements: [
+        {
+          type: "rich_text_section",
+          elements: [
+            { type: "text", text: "see " },
+            { type: "link", url: "https://ci", text: "the run" },
+          ],
+        },
+      ],
+    },
+    { type: "section", fields: [{ type: "mrkdwn", text: "*env* prod" }] },
+  ]
+  expect(shapeMessage({ ts: "1.2", bot_id: "B1", blocks }).text).toBe(
+    "Deploy done\nsee the run\n*env* prod",
+  )
+  expect(shapeMessage({ ts: "1.3", user: "U1", text: "hello", blocks }).text).toBe("hello")
+})

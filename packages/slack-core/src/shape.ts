@@ -40,6 +40,32 @@ export const shapeChannel = (value: unknown): Obj => {
   })
 }
 
+const nonEmpty = (values: unknown[]): string[] =>
+  values.filter((v): v is string => typeof v === "string" && v !== "")
+
+// Every string under a "text" key, at any depth: how blocks hold their words.
+const texts = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.flatMap(texts)
+    : Object.entries(obj(value)).flatMap(([key, v]) =>
+        key === "text" && typeof v === "string" ? [v] : typeof v === "object" ? texts(v) : [],
+      )
+
+const blockText = (blocks: unknown): string =>
+  nonEmpty(list(blocks, (b) => texts(b).join(b.type === "rich_text" ? "" : "\n")) ?? []).join("\n")
+
+const attachmentText = (attachments: unknown): string =>
+  nonEmpty(
+    list(attachments, (a) => {
+      const fields = list(a.fields, (f) => nonEmpty([f.title, f.value]).join(": ")) ?? []
+      return nonEmpty([a.pretext, a.title, a.text, ...fields]).join("\n") || a.fallback
+    }) ?? [],
+  ).join("\n")
+
+// A bot post often leaves text empty and carries its words in blocks or attachments.
+const messageText = (m: Obj): string =>
+  nonEmpty([nonEmpty([m.text])[0] ?? blockText(m.blocks), attachmentText(m.attachments)]).join("\n")
+
 export const shapeMessage = (value: unknown): Obj => {
   const m = obj(value)
   const channel = obj(m.channel)
@@ -50,8 +76,9 @@ export const shapeMessage = (value: unknown): Obj => {
     user: m.user,
     username: m.username,
     bot_id: m.bot_id,
+    bot_name: obj(m.bot_profile).name,
     subtype: m.subtype,
-    text: m.text,
+    text: messageText(m),
     reply_count: m.reply_count,
     reactions: list(m.reactions, (r) => ({ name: r.name, count: r.count })),
     files: list(m.files, (f) => compact({ id: f.id, name: f.name, mimetype: f.mimetype })),
