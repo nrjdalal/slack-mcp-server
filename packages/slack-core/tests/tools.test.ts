@@ -454,13 +454,16 @@ test("files_upload_v2 uploads a local file to a channel and returns the shared f
       calls.push(args)
       return {
         ok: true,
-        files: [{ ok: true, files: [{ id: "F1", name: "r.pdf", permalink: "https://p" }] }],
+        files: [
+          { ok: true, files: [{ id: "F1", name: "r.pdf", permalink: "https://p", title: "R" }] },
+        ],
       }
     },
   } as unknown as WebClient
   const out = await invoke(filesUploadV2, client, {
     channel: "D1",
     path: "/tmp/x/r.pdf",
+    title: "R",
     initial_comment: "here",
     thread_ts: "1.2",
   })
@@ -469,11 +472,14 @@ test("files_upload_v2 uploads a local file to a channel and returns the shared f
       channel_id: "D1",
       file: "/tmp/x/r.pdf",
       filename: "r.pdf",
+      title: "R",
       initial_comment: "here",
       thread_ts: "1.2",
     },
   ])
-  expect(out).toEqual({ files: [{ id: "F1", name: "r.pdf", permalink: "https://p" }] })
+  expect(out).toEqual({
+    files: [{ id: "F1", name: "r.pdf", permalink: "https://p", title: "R" }],
+  })
 })
 
 test("files_upload_v2 uploads text content, and needs exactly one of path or content", async () => {

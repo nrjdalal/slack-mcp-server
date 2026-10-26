@@ -195,7 +195,14 @@ export const filesUploadV2 = defineTool({
         thread_ts: args.thread_ts,
       } as Parameters<typeof client.filesUploadV2>[0])
       const files = res.files.flatMap((r) => r.files ?? [])
-      return { files: files.map((f) => ({ id: f.id, name: f.name, permalink: f.permalink })) }
+      return {
+        files: files.map((f) => ({
+          id: f.id,
+          name: f.name,
+          permalink: f.permalink,
+          title: f.title,
+        })),
+      }
     } catch (error) {
       if ((error as { data?: { error?: string } }).data?.error === "missing_scope") {
         throw new Error(
