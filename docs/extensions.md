@@ -1,19 +1,21 @@
 # Extension catalog
 
-The menu of tools/scopes we could add beyond the current 29, ordered
+The menu of tools/scopes we could add beyond the current 30, ordered
 cheapest-first (no new OAuth scopes before new ones). This is the **what**;
 [phases.md](phases.md) decides the **when** (Batch A = P3, Batch B = P4). Derived
 from the scraped `scripts/slack-methods.json` (non-admin, xoxp methods only).
 
 Inventory: of the unimplemented methods with a user scope, **15 need only scopes
-we already request** (Batch A) and **~90 would add ~47 new scopes** (Batch B +
+we already request** (Batch A) and **~85 would add ~46 new scopes** (Batch B +
 parking lot). Destructive, irreversible tools are marked **⚠**; per the
 [phases.md](phases.md) P2 decision (option A) they ship as ordinary write tools, on
 by default.
 
 ## Batch A — free (zero new scopes)
 
-Existing installs keep working with no re-consent. The highest-value seven shipped in P3.
+Existing installs keep working with no re-consent, except `files.delete`, whose `files:write`
+scope came with `files_upload_v2` and needs the re-install the README describes. The
+highest-value seven shipped in P3.
 
 ### Shipped (P3)
 
@@ -33,6 +35,7 @@ Existing installs keep working with no re-consent. The highest-value seven shipp
 - **Conversations:** `conversations.create`, `conversations.rename`,
   `conversations.archive` ⚠, `conversations.unarchive`, `conversations.close`,
   `conversations.kick` ⚠
+- **Files:** `files.delete` ⚠
 - **Users / bots:** `users.getPresence`, `bots.info`
 - **Search:** `search.all`
 - **Usergroups:** `usergroups.disable` ⚠, `usergroups.enable`, `usergroups.users.list`
@@ -42,13 +45,12 @@ Existing installs keep working with no re-consent. The highest-value seven shipp
 Each row adds OAuth scope(s); users must re-install with the updated manifest.
 Spend them deliberately and document the re-consent step.
 
-| Capability               | Methods                                                                 | New scope(s)                        |
-| ------------------------ | ----------------------------------------------------------------------- | ----------------------------------- |
-| Read reactions           | `reactions.get` / `.list`                                               | `reactions:read`                    |
-| Pins                     | `pins.list/add/remove`                                                  | `pins:read`, `pins:write`           |
-| Reminders ("remind me")  | `reminders.add/list/complete/delete`                                    | `reminders:read`, `reminders:write` |
-| Profile + set status     | `users.profile.get/set`                                                 | `users.profile:read`, `:write`      |
-| Files: upload / delete ⚠ | `files.getUploadURLExternal` → `completeUploadExternal`, `files.delete` | `files:write`                       |
+| Capability              | Methods                              | New scope(s)                        |
+| ----------------------- | ------------------------------------ | ----------------------------------- |
+| Read reactions          | `reactions.get` / `.list`            | `reactions:read`                    |
+| Pins                    | `pins.list/add/remove`               | `pins:read`, `pins:write`           |
+| Reminders ("remind me") | `reminders.add/list/complete/delete` | `reminders:read`, `reminders:write` |
+| Profile + set status    | `users.profile.get/set`              | `users.profile:read`, `:write`      |
 
 ### Also available (lower priority, one scope each)
 

@@ -23,6 +23,8 @@ A user-token (xoxp) Slack MCP server. Tools mirror the Slack Web API.
 }
 ```
 
+When a new version asks for a scope your app lacks, a tool says `missing_scope`. Update the app from the new [`manifest.full.json`](manifest.full.json) (or add the scope under **OAuth & Permissions** -> **User Token Scopes**), reinstall the app, and use the new user token. `files_upload_v2` is the first tool to need one, `files:write`.
+
 Read tools return the fields an agent needs (about 70 to 90% smaller than Slack's raw JSON); pass `"raw": true` for Slack's full objects.
 
 The server speaks MCP over stdio, to clients on any protocol revision from 2024-11-05 to 2026-07-28, and needs Node 20 or newer. It exposes both read and write tools by default. To run read-only, add `"SLACK_MCP_ALLOW_WRITE": "false"` to `env`.
@@ -35,7 +37,7 @@ Behind a proxy, set `HTTPS_PROXY` together with `"NODE_USE_ENV_PROXY": "1"` in `
 
 **slack-mcp-server** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope). **tier** is Slack's documented [rate-limit tier](https://docs.slack.dev/apis/web-api/rate-limits) for the method.
 
-25 methods covered 1:1, plus 4 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me`, `files_download` (29 tools total).
+25 methods covered 1:1, plus 5 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me`, `files_download`, `files_upload_v2` (30 tools total).
 
 | slack api | slack-mcp-server | user token scopes | tier |
 | --- | --- | --- | --- |

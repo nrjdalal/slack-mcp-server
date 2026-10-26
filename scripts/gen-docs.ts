@@ -73,6 +73,8 @@ A user-token (xoxp) Slack MCP server. Tools mirror the Slack Web API.
 }
 \`\`\`
 
+When a new version asks for a scope your app lacks, a tool says \`missing_scope\`. Update the app from the new [\`manifest.full.json\`](manifest.full.json) (or add the scope under **OAuth & Permissions** -> **User Token Scopes**), reinstall the app, and use the new user token. \`files_upload_v2\` is the first tool to need one, \`files:write\`.
+
 Read tools return the fields an agent needs (about 70 to 90% smaller than Slack's raw JSON); pass \`"raw": true\` for Slack's full objects.
 
 The server speaks MCP over stdio, to clients on any protocol revision from 2024-11-05 to 2026-07-28, and needs Node 20 or newer. It exposes both read and write tools by default. To run read-only, add \`"SLACK_MCP_ALLOW_WRITE": "false"\` to \`env\`.
