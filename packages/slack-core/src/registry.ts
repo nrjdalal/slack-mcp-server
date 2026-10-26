@@ -1,4 +1,5 @@
 import {
+  chatDelete,
   chatDeleteScheduledMessage,
   chatPostMessage,
   chatScheduleMessage,
@@ -49,6 +50,7 @@ export const readTools: SlackTool[] = [
 export const writeTools: SlackTool[] = [
   chatPostMessage,
   chatUpdate,
+  chatDelete,
   chatScheduleMessage,
   chatDeleteScheduledMessage,
   reactionsAdd,

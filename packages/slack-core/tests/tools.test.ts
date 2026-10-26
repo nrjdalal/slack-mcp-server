@@ -6,6 +6,7 @@ import { createClient, TOKEN_ENV } from "@/client"
 import { invoke } from "@/invoke"
 import { allTools, enabledTools, readTools, toolByName, writeTools } from "@/registry"
 import {
+  chatDelete,
   chatDeleteScheduledMessage,
   chatPostMessage,
   chatScheduleMessage,
@@ -38,7 +39,11 @@ const fakeClient = (responses: Record<string, unknown> = {}) => {
     },
     users: { list: rec("users.list") },
     search: { messages: rec("search.messages") },
-    chat: { postMessage: rec("chat.postMessage") },
+    chat: {
+      postMessage: rec("chat.postMessage"),
+      update: rec("chat.update"),
+      delete: rec("chat.delete"),
+    },
   } as unknown as WebClient
   return { client, calls }
 }
@@ -201,6 +206,50 @@ test("chat_post_message (write) posts and returns ts", async () => {
   expect(out).toEqual({ ts: "123.45", channel: "C1" })
 })
 
+test("chat_update (write) edits the message in place and returns ts", async () => {
+  const { client, calls } = fakeClient({
+    "chat.update": { ok: true, ts: "123.45", channel: "C1", text: "fixed" },
+  })
+  const out = await chatUpdate.handler(client, { channel: "C1", ts: "123.45", text: "fixed" })
+  expect(calls).toEqual([
+    { method: "chat.update", args: { channel: "C1", ts: "123.45", text: "fixed" } },
+  ])
+  expect(out).toEqual({ ts: "123.45", channel: "C1" })
+})
+
+test("chat_update passes markdown_text and blocks through to chat.update", async () => {
+  const { client, calls } = fakeClient()
+  await invoke(chatUpdate, client, { channel: "C1", ts: "1.2", markdown_text: "**bold**" })
+  await invoke(chatUpdate, client, { channel: "C1", ts: "1.2", blocks: [] })
+  expect(calls.map((c) => c.args)).toEqual([
+    { channel: "C1", ts: "1.2", markdown_text: "**bold**" },
+    { channel: "C1", ts: "1.2", blocks: [] },
+  ])
+})
+
+test("chat_update rejects a call without channel or ts", async () => {
+  const { client, calls } = fakeClient()
+  await expect(invoke(chatUpdate, client, { channel: "C1", text: "x" })).rejects.toThrow()
+  await expect(invoke(chatUpdate, client, { ts: "1.2", text: "x" })).rejects.toThrow()
+  expect(calls).toHaveLength(0)
+})
+
+test("chat_delete (write) deletes by channel and ts and returns them", async () => {
+  const { client, calls } = fakeClient({
+    "chat.delete": { ok: true, ts: "123.45", channel: "C1" },
+  })
+  const out = await chatDelete.handler(client, { channel: "C1", ts: "123.45" })
+  expect(calls).toEqual([{ method: "chat.delete", args: { channel: "C1", ts: "123.45" } }])
+  expect(out).toEqual({ ts: "123.45", channel: "C1" })
+})
+
+test("chat_delete rejects a call without channel or ts", async () => {
+  const { client, calls } = fakeClient()
+  await expect(invoke(chatDelete, client, { channel: "C1" })).rejects.toThrow()
+  await expect(invoke(chatDelete, client, { ts: "1.2" })).rejects.toThrow()
+  expect(calls).toHaveLength(0)
+})
+
 test("conversations_unreads keeps only channels with unreads, in order", async () => {
   const counts: Record<string, number> = { C1: 3, C2: 0, C3: 7 }
   const client = {
@@ -253,14 +302,6 @@ test("conversations_unreads skips a channel whose info call fails", async () => 
     unreads: Array<{ id: string }>
   }
   expect(out.unreads.map((u) => u.id)).toEqual(["C1", "C3"])
-})
-
-test("chat_update (write) returns the updated ts/channel/text", async () => {
-  const client = {
-    chat: { update: async () => ({ ok: true, ts: "1.2", channel: "C1", text: "edited" }) },
-  } as unknown as WebClient
-  const out = await chatUpdate.handler(client, { channel: "C1", ts: "1.2", text: "edited" })
-  expect(out).toEqual({ ts: "1.2", channel: "C1", text: "edited" })
 })
 
 test("chat_schedule_message (write) returns the scheduled id", async () => {
@@ -377,17 +418,19 @@ test("registry: every tool has a title, and every write tool states both hints",
 
 test("registry: read/write tiers and the enabledTools selector", () => {
   expect(readTools).toHaveLength(14)
-  expect(writeTools).toHaveLength(13)
-  expect(allTools).toHaveLength(27)
+  expect(writeTools).toHaveLength(14)
+  expect(allTools).toHaveLength(28)
   expect(readTools.every((t) => t.tier === "read")).toBe(true)
   expect(writeTools.every((t) => t.tier === "write")).toBe(true)
   expect(enabledTools(false)).toHaveLength(14)
-  expect(enabledTools(true)).toHaveLength(27)
+  expect(enabledTools(true)).toHaveLength(28)
 })
 
 test("toolByName resolves tool names", () => {
   expect(toolByName("conversations_list")?.name).toBe("conversations_list")
   expect(toolByName("chat_post_message")?.name).toBe("chat_post_message")
+  expect(toolByName("chat_update")?.name).toBe("chat_update")
+  expect(toolByName("chat_delete")?.name).toBe("chat_delete")
   expect(toolByName("nope")).toBeUndefined()
 })
 
