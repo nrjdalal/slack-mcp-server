@@ -5,15 +5,24 @@ import type { WebClient } from "@slack/web-api"
 import { createClient, TOKEN_ENV } from "@/client"
 import { invoke } from "@/invoke"
 import { allTools, enabledTools, readTools, toolByName, writeTools } from "@/registry"
-import { chatDelete, chatPostMessage, chatUpdate } from "@/tools/chat"
+import {
+  chatDelete,
+  chatDeleteScheduledMessage,
+  chatPostMessage,
+  chatScheduleMessage,
+  chatUpdate,
+} from "@/tools/chat"
 import {
   conversationsHistory,
   conversationsList,
   conversationsMark,
+  conversationsMembers,
+  conversationsOpen,
   conversationsUnreads,
 } from "@/tools/conversations"
-import { searchMessages } from "@/tools/search"
-import { usersSearch } from "@/tools/users"
+import { filesUploadV2 } from "@/tools/files"
+import { searchFiles, searchMessages } from "@/tools/search"
+import { usersInfo, usersLookupByEmail, usersSearch } from "@/tools/users"
 
 type Call = { method: string; args: unknown }
 
@@ -131,8 +140,62 @@ test("users_search filters users.list by query", async () => {
   })
   const out = (await usersSearch.handler(client, { query: "ALICE", limit: 200 })) as {
     matches: Array<{ id: string }>
+    scanned: number
+    next_cursor?: string
   }
   expect(out.matches.map((m) => m.id)).toEqual(["U1"])
+  expect(out.scanned).toBe(2)
+  expect(out.next_cursor).toBeUndefined()
+})
+
+const pagedUsers = (pages: Array<Array<{ id: string; name: string }>>) => {
+  const calls: Array<{ limit?: number; cursor?: string }> = []
+  const client = {
+    users: {
+      list: async (args: { limit?: number; cursor?: string }) => {
+        calls.push(args)
+        const i = args.cursor ? Number(args.cursor) : 0
+        return {
+          ok: true,
+          members: pages[i],
+          response_metadata: { next_cursor: i + 1 < pages.length ? String(i + 1) : "" },
+        }
+      },
+    },
+  } as unknown as WebClient
+  return { client, calls }
+}
+
+test("users_search finds a user past the first users.list page", async () => {
+  const { client, calls } = pagedUsers([
+    [{ id: "U1", name: "alice" }],
+    [{ id: "U2", name: "bob" }],
+    [{ id: "U3", name: "carol" }],
+  ])
+  const out = (await usersSearch.handler(client, { query: "carol", limit: 1000 })) as {
+    matches: Array<{ id: string }>
+    scanned: number
+  }
+  expect(out.matches.map((m) => m.id)).toEqual(["U3"])
+  expect(out.scanned).toBe(3)
+  expect(calls).toHaveLength(3)
+})
+
+test("users_search stops at limit and returns a cursor to resume from", async () => {
+  const { client, calls } = pagedUsers([
+    [
+      { id: "U1", name: "alice" },
+      { id: "U2", name: "bob" },
+    ],
+    [{ id: "U3", name: "carol" }],
+  ])
+  const out = (await usersSearch.handler(client, { query: "carol", limit: 2 })) as {
+    matches: unknown[]
+    next_cursor?: string
+  }
+  expect(out.matches).toEqual([])
+  expect(out.next_cursor).toBe("1")
+  expect(calls[0]!.limit).toBe(2)
 })
 
 test("chat_post_message (write) posts and returns ts", async () => {
@@ -242,6 +305,108 @@ test("conversations_unreads skips a channel whose info call fails", async () => 
   expect(out.unreads.map((u) => u.id)).toEqual(["C1", "C3"])
 })
 
+test("chat_schedule_message (write) returns the scheduled id", async () => {
+  const client = {
+    chat: {
+      scheduleMessage: async () => ({
+        ok: true,
+        scheduled_message_id: "Q1",
+        channel: "C1",
+        post_at: 123,
+      }),
+    },
+  } as unknown as WebClient
+  const out = await chatScheduleMessage.handler(client, { channel: "C1", post_at: 123, text: "hi" })
+  expect(out).toEqual({ scheduled_message_id: "Q1", channel: "C1", post_at: 123 })
+})
+
+test("chat_delete_scheduled_message (write) deletes and returns ok", async () => {
+  let received: unknown
+  const client = {
+    chat: {
+      deleteScheduledMessage: async (a: unknown) => {
+        received = a
+        return { ok: true }
+      },
+    },
+  } as unknown as WebClient
+  const out = await chatDeleteScheduledMessage.handler(client, {
+    channel: "C1",
+    scheduled_message_id: "Q1",
+  })
+  expect((received as { scheduled_message_id?: string }).scheduled_message_id).toBe("Q1")
+  expect(out).toEqual({ ok: true })
+})
+
+test("conversations_members maps members and cursor", async () => {
+  const client = {
+    conversations: {
+      members: async () => ({
+        ok: true,
+        members: ["U1", "U2"],
+        response_metadata: { next_cursor: "CUR" },
+      }),
+    },
+  } as unknown as WebClient
+  const out = (await conversationsMembers.handler(client, { channel: "C1", limit: 100 })) as {
+    members: string[]
+    next_cursor?: string
+  }
+  expect(out).toEqual({ members: ["U1", "U2"], next_cursor: "CUR" })
+})
+
+test("conversations_open joins users into a csv and returns the channel", async () => {
+  let received: unknown
+  const client = {
+    conversations: {
+      open: async (args: unknown) => {
+        received = args
+        return { ok: true, channel: { id: "D1" }, no_op: false, already_open: false }
+      },
+    },
+  } as unknown as WebClient
+  const out = (await conversationsOpen.handler(client, { users: ["U1", "U2"] })) as {
+    channel: { id: string }
+  }
+  expect((received as { users?: string }).users).toBe("U1,U2")
+  expect(out.channel).toEqual({ id: "D1" })
+})
+
+test("users_info returns the user", async () => {
+  const client = {
+    users: { info: async () => ({ ok: true, user: { id: "U1", name: "alice" } }) },
+  } as unknown as WebClient
+  const out = (await usersInfo.handler(client, { user: "U1" })) as {
+    user: { id: string; name: string }
+  }
+  expect(out.user).toEqual({ id: "U1", name: "alice" })
+})
+
+test("users_lookup_by_email returns the user", async () => {
+  const slackUser = { id: "U9", name: "bob", color: "9f69e7", profile: { image_72: "https://x" } }
+  const client = {
+    users: { lookupByEmail: async () => ({ ok: true, user: slackUser }) },
+  } as unknown as WebClient
+  const out = (await usersLookupByEmail.handler(client, { email: "bob@x.dev" })) as {
+    user: unknown
+  }
+  const raw = (await usersLookupByEmail.handler(client, { email: "bob@x.dev", raw: true })) as {
+    user: unknown
+  }
+  expect(out.user).toEqual({ id: "U9", name: "bob" })
+  expect(raw.user).toBe(slackUser)
+})
+
+test("search_files unwraps file matches and total", async () => {
+  const client = {
+    search: {
+      files: async () => ({ ok: true, files: { matches: [{ id: "F1" }], total: 1 } }),
+    },
+  } as unknown as WebClient
+  const out = (await searchFiles.handler(client, { query: "x", count: 20 })) as { total: number }
+  expect(out.total).toBe(1)
+})
+
 test("conversations_mark (write) marks read", async () => {
   const { client, calls } = fakeClient()
   const out = await conversationsMark.handler(client, { channel: "C1", ts: "1.2" })
@@ -249,14 +414,22 @@ test("conversations_mark (write) marks read", async () => {
   expect(out).toEqual({ ok: true })
 })
 
+test("registry: every tool has a title, and every write tool states both hints", () => {
+  for (const tool of allTools) expect(tool.title.length).toBeGreaterThan(0)
+  for (const tool of writeTools) {
+    expect(typeof tool.destructive).toBe("boolean")
+    expect(typeof tool.idempotent).toBe("boolean")
+  }
+})
+
 test("registry: read/write tiers and the enabledTools selector", () => {
-  expect(readTools).toHaveLength(10)
-  expect(writeTools).toHaveLength(11)
-  expect(allTools).toHaveLength(21)
+  expect(readTools).toHaveLength(15)
+  expect(writeTools).toHaveLength(15)
+  expect(allTools).toHaveLength(30)
   expect(readTools.every((t) => t.tier === "read")).toBe(true)
   expect(writeTools.every((t) => t.tier === "write")).toBe(true)
-  expect(enabledTools(false)).toHaveLength(10)
-  expect(enabledTools(true)).toHaveLength(21)
+  expect(enabledTools(false)).toHaveLength(15)
+  expect(enabledTools(true)).toHaveLength(30)
 })
 
 test("toolByName resolves tool names", () => {
@@ -272,4 +445,70 @@ test("invoke applies declared defaults and rejects invalid input", async () => {
   await invoke(conversationsList, client, {})
   expect(calls[0]?.args).toMatchObject({ exclude_archived: true, limit: 200 })
   await expect(invoke(conversationsList, client, { limit: 99999 })).rejects.toThrow()
+})
+
+test("files_upload_v2 uploads a local file to a channel and returns the shared file", async () => {
+  const calls: unknown[] = []
+  const client = {
+    filesUploadV2: async (args: unknown) => {
+      calls.push(args)
+      return {
+        ok: true,
+        files: [
+          { ok: true, files: [{ id: "F1", name: "r.pdf", permalink: "https://p", title: "R" }] },
+        ],
+      }
+    },
+  } as unknown as WebClient
+  const out = await invoke(filesUploadV2, client, {
+    channel: "D1",
+    path: "/tmp/x/r.pdf",
+    title: "R",
+    initial_comment: "here",
+    thread_ts: "1.2",
+  })
+  expect(calls).toEqual([
+    {
+      channel_id: "D1",
+      file: "/tmp/x/r.pdf",
+      filename: "r.pdf",
+      title: "R",
+      initial_comment: "here",
+      thread_ts: "1.2",
+    },
+  ])
+  expect(out).toEqual({
+    files: [{ id: "F1", name: "r.pdf", permalink: "https://p", title: "R" }],
+  })
+})
+
+test("files_upload_v2 uploads text content, and needs exactly one of path or content", async () => {
+  const calls: unknown[] = []
+  const client = {
+    filesUploadV2: async (args: unknown) => {
+      calls.push(args)
+      return { ok: true, files: [] }
+    },
+  } as unknown as WebClient
+  await invoke(filesUploadV2, client, { channel: "D1", content: "hi" })
+  expect(calls).toEqual([{ channel_id: "D1", content: "hi", filename: "snippet.txt" }])
+  await expect(invoke(filesUploadV2, client, { channel: "D1" })).rejects.toThrow(
+    "exactly one of path or content",
+  )
+  await expect(
+    invoke(filesUploadV2, client, { channel: "D1", path: "/a", content: "b" }),
+  ).rejects.toThrow("exactly one of path or content")
+})
+
+test("files_upload_v2 explains a missing files:write scope", async () => {
+  const client = {
+    filesUploadV2: async () => {
+      throw Object.assign(new Error("An API error occurred: missing_scope"), {
+        data: { ok: false, error: "missing_scope", needed: "files:write" },
+      })
+    },
+  } as unknown as WebClient
+  await expect(invoke(filesUploadV2, client, { channel: "D1", content: "hi" })).rejects.toThrow(
+    "missing_scope: add files:write",
+  )
 })

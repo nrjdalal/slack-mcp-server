@@ -10,6 +10,7 @@
         "channels:write",
         "chat:write",
         "files:read",
+        "files:write",
         "groups:history",
         "groups:read",
         "groups:write",

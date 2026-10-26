@@ -1,11 +1,14 @@
 import { expect, test } from "bun:test"
+import { tmpdir } from "node:os"
+import { basename } from "node:path"
 
 import type { WebClient } from "@slack/web-api"
 
 import { TOKEN_ENV } from "@/client"
 import { conversationsUnreads } from "@/tools/conversations"
-import { filesInfo } from "@/tools/files"
+import { filesDownload, filesInfo } from "@/tools/files"
 import { usergroupsMe } from "@/tools/usergroups"
+import { IMAGE } from "@/types"
 
 test("conversations_unreads aggregates per-channel unread counts and drops zeros", async () => {
   const info: Record<string, unknown> = {
@@ -52,7 +55,10 @@ test("usergroups_me keeps only groups the authed user belongs to", async () => {
   expect(out.usergroups.map((g) => g.id)).toEqual(["S1"])
 })
 
-const withFetch = async (impl: () => Promise<Response>, fn: () => Promise<void>) => {
+const withFetch = async (
+  impl: (url: unknown, init?: RequestInit) => Promise<Response>,
+  fn: () => Promise<void>,
+) => {
   const prevToken = process.env[TOKEN_ENV]
   const prevFetch = globalThis.fetch
   process.env[TOKEN_ENV] = "xoxp-test"
@@ -66,6 +72,8 @@ const withFetch = async (impl: () => Promise<Response>, fn: () => Promise<void>)
   }
 }
 
+const DEFAULT_CAP = 256 * 1024
+
 const fileClient = (file: unknown) =>
   ({ files: { info: async () => ({ file }) } }) as unknown as WebClient
 
@@ -75,7 +83,7 @@ test("files_info returns text content as utf8 under the size cap", async () => {
     async () => {
       const out = (await filesInfo.handler(
         fileClient({ mimetype: "text/plain", size: 5, url_private: "https://files.slack.com/x" }),
-        { file: "F1" },
+        { file: "F1", max_bytes: DEFAULT_CAP },
       )) as { content?: { encoding: string; data: string } }
       expect(out.content).toEqual({ encoding: "utf8", data: "hello" })
     },
@@ -88,7 +96,7 @@ test("files_info returns binary content as base64", async () => {
     async () => {
       const out = (await filesInfo.handler(
         fileClient({ mimetype: "image/png", size: 3, url_private: "https://files.slack.com/x" }),
-        { file: "F1" },
+        { file: "F1", max_bytes: DEFAULT_CAP },
       )) as { content?: { encoding: string; data: string } }
       expect(out.content).toEqual({ encoding: "base64", data: "AQID" })
     },
@@ -109,10 +117,181 @@ test("files_info skips content above the size cap", async () => {
           size: 6 * 1024 * 1024,
           url_private: "https://files.slack.com/x",
         }),
-        { file: "F1" },
+        { file: "F1", max_bytes: DEFAULT_CAP },
+      )) as { content?: unknown; content_omitted?: string }
+      expect(out.content).toBeUndefined()
+      expect(out.content_omitted).toContain("over max_bytes")
+      expect(fetched).toBe(false)
+    },
+  )
+})
+
+test("files_info inlines a larger file when max_bytes is raised", async () => {
+  await withFetch(
+    async () => new Response("x".repeat(300 * 1024)),
+    async () => {
+      const out = (await filesInfo.handler(
+        fileClient({
+          mimetype: "text/plain",
+          size: 300 * 1024,
+          url_private: "https://files.slack.com/x",
+        }),
+        { file: "F1", max_bytes: 1024 * 1024 },
+      )) as { content?: { data: string } }
+      expect(out.content!.data).toHaveLength(300 * 1024)
+    },
+  )
+})
+
+test("files_info reports a failed download instead of inlining the error page", async () => {
+  await withFetch(
+    async () => new Response("<html>forbidden</html>", { status: 403 }),
+    async () => {
+      const out = (await filesInfo.handler(
+        fileClient({ mimetype: "text/plain", size: 5, url_private: "https://files.slack.com/x" }),
+        { file: "F1", max_bytes: DEFAULT_CAP },
+      )) as { content?: unknown; content_omitted?: string }
+      expect(out.content).toBeUndefined()
+      expect(out.content_omitted).toBe("download failed with HTTP 403")
+    },
+  )
+})
+
+test("files_info with max_bytes 0 returns metadata only", async () => {
+  let fetched = false
+  await withFetch(
+    async () => {
+      fetched = true
+      return new Response("hello")
+    },
+    async () => {
+      const out = (await filesInfo.handler(
+        fileClient({ mimetype: "text/plain", size: 5, url_private: "https://files.slack.com/x" }),
+        { file: "F1", max_bytes: 0 },
       )) as { content?: unknown }
       expect(out.content).toBeUndefined()
       expect(fetched).toBe(false)
+    },
+  )
+})
+
+test("files_download returns a text file inline", async () => {
+  let auth = ""
+  await withFetch(
+    async (_url: unknown, init?: RequestInit) => {
+      auth = new Headers(init?.headers).get("authorization") ?? ""
+      return new Response("hello", { headers: { "content-type": "text/plain" } })
+    },
+    async () => {
+      const out = (await filesDownload.handler(
+        fileClient({
+          id: "F1",
+          name: "a.txt",
+          mimetype: "text/plain",
+          url_private_download: "https://files.slack.com/x",
+        }),
+        { file: "F1", max_bytes: DEFAULT_CAP },
+      )) as { file: unknown; text?: string; path?: string }
+      expect(out.text).toBe("hello")
+      expect(out.path).toBeUndefined()
+      expect(out.file).toEqual({ id: "F1", name: "a.txt", mimetype: "text/plain", size: 5 })
+      expect(auth).toBe("Bearer xoxp-test")
+    },
+  )
+})
+
+test("files_download attaches an image as image content, kept out of the JSON", async () => {
+  await withFetch(
+    async () =>
+      new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "image/png" } }),
+    async () => {
+      const out = (await filesDownload.handler(
+        fileClient({
+          id: "F1",
+          name: "a.png",
+          mimetype: "image/png",
+          url_private_download: "https://files.slack.com/x",
+        }),
+        { file: "F1", max_bytes: DEFAULT_CAP },
+      )) as Record<string | symbol, unknown>
+      expect(out[IMAGE]).toEqual({ data: "AQID", mimeType: "image/png" })
+      expect(JSON.parse(JSON.stringify(out))).toEqual({
+        file: { id: "F1", name: "a.png", mimetype: "image/png", size: 3 },
+      })
+    },
+  )
+})
+
+test("files_download saves other files, and text over max_bytes, to a temp path", async () => {
+  await withFetch(
+    async () =>
+      new Response(new Uint8Array([9, 8, 7]), { headers: { "content-type": "application/pdf" } }),
+    async () => {
+      const pdf = (await filesDownload.handler(
+        fileClient({
+          id: "F1",
+          name: "../r.pdf",
+          mimetype: "application/pdf",
+          url_private_download: "https://files.slack.com/x",
+        }),
+        { file: "F1", max_bytes: DEFAULT_CAP },
+      )) as { path: string; text?: string }
+      expect(pdf.text).toBeUndefined()
+      expect(basename(pdf.path)).toBe("r.pdf")
+      expect(pdf.path.startsWith(tmpdir())).toBe(true)
+      expect([...new Uint8Array(await Bun.file(pdf.path).arrayBuffer())]).toEqual([9, 8, 7])
+
+      const big = (await filesDownload.handler(
+        fileClient({
+          id: "F2",
+          name: "b.txt",
+          mimetype: "text/plain",
+          url_private_download: "https://files.slack.com/x",
+        }),
+        { file: "F2", max_bytes: 2 },
+      )) as { path?: string; text?: string }
+      expect(big.text).toBeUndefined()
+      expect(basename(big.path!)).toBe("b.txt")
+    },
+  )
+})
+
+test("files_download throws on a failed download or a sign-in page", async () => {
+  const client = fileClient({
+    id: "F1",
+    name: "a.pdf",
+    mimetype: "application/pdf",
+    url_private_download: "https://files.slack.com/x",
+  })
+  await withFetch(
+    async () => new Response("no", { status: 403 }),
+    async () => {
+      await expect(
+        filesDownload.handler(client, { file: "F1", max_bytes: DEFAULT_CAP }),
+      ).rejects.toThrow("HTTP 403")
+    },
+  )
+  await withFetch(
+    async () => new Response("<html>sign in</html>", { headers: { "content-type": "text/html" } }),
+    async () => {
+      await expect(
+        filesDownload.handler(client, { file: "F1", max_bytes: DEFAULT_CAP }),
+      ).rejects.toThrow("sign-in page")
+    },
+  )
+})
+
+test("files_info leaves out content over max_bytes when Slack gives no size", async () => {
+  await withFetch(
+    async () => new Response("x".repeat(2048)),
+    async () => {
+      const out = (await filesInfo.handler(
+        fileClient({ mimetype: "text/plain", url_private: "https://files.slack.com/x" }),
+        { file: "F1", max_bytes: 1024 },
+      )) as { file?: unknown; content?: unknown; content_omitted?: string }
+      expect(out.file).toEqual({ mimetype: "text/plain" })
+      expect(out.content).toBeUndefined()
+      expect(out.content_omitted).toBe("file is 2048 bytes, over max_bytes (1024)")
     },
   )
 })
