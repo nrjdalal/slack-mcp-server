@@ -17,7 +17,7 @@ import {
   conversationsUnreads,
   usersConversations,
 } from "@/tools/conversations"
-import { filesInfo } from "@/tools/files"
+import { filesDownload, filesInfo } from "@/tools/files"
 import { reactionsAdd, reactionsRemove } from "@/tools/reactions"
 import { searchFiles, searchMessages } from "@/tools/search"
 import {
@@ -45,6 +45,7 @@ export const readTools: SlackTool[] = [
   usergroupsList,
   usergroupsMe,
   filesInfo,
+  filesDownload,
 ]
 
 export const writeTools: SlackTool[] = [

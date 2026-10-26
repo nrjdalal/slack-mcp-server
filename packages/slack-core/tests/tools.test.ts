@@ -422,13 +422,13 @@ test("registry: every tool has a title, and every write tool states both hints",
 })
 
 test("registry: read/write tiers and the enabledTools selector", () => {
-  expect(readTools).toHaveLength(14)
+  expect(readTools).toHaveLength(15)
   expect(writeTools).toHaveLength(14)
-  expect(allTools).toHaveLength(28)
+  expect(allTools).toHaveLength(29)
   expect(readTools.every((t) => t.tier === "read")).toBe(true)
   expect(writeTools.every((t) => t.tier === "write")).toBe(true)
-  expect(enabledTools(false)).toHaveLength(14)
-  expect(enabledTools(true)).toHaveLength(28)
+  expect(enabledTools(false)).toHaveLength(15)
+  expect(enabledTools(true)).toHaveLength(29)
 })
 
 test("toolByName resolves tool names", () => {

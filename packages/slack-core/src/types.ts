@@ -15,6 +15,13 @@ export const NO_CONTEXT: ToolContext = {
   progress: async () => {},
 }
 
+// A handler attaches an image under this key; the server sends it as MCP image content, and JSON output skips symbol keys.
+export const IMAGE = Symbol.for("slack-mcp-server.image")
+export interface ImageAttachment {
+  data: string
+  mimeType: string
+}
+
 export interface SlackTool {
   name: string
   title: string

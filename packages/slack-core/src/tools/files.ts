@@ -1,8 +1,12 @@
+import { mkdtemp, writeFile } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { basename, join } from "node:path"
+
 import { z } from "zod"
 
 import { getToken } from "@/client"
 import { rawInput, shapeFile } from "@/shape"
-import { defineTool } from "@/types"
+import { defineTool, IMAGE } from "@/types"
 
 const DEFAULT_MAX_BYTES = 256 * 1024
 const MAX_BYTES = 5 * 1024 * 1024
@@ -77,5 +81,62 @@ export const filesInfo = defineTool({
       ? { encoding: "utf8" as const, data: buf.toString("utf8") }
       : { encoding: "base64" as const, data: buf.toString("base64") }
     return { file: shown, content }
+  },
+})
+
+const IMAGE_TYPES = new Set(["image/gif", "image/jpeg", "image/png", "image/webp"])
+
+export const filesDownload = defineTool({
+  name: "files_download",
+  title: "Download file",
+  description:
+    "Downloads a file. Text under max_bytes comes back inline and images under max_bytes as image content; anything else is saved to a local temp file whose path is returned.",
+  tier: "read",
+  scopes: ["files:read"],
+  input: z.object({
+    file: z.string().describe("Specify a file by providing its ID."),
+    max_bytes: z
+      .number()
+      .int()
+      .min(0)
+      .max(MAX_BYTES)
+      .default(DEFAULT_MAX_BYTES)
+      .describe(
+        "Largest text or image, in bytes, returned inline. Larger files are saved to a temp path instead.",
+      ),
+  }),
+  handler: async (client, args) => {
+    const res = await client.files.info({ file: args.file })
+    const file = res.file as
+      | {
+          id?: string
+          name?: string
+          mimetype?: string
+          url_private_download?: string
+          url_private?: string
+        }
+      | undefined
+    const url = file?.url_private_download ?? file?.url_private
+    const token = getToken(client)
+    if (!file || !url || !token) throw new Error(`file ${args.file} has no downloadable URL`)
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (!r.ok) throw new Error(`download failed with HTTP ${r.status}`)
+    const mimetype = file.mimetype ?? ""
+    if ((r.headers.get("content-type") ?? "").startsWith("text/html") && mimetype !== "text/html") {
+      throw new Error(
+        "download returned a Slack sign-in page, not the file; check the token has files:read",
+      )
+    }
+    const buf = Buffer.from(await r.arrayBuffer())
+    const meta = { file: { id: file.id, name: file.name, mimetype, size: buf.length } }
+    if (buf.length <= args.max_bytes) {
+      if (mimetype.startsWith("text/")) return { ...meta, text: buf.toString("utf8") }
+      if (IMAGE_TYPES.has(mimetype)) {
+        return { ...meta, [IMAGE]: { data: buf.toString("base64"), mimeType: mimetype } }
+      }
+    }
+    const path = join(await mkdtemp(join(tmpdir(), "slack-mcp-")), basename(file.name ?? args.file))
+    await writeFile(path, buf)
+    return { ...meta, path }
   },
 })
