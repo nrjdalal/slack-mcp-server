@@ -2,6 +2,8 @@ import { McpServer, type ServerContext, type ToolAnnotations } from "@modelconte
 import {
   createClient,
   enabledTools,
+  IMAGE,
+  type ImageAttachment,
   invoke,
   type SlackTool,
   type ToolContext,
@@ -75,7 +77,13 @@ export const createServer = ({
       },
       async (args, ctx) => {
         const result = await invoke(tool, client, args, toolContext(ctx))
-        return { content: [{ type: "text" as const, text: JSON.stringify(result) }] }
+        const image = (result as { [IMAGE]?: ImageAttachment } | undefined)?.[IMAGE]
+        return {
+          content: [
+            { type: "text" as const, text: JSON.stringify(result) },
+            ...(image ? [{ type: "image" as const, ...image }] : []),
+          ],
+        }
       },
     )
   }

@@ -1,5 +1,5 @@
 export { createClient, TOKEN_ENV } from "@/client"
 export { invoke } from "@/invoke"
 export { allTools, enabledTools, readTools, toolByName, writeTools } from "@/registry"
-export { defineTool, NO_CONTEXT } from "@/types"
-export type { SlackTool, Tier, ToolContext } from "@/types"
+export { defineTool, IMAGE, NO_CONTEXT } from "@/types"
+export type { ImageAttachment, SlackTool, Tier, ToolContext } from "@/types"

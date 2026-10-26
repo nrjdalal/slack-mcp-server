@@ -120,6 +120,38 @@ test("chat_delete roundtrip deletes the message and returns the mapped result", 
   expect(JSON.parse(content[0]!.text)).toEqual({ ts: "1.2", channel: "C1" })
 })
 
+test("files_download sends an image as MCP image content beside its JSON", async () => {
+  const slack = {
+    files: {
+      info: async () => ({
+        file: { id: "F1", name: "a.png", mimetype: "image/png", url_private_download: "https://x" },
+      }),
+    },
+  } as unknown as WebClient
+  const prevFetch = globalThis.fetch
+  const prevToken = process.env[TOKEN_ENV]
+  process.env[TOKEN_ENV] = "xoxp-test"
+  globalThis.fetch = (async () =>
+    new Response(new Uint8Array([1, 2, 3]), {
+      headers: { "content-type": "image/png" },
+    })) as unknown as typeof fetch
+  try {
+    const client = await connect({ client: slack })
+    const res = await client.callTool({ name: "files_download", arguments: { file: "F1" } })
+    expect(res.content).toEqual([
+      {
+        type: "text",
+        text: JSON.stringify({ file: { id: "F1", name: "a.png", mimetype: "image/png", size: 3 } }),
+      },
+      { type: "image", data: "AQID", mimeType: "image/png" },
+    ])
+  } finally {
+    globalThis.fetch = prevFetch
+    if (prevToken === undefined) delete process.env[TOKEN_ENV]
+    else process.env[TOKEN_ENV] = prevToken
+  }
+})
+
 test("allowWrite: false hides chat_update and chat_delete", async () => {
   const { client: slack } = fakeClient()
   const client = await connect({ client: slack, allowWrite: false })
