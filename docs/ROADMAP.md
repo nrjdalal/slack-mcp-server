@@ -40,7 +40,7 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
 ### M2 - `slack-mcp` (stdio server) [done]
 
 - New package `@nrjdalal/slack-mcp-server` (`packages/slack-mcp-server`) wrapping
-  the `slack-core` registry in an `McpServer` over stdio. Since v0.2 it runs on MCP SDK v2
+  the `slack-core` registry in an `McpServer` over stdio. It now runs on MCP SDK v2
   (`@modelcontextprotocol/server`) through `serveStdio`, which also serves pre-2026 clients.
 - npx-able bin (`slack-mcp-server`); reads `SLACK_MCP_XOXP_TOKEN`.
 - Registers tools from the registry; each call runs `invoke(tool, client, args)`.
