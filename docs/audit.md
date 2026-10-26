@@ -37,6 +37,8 @@ Transport (stdio-only), token model (`xoxp`-only), and `saved_*` are deferred
 | L   | Tests                           | 9/10     | n/a             | ~47 tests; strong edge cases (size-cap skips fetch, base64/utf8, dedupe crawl, env matrix, bucket math).                                                                                     |
 | M   | DX / install                    | 9/10     | =               | npx, JSON manifests, generated README, provenance release.                                                                                                                                   |
 
+Update 2026-09-30: response shaping (dimension H) landed with P1. The seven read tools return trimmed objects unless called with `raw: true`; on a real workspace that cut `conversations_history` by 69%, `search_messages` by 74%, the channel lists by 78 to 79% and `users_search` by 92%. Re-score H at the next audit.
+
 ## Findings (beyond the parity doc)
 
 | Severity        | Finding                                                                                                                             | Location             |

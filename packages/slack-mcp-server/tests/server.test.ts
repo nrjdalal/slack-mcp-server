@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, expect, test } from "bun:test"
 
-import { Client } from "@modelcontextprotocol/sdk/client/index.js"
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
-import { allTools, readTools, TOKEN_ENV } from "@packages/slack-core"
+import { Client, InMemoryTransport } from "@modelcontextprotocol/client"
+import { allTools, readTools, TOKEN_ENV, writeTools } from "@packages/slack-core"
 import type { WebClient } from "@slack/web-api"
 
 import { ALLOW_WRITE_ENV, allowWriteFromEnv } from "@/env"
@@ -110,6 +109,94 @@ test("call roundtrip invokes the tool and returns the mapped result", async () =
     channels: [{ id: "C1", name: "general" }],
     next_cursor: "CUR",
   })
+})
+
+test("every tool carries a title and hints that match its tier", async () => {
+  const { client: slack } = fakeClient()
+  const client = await connect({ client: slack })
+
+  const { tools } = await client.listTools()
+  const byName = new Map(tools.map((t) => [t.name, t]))
+  for (const tool of readTools) {
+    const listed = byName.get(tool.name)!
+    expect(listed.title).toBe(tool.title)
+    expect(listed.annotations).toMatchObject({ readOnlyHint: true, openWorldHint: true })
+  }
+  for (const tool of writeTools) {
+    expect(byName.get(tool.name)!.annotations).toMatchObject({
+      title: tool.title,
+      readOnlyHint: false,
+      destructiveHint: tool.destructive,
+      idempotentHint: tool.idempotent,
+    })
+  }
+  expect(byName.get("conversations_leave")!.annotations).toMatchObject({ destructiveHint: true })
+  expect(byName.get("reactions_add")!.annotations).toMatchObject({
+    destructiveHint: false,
+    idempotentHint: true,
+  })
+})
+
+test("the server describes itself, and says so when it is read-only", async () => {
+  const { client: slack } = fakeClient()
+  const full = await connect({ client: slack })
+  const readOnly = await connect({ client: slack, allowWrite: false })
+
+  expect(full.getInstructions()).toContain("next_cursor")
+  expect(full.getInstructions()).not.toContain("read-only")
+  expect(readOnly.getInstructions()).toContain("read-only")
+})
+
+const unreadsSlack = (channels: number, onInfo: () => Promise<void> = async () => {}) => {
+  const infoCalls: string[] = []
+  const slack = {
+    users: {
+      conversations: async () => ({
+        ok: true,
+        channels: Array.from({ length: channels }, (_, i) => ({ id: `C${i}`, name: `c${i}` })),
+      }),
+    },
+    conversations: {
+      info: async ({ channel }: { channel: string }) => {
+        infoCalls.push(channel)
+        await onInfo()
+        return { ok: true, channel: { id: channel, unread_count_display: 1 } }
+      },
+    },
+  } as unknown as WebClient
+  return { slack, infoCalls }
+}
+
+test("a long scan reports progress to a client that asks for it", async () => {
+  const { slack } = unreadsSlack(3)
+  const client = await connect({ client: slack })
+
+  const seen: Array<{ progress: number; total?: number }> = []
+  const res = await client.callTool(
+    { name: "conversations_unreads", arguments: {} },
+    { onprogress: (p) => void seen.push({ progress: p.progress, total: p.total }) },
+  )
+  const content = res.content as Array<{ type: string; text: string }>
+  expect(JSON.parse(content[0]!.text).unreads).toHaveLength(3)
+  expect(seen).toEqual([
+    { progress: 1, total: 3 },
+    { progress: 2, total: 3 },
+    { progress: 3, total: 3 },
+  ])
+})
+
+test("cancelling a call stops the scan instead of finishing it", async () => {
+  const controller = new AbortController()
+  const { slack, infoCalls } = unreadsSlack(20, () => new Promise((r) => setTimeout(r, 20)))
+  const client = await connect({ client: slack })
+
+  const call = client.callTool(
+    { name: "conversations_unreads", arguments: {} },
+    { signal: controller.signal, onprogress: () => controller.abort() },
+  )
+  await expect(call).rejects.toThrow()
+  await new Promise((r) => setTimeout(r, 200))
+  expect(infoCalls.length).toBeLessThan(20)
 })
 
 let savedToken: string | undefined

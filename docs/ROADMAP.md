@@ -19,7 +19,7 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
 - **M3 write gating**: done
 - **M4 resilience**: done
 - **M5 release**: done
-- **M6 inscope integration**: next
+- **M6 inscope integration**: done (inscope, 2026-06-15)
 
 ## What shaped the current design
 
@@ -40,14 +40,15 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
 ### M2 - `slack-mcp` (stdio server) [done]
 
 - New package `@nrjdalal/slack-mcp-server` (`packages/slack-mcp-server`) wrapping
-  the `slack-core` registry in `@modelcontextprotocol/sdk`'s `McpServer` over stdio.
+  the `slack-core` registry in an `McpServer` over stdio. Since v0.2 it runs on MCP SDK v2
+  (`@modelcontextprotocol/server`) through `serveStdio`, which also serves pre-2026 clients.
 - npx-able bin (`slack-mcp-server`); reads `SLACK_MCP_XOXP_TOKEN`.
 - Registers tools from the registry; each call runs `invoke(tool, client, args)`.
 - Read-only by default (write tools arrive gated in M3).
 - Tests via the SDK in-memory transport (list tools, call roundtrip, missing-token error).
 - README: `mcpServers` client config.
 - `slack-core` is bundled into the published artifact (it stays private/unpublished),
-  so the only runtime deps are `@modelcontextprotocol/sdk`, `@slack/web-api`, `zod`.
+  so the only runtime deps are `@modelcontextprotocol/server`, `@slack/web-api`, `zod`.
 
 ### M3 - write gating [done]
 
@@ -90,15 +91,20 @@ Related: [phases.md](phases.md) (forward plan / sequence) ·
   fixes: the bumped version is mirrored into the workspace manifest, the
   `catalog:` protocol is resolved to concrete versions npm can read, and
   `scripts`/`devDependencies` are stripped before publishing.
-- Auto-derived versioning (changelogen) is kept; `NPM_TOKEN` gates the run.
+- Auto-derived versioning (changelogen) is kept. Publishing authenticates via npm Trusted
+  Publishing (OIDC, tied to this repo + `auto-release.yml`); there is no `NPM_TOKEN` secret.
 
-### M6 - inscope integration
+### M6 - inscope integration [done]
 
 - Make inscope's Slack MCP server swappable (it currently pins korotovsky's
   `slack-mcp-server`) so a workspace can point at `@nrjdalal/slack-mcp-server`.
   Token plumbing (`SLACK_MCP_XOXP_TOKEN`) is unchanged, so per-directory identity
   keeps working. Writes move from korotovsky's per-tool gates to our single
   `SLACK_MCP_ALLOW_WRITE`.
+- Done in inscope on 2026-06-15 (`feat(mcp): let Slack setup pick the server package`):
+  a workspace's `slack.package` picks the server, `@nrjdalal/slack-mcp-server` is the default,
+  and `diff --adopt` reads the package back from `.mcp.json`. nrjdalal/inscope#55 launches it
+  with `npx --prefix /`, so a project's own npm overrides can't stop it from starting.
 
 ## Parking lot (post-parity)
 

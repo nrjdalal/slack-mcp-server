@@ -4,8 +4,11 @@ import { defineTool } from "@/types"
 
 export const chatPostMessage = defineTool({
   name: "chat_post_message",
+  title: "Post message",
   description: "Sends a message to a channel.",
   tier: "write",
+  destructive: false,
+  idempotent: false,
   scopes: ["chat:write"],
   input: z.object({
     channel: z
@@ -19,8 +22,14 @@ export const chatPostMessage = defineTool({
       .describe(
         "How this field works and whether it is required depends on other fields you use in your API call.",
       ),
-    blocks: z.array(z.unknown()).optional().describe("An array of structured blocks."),
-    attachments: z.array(z.unknown()).optional().describe("An array of structured attachments."),
+    blocks: z
+      .array(z.record(z.string(), z.unknown()))
+      .optional()
+      .describe("An array of structured blocks."),
+    attachments: z
+      .array(z.record(z.string(), z.unknown()))
+      .optional()
+      .describe("An array of structured attachments."),
     markdown_text: z
       .string()
       .optional()
@@ -54,7 +63,7 @@ export const chatPostMessage = defineTool({
       .optional()
       .describe("Pass false to disable unfurling of media content."),
     metadata: z
-      .unknown()
+      .object({ event_type: z.string(), event_payload: z.record(z.string(), z.unknown()) })
       .optional()
       .describe("JSON object with event_type and event_payload fields."),
     icon_emoji: z
@@ -81,8 +90,11 @@ export const chatPostMessage = defineTool({
 
 export const chatUpdate = defineTool({
   name: "chat_update",
+  title: "Edit message",
   description: "Updates a message.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["chat:write"],
   input: z.object({
     channel: z.string().describe("Channel containing the message to be updated."),
@@ -117,8 +129,11 @@ export const chatUpdate = defineTool({
 
 export const chatScheduleMessage = defineTool({
   name: "chat_schedule_message",
+  title: "Schedule message",
   description: "Schedules a message to be sent to a channel at a future time.",
   tier: "write",
+  destructive: false,
+  idempotent: false,
   scopes: ["chat:write"],
   input: z.object({
     channel: z.string().describe("Channel, private group, or DM channel to send the message to."),
@@ -164,8 +179,11 @@ export const chatScheduleMessage = defineTool({
 
 export const chatDeleteScheduledMessage = defineTool({
   name: "chat_delete_scheduled_message",
+  title: "Delete scheduled message",
   description: "Deletes a pending scheduled message from the queue.",
   tier: "write",
+  destructive: true,
+  idempotent: true,
   scopes: ["chat:write"],
   input: z.object({
     channel: z.string().describe("The channel the scheduled message is posting to."),
