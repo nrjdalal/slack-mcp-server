@@ -69,7 +69,7 @@ export const filesInfo = defineTool({
     const buf = Buffer.from(await r.arrayBuffer())
     if (buf.length > args.max_bytes) {
       return {
-        file: res.file,
+        file: shown,
         content_omitted: `file is ${buf.length} bytes, over max_bytes (${args.max_bytes})`,
       }
     }
