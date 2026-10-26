@@ -163,6 +163,16 @@ test("users_info returns a trimmed user, and Slack's object with raw", async () 
   expect(raw.user).toBe(slackUser)
 })
 
+test("users_info keeps the locale it was asked for", async () => {
+  const client = {
+    users: { info: async () => ({ ok: true, user: { id: "U1", name: "ada", locale: "en-GB" } }) },
+  } as unknown as WebClient
+  const out = (await usersInfo.handler(client, { user: "U1", include_locale: true })) as {
+    user: unknown
+  }
+  expect(out.user).toEqual({ id: "U1", name: "ada", locale: "en-GB" })
+})
+
 test("search_files trims each matched file, and returns Slack's with raw", async () => {
   const client = {
     search: {

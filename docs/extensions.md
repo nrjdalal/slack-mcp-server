@@ -1,11 +1,11 @@
 # Extension catalog
 
-The menu of tools/scopes we could add beyond the current 21, ordered
+The menu of tools/scopes we could add beyond the current 28, ordered
 cheapest-first (no new OAuth scopes before new ones). This is the **what**;
 [phases.md](phases.md) decides the **when** (Batch A = P3, Batch B = P4). Derived
 from the scraped `scripts/slack-methods.json` (non-admin, xoxp methods only).
 
-Inventory: of the unimplemented methods with a user scope, **22 need only scopes
+Inventory: of the unimplemented methods with a user scope, **15 need only scopes
 we already request** (Batch A) and **~90 would add ~47 new scopes** (Batch B +
 parking lot). Destructive, irreversible tools are marked **⚠**; per the
 [phases.md](phases.md) P2 decision (option A) they ship as ordinary write tools, on
@@ -13,9 +13,9 @@ by default.
 
 ## Batch A — free (zero new scopes)
 
-Existing installs keep working with no re-consent. Ship the highest-value first.
+Existing installs keep working with no re-consent. The highest-value seven shipped in P3.
 
-### Priority
+### Shipped (P3)
 
 | Tool                            | Method                        | Note                             |
 | ------------------------------- | ----------------------------- | -------------------------------- |
