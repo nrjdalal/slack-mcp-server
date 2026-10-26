@@ -17,7 +17,7 @@ import {
   conversationsUnreads,
   usersConversations,
 } from "@/tools/conversations"
-import { filesDownload, filesInfo } from "@/tools/files"
+import { filesDownload, filesInfo, filesUploadV2 } from "@/tools/files"
 import { reactionsAdd, reactionsRemove } from "@/tools/reactions"
 import { searchFiles, searchMessages } from "@/tools/search"
 import {
@@ -54,6 +54,7 @@ export const writeTools: SlackTool[] = [
   chatDelete,
   chatScheduleMessage,
   chatDeleteScheduledMessage,
+  filesUploadV2,
   reactionsAdd,
   reactionsRemove,
   conversationsMark,

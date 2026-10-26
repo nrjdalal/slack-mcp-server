@@ -134,3 +134,69 @@ export const filesDownload = defineTool({
     return { ...meta, path }
   },
 })
+
+export const filesUploadV2 = defineTool({
+  name: "files_upload_v2",
+  title: "Upload file",
+  description:
+    "Uploads a file to a channel, DM or thread, from a local path or from text content. Needs the files:write user scope.",
+  tier: "write",
+  destructive: false,
+  idempotent: false,
+  scopes: ["files:write"],
+  input: z
+    .object({
+      channel: z
+        .string()
+        .describe(
+          "Channel to share the file in. For direct messages, use the DM ID (starts with D), not a user ID.",
+        ),
+      path: z
+        .string()
+        .optional()
+        .describe("Local path of the file to upload. Use this or content."),
+      content: z.string().optional().describe("Text to upload as a file. Use this or path."),
+      filename: z
+        .string()
+        .optional()
+        .describe(
+          "Name of the file. Defaults to the path's file name, or snippet.txt for content.",
+        ),
+      title: z.string().optional().describe("File title."),
+      initial_comment: z
+        .string()
+        .optional()
+        .describe("The message text introducing the file in the channel."),
+      thread_ts: z
+        .string()
+        .optional()
+        .describe("Provide another message's ts value to upload this file as a reply."),
+    })
+    .refine((a) => (a.path === undefined) !== (a.content === undefined), {
+      message: "Pass exactly one of path or content.",
+    }),
+  handler: async (client, args) => {
+    const source =
+      args.path !== undefined
+        ? { file: args.path, filename: args.filename ?? basename(args.path) }
+        : { content: args.content ?? "", filename: args.filename ?? "snippet.txt" }
+    try {
+      const res = await client.filesUploadV2({
+        channel_id: args.channel,
+        ...source,
+        title: args.title,
+        initial_comment: args.initial_comment,
+        thread_ts: args.thread_ts,
+      } as Parameters<typeof client.filesUploadV2>[0])
+      const files = res.files.flatMap((r) => r.files ?? [])
+      return { files: files.map((f) => ({ id: f.id, name: f.name, permalink: f.permalink })) }
+    } catch (error) {
+      if ((error as { data?: { error?: string } }).data?.error === "missing_scope") {
+        throw new Error(
+          "missing_scope: add files:write under User Token Scopes on the Slack app's OAuth & Permissions page, reinstall the app, and use the new user token",
+        )
+      }
+      throw error
+    }
+  },
+})

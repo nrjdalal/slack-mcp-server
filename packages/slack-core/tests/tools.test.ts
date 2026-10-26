@@ -20,6 +20,7 @@ import {
   conversationsOpen,
   conversationsUnreads,
 } from "@/tools/conversations"
+import { filesUploadV2 } from "@/tools/files"
 import { searchFiles, searchMessages } from "@/tools/search"
 import { usersInfo, usersLookupByEmail, usersSearch } from "@/tools/users"
 
@@ -418,12 +419,12 @@ test("registry: every tool has a title, and every write tool states both hints",
 
 test("registry: read/write tiers and the enabledTools selector", () => {
   expect(readTools).toHaveLength(15)
-  expect(writeTools).toHaveLength(14)
-  expect(allTools).toHaveLength(29)
+  expect(writeTools).toHaveLength(15)
+  expect(allTools).toHaveLength(30)
   expect(readTools.every((t) => t.tier === "read")).toBe(true)
   expect(writeTools.every((t) => t.tier === "write")).toBe(true)
   expect(enabledTools(false)).toHaveLength(15)
-  expect(enabledTools(true)).toHaveLength(29)
+  expect(enabledTools(true)).toHaveLength(30)
 })
 
 test("toolByName resolves tool names", () => {
@@ -439,4 +440,64 @@ test("invoke applies declared defaults and rejects invalid input", async () => {
   await invoke(conversationsList, client, {})
   expect(calls[0]?.args).toMatchObject({ exclude_archived: true, limit: 200 })
   await expect(invoke(conversationsList, client, { limit: 99999 })).rejects.toThrow()
+})
+
+test("files_upload_v2 uploads a local file to a channel and returns the shared file", async () => {
+  const calls: unknown[] = []
+  const client = {
+    filesUploadV2: async (args: unknown) => {
+      calls.push(args)
+      return {
+        ok: true,
+        files: [{ ok: true, files: [{ id: "F1", name: "r.pdf", permalink: "https://p" }] }],
+      }
+    },
+  } as unknown as WebClient
+  const out = await invoke(filesUploadV2, client, {
+    channel: "D1",
+    path: "/tmp/x/r.pdf",
+    initial_comment: "here",
+    thread_ts: "1.2",
+  })
+  expect(calls).toEqual([
+    {
+      channel_id: "D1",
+      file: "/tmp/x/r.pdf",
+      filename: "r.pdf",
+      initial_comment: "here",
+      thread_ts: "1.2",
+    },
+  ])
+  expect(out).toEqual({ files: [{ id: "F1", name: "r.pdf", permalink: "https://p" }] })
+})
+
+test("files_upload_v2 uploads text content, and needs exactly one of path or content", async () => {
+  const calls: unknown[] = []
+  const client = {
+    filesUploadV2: async (args: unknown) => {
+      calls.push(args)
+      return { ok: true, files: [] }
+    },
+  } as unknown as WebClient
+  await invoke(filesUploadV2, client, { channel: "D1", content: "hi" })
+  expect(calls).toEqual([{ channel_id: "D1", content: "hi", filename: "snippet.txt" }])
+  await expect(invoke(filesUploadV2, client, { channel: "D1" })).rejects.toThrow(
+    "exactly one of path or content",
+  )
+  await expect(
+    invoke(filesUploadV2, client, { channel: "D1", path: "/a", content: "b" }),
+  ).rejects.toThrow("exactly one of path or content")
+})
+
+test("files_upload_v2 explains a missing files:write scope", async () => {
+  const client = {
+    filesUploadV2: async () => {
+      throw Object.assign(new Error("An API error occurred: missing_scope"), {
+        data: { ok: false, error: "missing_scope", needed: "files:write" },
+      })
+    },
+  } as unknown as WebClient
+  await expect(invoke(filesUploadV2, client, { channel: "D1", content: "hi" })).rejects.toThrow(
+    "missing_scope: add files:write",
+  )
 })

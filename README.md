@@ -35,7 +35,7 @@ Behind a proxy, set `HTTPS_PROXY` together with `"NODE_USE_ENV_PROXY": "1"` in `
 
 **slack-mcp-server** is our tool name (names mirror the method, snake_cased; `-` = not yet implemented). **user token scopes** are the OAuth scopes a user token (`xoxp`) needs, per the linked [method](https://docs.slack.dev/reference/methods/) and [scope](https://docs.slack.dev/reference/scopes/) pages (`-` = none listed; the method is bot/app-only or needs no scope). **tier** is Slack's documented [rate-limit tier](https://docs.slack.dev/apis/web-api/rate-limits) for the method.
 
-25 methods covered 1:1, plus 4 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me`, `files_download` (29 tools total).
+25 methods covered 1:1, plus 5 composite tools that wrap no single method: `conversations_unreads`, `users_search`, `usergroups_me`, `files_download`, `files_upload_v2` (30 tools total).
 
 | slack api | slack-mcp-server | user token scopes | tier |
 | --- | --- | --- | --- |
