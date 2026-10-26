@@ -1,11 +1,11 @@
 # Extension catalog
 
-The menu of tools/scopes we could add beyond the current 21, ordered
+The menu of tools/scopes we could add beyond the current 29, ordered
 cheapest-first (no new OAuth scopes before new ones). This is the **what**;
 [phases.md](phases.md) decides the **when** (Batch A = P3, Batch B = P4). Derived
 from the scraped `scripts/slack-methods.json` (non-admin, xoxp methods only).
 
-Inventory: of the unimplemented methods with a user scope, **22 need only scopes
+Inventory: of the unimplemented methods with a user scope, **15 need only scopes
 we already request** (Batch A) and **~90 would add ~47 new scopes** (Batch B +
 parking lot). Destructive, irreversible tools are marked **⚠**; per the
 [phases.md](phases.md) P2 decision (option A) they ship as ordinary write tools, on
@@ -13,22 +13,23 @@ by default.
 
 ## Batch A — free (zero new scopes)
 
-Existing installs keep working with no re-consent. Ship the highest-value first.
+Existing installs keep working with no re-consent. The highest-value seven shipped in P3.
 
-### Priority
+### Shipped (P3)
 
-| Tool                    | Method                  | Note                             |
-| ----------------------- | ----------------------- | -------------------------------- |
-| `conversations_open`    | `conversations.open`    | start a DM / group DM            |
-| `conversations_members` | `conversations.members` | who's in a channel               |
-| `users_info`            | `users.info`            | direct lookup by ID              |
-| `users_lookup_by_email` | `users.lookupByEmail`   | find a user by email             |
-| `chat_schedule_message` | `chat.scheduleMessage`  | send later                       |
-| `search_files`          | `search.files`          | search files (not just messages) |
+| Tool                            | Method                        | Note                             |
+| ------------------------------- | ----------------------------- | -------------------------------- |
+| `conversations_open`            | `conversations.open`          | start a DM / group DM            |
+| `conversations_members`         | `conversations.members`       | who's in a channel               |
+| `users_info`                    | `users.info`                  | direct lookup by ID              |
+| `users_lookup_by_email`         | `users.lookupByEmail`         | find a user by email             |
+| `chat_schedule_message`         | `chat.scheduleMessage`        | send later                       |
+| `chat_delete_scheduled_message` | `chat.deleteScheduledMessage` | cancel a scheduled message       |
+| `search_files`                  | `search.files`                | search files (not just messages) |
 
 ### Remaining free candidates
 
-- **Messaging:** `chat.postEphemeral`, `chat.meMessage`, `chat.deleteScheduledMessage`
+- **Messaging:** `chat.postEphemeral`, `chat.meMessage`
 - **Conversations:** `conversations.create`, `conversations.rename`,
   `conversations.archive` ⚠, `conversations.unarchive`, `conversations.close`,
   `conversations.kick` ⚠

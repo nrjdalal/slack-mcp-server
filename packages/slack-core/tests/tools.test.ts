@@ -383,13 +383,18 @@ test("users_info returns the user", async () => {
 })
 
 test("users_lookup_by_email returns the user", async () => {
+  const slackUser = { id: "U9", name: "bob", color: "9f69e7", profile: { image_72: "https://x" } }
   const client = {
-    users: { lookupByEmail: async () => ({ ok: true, user: { id: "U9", name: "bob" } }) },
+    users: { lookupByEmail: async () => ({ ok: true, user: slackUser }) },
   } as unknown as WebClient
   const out = (await usersLookupByEmail.handler(client, { email: "bob@x.dev" })) as {
-    user: { id: string; name: string }
+    user: unknown
+  }
+  const raw = (await usersLookupByEmail.handler(client, { email: "bob@x.dev", raw: true })) as {
+    user: unknown
   }
   expect(out.user).toEqual({ id: "U9", name: "bob" })
+  expect(raw.user).toBe(slackUser)
 })
 
 test("search_files unwraps file matches and total", async () => {

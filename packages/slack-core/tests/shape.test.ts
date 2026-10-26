@@ -163,7 +163,17 @@ test("users_info returns a trimmed user, and Slack's object with raw", async () 
   expect(raw.user).toBe(slackUser)
 })
 
-test("search_files trims each matched file", async () => {
+test("users_info keeps the locale it was asked for", async () => {
+  const client = {
+    users: { info: async () => ({ ok: true, user: { id: "U1", name: "ada", locale: "en-GB" } }) },
+  } as unknown as WebClient
+  const out = (await usersInfo.handler(client, { user: "U1", include_locale: true })) as {
+    user: unknown
+  }
+  expect(out.user).toEqual({ id: "U1", name: "ada", locale: "en-GB" })
+})
+
+test("search_files trims each matched file, and returns Slack's with raw", async () => {
   const client = {
     search: {
       files: async () => ({
@@ -176,7 +186,11 @@ test("search_files trims each matched file", async () => {
     },
   } as unknown as WebClient
   const out = (await searchFiles.handler(client, { query: "a" })) as { matches: unknown[] }
+  const raw = (await searchFiles.handler(client, { query: "a", raw: true })) as {
+    matches: Array<Record<string, unknown>>
+  }
   expect(out.matches).toEqual([{ id: "F1", name: "a.txt" }])
+  expect(raw.matches[0]?.thumb_64).toBe("https://t")
 })
 
 test("a bot post with no text keeps its attachment text and its bot's name", () => {

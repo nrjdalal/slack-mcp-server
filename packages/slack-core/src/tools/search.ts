@@ -77,12 +77,6 @@ export const searchFiles = defineTool({
       .describe('Number of results you want per "page". Maximum of 100.'),
     highlight: z.boolean().optional().describe("Pass true to enable query highlight markers."),
     page: z.number().int().min(1).optional().describe("Page number of results to return."),
-    cursor: z
-      .string()
-      .optional()
-      .describe(
-        "Use for cursormark pagination. Send * for the first call, then the next_cursor from the previous results.",
-      ),
     sort: z
       .enum(["score", "timestamp"])
       .optional()
@@ -98,22 +92,19 @@ export const searchFiles = defineTool({
     raw: rawInput,
   }),
   handler: async (client, args) => {
-    // cursor is a valid search.files param (cursormark) but missing from the SDK type
     const res = await client.search.files({
       query: args.query,
       count: args.count,
       highlight: args.highlight,
       page: args.page,
-      cursor: args.cursor,
       sort: args.sort,
       sort_dir: args.sort_dir,
       team_id: args.team_id,
-    } as Parameters<typeof client.search.files>[0])
+    })
     return {
-      matches: shapeAll(args.raw, (res.files ?? {}).matches ?? [], shapeFile),
+      matches: shapeAll(args.raw, res.files?.matches ?? [], shapeFile),
       total: res.files?.total ?? 0,
       pagination: res.files?.pagination,
-      next_cursor: res.response_metadata?.next_cursor || undefined,
     }
   },
 })

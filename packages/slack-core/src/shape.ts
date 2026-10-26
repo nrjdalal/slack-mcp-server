@@ -117,6 +117,7 @@ export const shapeUser = (value: unknown): Obj => {
     email: profile.email,
     title: profile.title,
     tz: u.tz,
+    locale: u.locale,
     is_bot: u.is_bot,
     deleted: u.deleted,
   })
