@@ -188,8 +188,14 @@ export const chatScheduleMessage = defineTool({
       .int()
       .describe("Unix timestamp representing the future time the message should post to Slack."),
     text: z.string().optional().describe("How this field works depends on other fields you use."),
-    blocks: z.array(z.unknown()).optional().describe("An array of structured blocks."),
-    attachments: z.array(z.unknown()).optional().describe("An array of structured attachments."),
+    blocks: z
+      .array(z.record(z.string(), z.unknown()))
+      .optional()
+      .describe("An array of structured blocks."),
+    attachments: z
+      .array(z.record(z.string(), z.unknown()))
+      .optional()
+      .describe("An array of structured attachments."),
     markdown_text: z.string().optional().describe("Accepts message text formatted in markdown."),
     thread_ts: z
       .string()
@@ -207,7 +213,7 @@ export const chatScheduleMessage = defineTool({
       .optional()
       .describe("Pass false to disable unfurling of media content."),
     metadata: z
-      .unknown()
+      .object({ event_type: z.string(), event_payload: z.record(z.string(), z.unknown()) })
       .optional()
       .describe("JSON object with event_type and event_payload fields."),
   }),
