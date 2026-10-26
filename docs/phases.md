@@ -17,13 +17,13 @@ before new ones).
 
 ## Overview
 
-| Phase | Theme                      | New tools | New scopes | Gate to start               |
-| ----- | -------------------------- | --------- | ---------- | --------------------------- |
-| P1    | Quality (no new tools)     | 0         | 0          | now                         |
-| P2    | Write-gating decision      | 0         | 0          | before any destructive tool |
-| P3    | Extend — Batch A (free)    | ~8        | 0          | after P1; P2 decided        |
-| P4    | Extend — Batch B (curated) | ~10       | ~6         | after P3                    |
-| —     | Parking lot                | n/a       | n/a        | post-extend / explicit ask  |
+| Phase | Theme                              | New tools | New scopes | Gate to start               |
+| ----- | ---------------------------------- | --------- | ---------- | --------------------------- |
+| P1    | Quality (no new tools)             | 0         | 0          | now                         |
+| P2    | Write-gating decision (decided: A) | 0         | 0          | before any destructive tool |
+| P3    | Extend — Batch A (free)            | ~8        | 0          | after P1; P2 decided        |
+| P4    | Extend — Batch B (curated)         | ~10       | ~6         | after P3                    |
+| —     | Parking lot                        | n/a       | n/a        | post-extend / explicit ask  |
 
 Parallel track: **M6 inscope integration** (point inscope at this package, drop
 `SLACK_MCP_ADD_MESSAGE_TOOL` since writes are default-on) — orthogonal, can land
@@ -54,6 +54,11 @@ Close the [audit](audit.md) findings. No new tools, no new scopes; pure depth.
 re-audit refreshes [audit.md](audit.md). Ships as 2–4 PRs (shaping is its own).
 
 ## P2 — Write-gating decision
+
+**Decided 2026-10-05: option A.** Neeraj: _"1 [option A], and on by default, both
+should be on by default"_. `chat_update` and `chat_delete` ship as ordinary write
+tools under `SLACK_MCP_ALLOW_WRITE`, on by default, with no destructive tier or
+second flag. Recorded in [ROADMAP.md](ROADMAP.md) locked decisions.
 
 `SLACK_MCP_ALLOW_WRITE` is now default-on. P3/P4 introduce **destructive,
 irreversible** tools (`chat_delete`, `conversations_archive`/`kick`,

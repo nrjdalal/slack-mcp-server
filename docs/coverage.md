@@ -58,7 +58,7 @@ All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/metho
 | [`canvases.edit`](https://docs.slack.dev/reference/methods/canvases.edit) | `-` | [`canvases:write`](https://docs.slack.dev/reference/scopes/canvases.write) | `Tier 3` |
 | [`canvases.sections.lookup`](https://docs.slack.dev/reference/methods/canvases.sections.lookup) | `-` | [`canvases:read`](https://docs.slack.dev/reference/scopes/canvases.read) | `Tier 3` |
 | [`chat.appendStream`](https://docs.slack.dev/reference/methods/chat.appendStream) | `-` | `-` | `Tier 4` |
-| [`chat.delete`](https://docs.slack.dev/reference/methods/chat.delete) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
+| [`chat.delete`](https://docs.slack.dev/reference/methods/chat.delete) | `chat_delete` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.deleteScheduledMessage`](https://docs.slack.dev/reference/methods/chat.deleteScheduledMessage) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`chat.getPermalink`](https://docs.slack.dev/reference/methods/chat.getPermalink) | `-` | `-` | `Special` |
 | [`chat.meMessage`](https://docs.slack.dev/reference/methods/chat.meMessage) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
@@ -69,7 +69,7 @@ All 205 non-admin methods, in [reference](https://docs.slack.dev/reference/metho
 | [`chat.startStream`](https://docs.slack.dev/reference/methods/chat.startStream) | `-` | `-` | `Tier 2` |
 | [`chat.stopStream`](https://docs.slack.dev/reference/methods/chat.stopStream) | `-` | `-` | `Tier 2` |
 | [`chat.unfurl`](https://docs.slack.dev/reference/methods/chat.unfurl) | `-` | [`links:write`](https://docs.slack.dev/reference/scopes/links.write) | `Tier 3` |
-| [`chat.update`](https://docs.slack.dev/reference/methods/chat.update) | `-` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
+| [`chat.update`](https://docs.slack.dev/reference/methods/chat.update) | `chat_update` | [`chat:write`](https://docs.slack.dev/reference/scopes/chat.write) | `Tier 3` |
 | [`conversations.acceptSharedInvite`](https://docs.slack.dev/reference/methods/conversations.acceptSharedInvite) | `-` | `-` | `Tier 2` |
 | [`conversations.approveSharedInvite`](https://docs.slack.dev/reference/methods/conversations.approveSharedInvite) | `-` | `-` | `Tier 3` |
 | [`conversations.archive`](https://docs.slack.dev/reference/methods/conversations.archive) | `-` | [`channels:write`](https://docs.slack.dev/reference/scopes/channels.write) · [`groups:write`](https://docs.slack.dev/reference/scopes/groups.write) · [`im:write`](https://docs.slack.dev/reference/scopes/im.write) · [`mpim:write`](https://docs.slack.dev/reference/scopes/mpim.write) | `Tier 2` |
