@@ -17,18 +17,19 @@ Existing installs keep working with no re-consent. Ship the highest-value first.
 
 ### Priority
 
-| Tool                    | Method                  | Note                             |
-| ----------------------- | ----------------------- | -------------------------------- |
-| `conversations_open`    | `conversations.open`    | start a DM / group DM            |
-| `conversations_members` | `conversations.members` | who's in a channel               |
-| `users_info`            | `users.info`            | direct lookup by ID              |
-| `users_lookup_by_email` | `users.lookupByEmail`   | find a user by email             |
-| `chat_schedule_message` | `chat.scheduleMessage`  | send later                       |
-| `search_files`          | `search.files`          | search files (not just messages) |
+| Tool                            | Method                        | Note                             |
+| ------------------------------- | ----------------------------- | -------------------------------- |
+| `conversations_open`            | `conversations.open`          | start a DM / group DM            |
+| `conversations_members`         | `conversations.members`       | who's in a channel               |
+| `users_info`                    | `users.info`                  | direct lookup by ID              |
+| `users_lookup_by_email`         | `users.lookupByEmail`         | find a user by email             |
+| `chat_schedule_message`         | `chat.scheduleMessage`        | send later                       |
+| `chat_delete_scheduled_message` | `chat.deleteScheduledMessage` | cancel a scheduled message       |
+| `search_files`                  | `search.files`                | search files (not just messages) |
 
 ### Remaining free candidates
 
-- **Messaging:** `chat.postEphemeral`, `chat.meMessage`, `chat.deleteScheduledMessage`
+- **Messaging:** `chat.postEphemeral`, `chat.meMessage`
 - **Conversations:** `conversations.create`, `conversations.rename`,
   `conversations.archive` ⚠, `conversations.unarchive`, `conversations.close`,
   `conversations.kick` ⚠
