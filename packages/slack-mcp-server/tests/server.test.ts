@@ -78,6 +78,57 @@ test("write tool roundtrip under allowWrite returns the mapped result", async ()
   expect(JSON.parse(content[0]!.text)).toEqual({ ts: "1.2", channel: "C1" })
 })
 
+test("chat_update roundtrip edits the message and returns the mapped result", async () => {
+  const calls: unknown[] = []
+  const slack = {
+    chat: {
+      update: async (args: unknown) => {
+        calls.push(args)
+        return { ok: true, ts: "1.2", channel: "C1", text: "edited" }
+      },
+    },
+  } as unknown as WebClient
+  const client = await connect({ client: slack })
+
+  const res = await client.callTool({
+    name: "chat_update",
+    arguments: { channel: "C1", ts: "1.2", text: "edited" },
+  })
+  expect(calls).toEqual([{ channel: "C1", ts: "1.2", text: "edited" }])
+  const content = res.content as Array<{ type: string; text: string }>
+  expect(JSON.parse(content[0]!.text)).toEqual({ ts: "1.2", channel: "C1" })
+})
+
+test("chat_delete roundtrip deletes the message and returns the mapped result", async () => {
+  const calls: unknown[] = []
+  const slack = {
+    chat: {
+      delete: async (args: unknown) => {
+        calls.push(args)
+        return { ok: true, ts: "1.2", channel: "C1" }
+      },
+    },
+  } as unknown as WebClient
+  const client = await connect({ client: slack })
+
+  const res = await client.callTool({
+    name: "chat_delete",
+    arguments: { channel: "C1", ts: "1.2" },
+  })
+  expect(calls).toEqual([{ channel: "C1", ts: "1.2" }])
+  const content = res.content as Array<{ type: string; text: string }>
+  expect(JSON.parse(content[0]!.text)).toEqual({ ts: "1.2", channel: "C1" })
+})
+
+test("allowWrite: false hides chat_update and chat_delete", async () => {
+  const { client: slack } = fakeClient()
+  const client = await connect({ client: slack, allowWrite: false })
+
+  const { tools } = await client.listTools()
+  expect(tools.some((t) => t.name === "chat_update")).toBe(false)
+  expect(tools.some((t) => t.name === "chat_delete")).toBe(false)
+})
+
 test("a handler that throws is surfaced as an isError result", async () => {
   const slack = {
     conversations: {
@@ -135,6 +186,22 @@ test("every tool carries a title and hints that match its tier", async () => {
     destructiveHint: false,
     idempotentHint: true,
   })
+})
+
+test("every tool input types its properties and array items, as strict clients require", async () => {
+  const { client: slack } = fakeClient()
+  const client = await connect({ client: slack })
+
+  const { tools } = await client.listTools()
+  const untyped: string[] = []
+  for (const tool of tools) {
+    for (const [key, prop] of Object.entries(tool.inputSchema.properties ?? {})) {
+      const schema = prop as { type?: unknown; items?: { type?: unknown } }
+      if (!schema.type) untyped.push(`${tool.name}.${key}`)
+      if (schema.type === "array" && !schema.items?.type) untyped.push(`${tool.name}.${key}[]`)
+    }
+  }
+  expect(untyped).toEqual([])
 })
 
 test("the server describes itself, and says so when it is read-only", async () => {

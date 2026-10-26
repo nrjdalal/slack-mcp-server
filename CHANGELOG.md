@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.7
+
+[compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.6...v0.1.7)
+
+### 🚀 Enhancements
+
+- Add chat_update and chat_delete tools ([#36](https://github.com/nrjdalal/slack-mcp-server/pull/36))
+
+### ❤️ Contributors
+
+- Neeraj Dalal @nrjdalal
+
 ## v0.1.6
 
 [compare changes](https://github.com/nrjdalal/slack-mcp-server/compare/v0.1.5...v0.1.6)
